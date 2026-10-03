@@ -1,0 +1,14 @@
+CERTIFICATE OF ANALYSIS
+
+Certificate No.: COA-VC-26-0917
+Product: Bleaching agent BX-40
+Buyer Material No.: CHEM-BX40
+Batch No.: BX40-2609-A
+Date of Analysis: 2026-09-30
+
+Parameter             Specification   Result
+Assay (as NaClO3)     >= 99.0 %       99.6 %
+Moisture              <= 0.10 %       0.07 %
+Insolubles            <= 0.01 %       0.004 %
+
+Conclusion: The batch conforms to the agreed specification.

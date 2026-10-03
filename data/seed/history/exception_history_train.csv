@@ -1,0 +1,801 @@
+exception_type,port,cargo_category,missing_documents,has_document_discrepancy,congestion_level,forwarder,origin_country,month,resolution_days
+customs_inspection,Tanjung Perak,sizing_agent,0,false,normal,FWD-E,CN,5,2.0
+document_discrepancy,Tanjung Priok,sizing_agent,0,true,elevated,FWD-D,US,6,3.3
+document_discrepancy,Tanjung Priok,retention_aid,0,true,normal,FWD-C,JP,6,3.3
+port_congestion,Tanjung Priok,caustic,0,false,high,FWD-C,DE,1,2.4
+port_congestion,Belawan,sizing_agent,0,false,high,FWD-B,DE,2,2.0
+document_discrepancy,Tanjung Priok,retention_aid,0,true,normal,FWD-B,CN,12,3.0
+missing_document,Tanjung Priok,caustic,1,false,normal,FWD-E,DE,4,3.2
+missing_document,Tanjung Perak,bleaching_chemical,1,true,normal,FWD-D,US,3,4.0
+port_congestion,Tanjung Priok,retention_aid,0,false,high,FWD-C,DE,12,2.2
+missing_document,Tanjung Perak,bleaching_chemical,1,false,elevated,FWD-C,DE,11,3.8
+document_discrepancy,Tanjung Priok,retention_aid,0,true,normal,FWD-D,KR,10,2.8
+document_discrepancy,Tanjung Perak,caustic,0,true,normal,FWD-C,CN,9,3.1
+customs_inspection,Tanjung Perak,sizing_agent,0,false,elevated,FWD-E,DE,7,2.5
+port_congestion,Tanjung Perak,retention_aid,0,false,elevated,FWD-C,US,7,1.3
+document_discrepancy,Tanjung Perak,bleaching_chemical,0,true,normal,FWD-B,FI,4,2.3
+missing_document,Belawan,sizing_agent,1,false,normal,FWD-C,KR,4,2.8
+document_discrepancy,Tanjung Perak,sizing_agent,0,true,high,FWD-B,US,10,3.2
+port_congestion,Tanjung Priok,sizing_agent,0,false,high,FWD-E,DE,4,1.5
+port_congestion,Tanjung Priok,retention_aid,0,false,high,FWD-C,CN,8,2.3
+customs_inspection,Tanjung Priok,bleaching_chemical,0,false,normal,FWD-B,KR,1,2.4
+missing_document,Tanjung Perak,sizing_agent,1,false,normal,FWD-C,US,6,4.0
+port_congestion,Tanjung Priok,caustic,0,false,high,FWD-B,JP,1,1.9
+document_discrepancy,Tanjung Perak,bleaching_chemical,0,true,high,FWD-E,CN,12,3.6
+document_discrepancy,Tanjung Perak,caustic,0,true,normal,FWD-A,KR,9,2.3
+port_congestion,Tanjung Priok,sizing_agent,0,false,elevated,FWD-E,FI,1,1.0
+document_discrepancy,Tanjung Priok,caustic,0,true,elevated,FWD-B,FI,11,2.7
+port_congestion,Tanjung Priok,retention_aid,0,false,high,FWD-D,FI,3,1.7
+document_discrepancy,Tanjung Perak,bleaching_chemical,0,true,elevated,FWD-C,FI,9,3.6
+customs_inspection,Belawan,sizing_agent,0,false,elevated,FWD-E,FI,6,1.3
+port_congestion,Tanjung Perak,caustic,0,false,high,FWD-B,JP,3,1.4
+missing_document,Tanjung Priok,retention_aid,1,false,normal,FWD-D,FI,2,3.2
+port_congestion,Tanjung Priok,bleaching_chemical,0,false,elevated,FWD-E,US,3,1.5
+missing_document,Tanjung Priok,bleaching_chemical,1,false,high,FWD-D,KR,5,4.4
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,normal,FWD-C,US,7,3.1
+missing_document,Tanjung Priok,retention_aid,1,false,elevated,FWD-A,KR,2,2.8
+missing_document,Tanjung Perak,sizing_agent,2,false,normal,FWD-A,FI,4,3.8
+port_congestion,Tanjung Perak,bleaching_chemical,0,false,elevated,FWD-A,FI,3,1.3
+port_congestion,Tanjung Priok,caustic,0,false,high,FWD-B,DE,12,2.0
+customs_inspection,Tanjung Priok,retention_aid,0,false,normal,FWD-C,JP,5,2.2
+document_discrepancy,Tanjung Perak,caustic,0,true,normal,FWD-E,US,10,2.5
+customs_inspection,Tanjung Perak,caustic,0,false,normal,FWD-D,FI,3,2.6
+customs_inspection,Tanjung Priok,bleaching_chemical,0,false,high,FWD-C,CN,10,3.8
+port_congestion,Belawan,sizing_agent,0,false,high,FWD-C,CN,2,2.2
+missing_document,Belawan,caustic,2,false,normal,FWD-E,US,9,3.2
+document_discrepancy,Tanjung Priok,sizing_agent,0,true,elevated,FWD-C,FI,6,3.2
+port_congestion,Tanjung Priok,bleaching_chemical,0,false,elevated,FWD-C,DE,9,2.2
+port_congestion,Belawan,retention_aid,0,false,high,FWD-E,US,11,1.8
+missing_document,Tanjung Perak,retention_aid,2,false,normal,FWD-B,FI,1,3.0
+missing_document,Tanjung Perak,retention_aid,1,true,normal,FWD-C,US,2,3.8
+customs_inspection,Tanjung Priok,caustic,0,false,elevated,FWD-B,KR,2,2.6
+document_discrepancy,Tanjung Perak,caustic,0,true,normal,FWD-E,DE,11,2.8
+port_congestion,Tanjung Priok,sizing_agent,0,false,elevated,FWD-C,KR,3,2.1
+document_discrepancy,Tanjung Priok,retention_aid,0,true,normal,FWD-B,KR,6,2.9
+document_discrepancy,Tanjung Priok,sizing_agent,0,true,high,FWD-B,DE,5,4.2
+customs_inspection,Tanjung Priok,bleaching_chemical,0,false,normal,FWD-C,JP,5,3.1
+missing_document,Belawan,sizing_agent,1,false,high,FWD-C,DE,7,4.3
+document_discrepancy,Tanjung Priok,caustic,0,true,elevated,FWD-E,US,11,3.3
+document_discrepancy,Tanjung Priok,caustic,0,true,normal,FWD-B,JP,4,3.1
+missing_document,Tanjung Priok,caustic,1,false,normal,FWD-E,DE,9,3.7
+port_congestion,Tanjung Priok,sizing_agent,0,false,elevated,FWD-E,DE,7,0.7
+port_congestion,Tanjung Priok,sizing_agent,0,false,elevated,FWD-B,KR,12,0.9
+missing_document,Belawan,sizing_agent,1,false,high,FWD-E,JP,4,4.5
+customs_inspection,Belawan,caustic,0,false,normal,FWD-C,CN,11,2.2
+port_congestion,Tanjung Priok,caustic,0,false,high,FWD-B,FI,8,2.0
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,normal,FWD-E,JP,8,3.2
+document_discrepancy,Tanjung Perak,sizing_agent,0,true,elevated,FWD-B,CN,10,2.3
+missing_document,Belawan,caustic,2,false,normal,FWD-D,CN,12,4.1
+missing_document,Tanjung Perak,caustic,2,false,normal,FWD-C,DE,7,3.9
+customs_inspection,Tanjung Priok,caustic,0,false,normal,FWD-C,KR,6,2.2
+document_discrepancy,Tanjung Perak,retention_aid,0,true,normal,FWD-E,US,8,2.5
+document_discrepancy,Tanjung Priok,caustic,0,true,normal,FWD-C,US,1,2.9
+missing_document,Tanjung Perak,bleaching_chemical,2,false,normal,FWD-B,FI,6,5.0
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,elevated,FWD-A,FI,8,4.0
+port_congestion,Tanjung Perak,retention_aid,0,false,elevated,FWD-E,FI,1,1.3
+customs_inspection,Tanjung Perak,retention_aid,0,false,high,FWD-E,FI,9,2.5
+port_congestion,Tanjung Perak,caustic,0,false,elevated,FWD-E,US,12,1.2
+missing_document,Belawan,caustic,1,false,elevated,FWD-A,US,2,3.4
+port_congestion,Tanjung Priok,retention_aid,0,false,high,FWD-D,DE,1,1.5
+document_discrepancy,Tanjung Perak,sizing_agent,0,true,high,FWD-B,DE,12,4.0
+port_congestion,Tanjung Priok,bleaching_chemical,0,false,elevated,FWD-C,CN,7,2.4
+document_discrepancy,Tanjung Priok,caustic,0,true,high,FWD-D,KR,3,3.7
+port_congestion,Tanjung Priok,caustic,0,false,high,FWD-A,US,5,1.7
+missing_document,Belawan,bleaching_chemical,1,false,normal,FWD-D,KR,2,3.1
+port_congestion,Tanjung Priok,retention_aid,0,false,high,FWD-B,KR,5,2.1
+missing_document,Tanjung Priok,bleaching_chemical,1,false,normal,FWD-E,FI,11,3.9
+document_discrepancy,Tanjung Priok,caustic,0,true,normal,FWD-C,KR,12,3.0
+document_discrepancy,Tanjung Priok,sizing_agent,0,true,high,FWD-B,FI,2,3.9
+missing_document,Tanjung Perak,caustic,1,false,high,FWD-D,US,5,4.4
+document_discrepancy,Tanjung Perak,caustic,0,true,elevated,FWD-E,CN,1,3.6
+customs_inspection,Belawan,caustic,0,false,normal,FWD-D,JP,8,1.7
+port_congestion,Tanjung Priok,bleaching_chemical,0,false,elevated,FWD-E,DE,10,2.2
+port_congestion,Tanjung Priok,bleaching_chemical,0,false,high,FWD-B,US,6,2.0
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,elevated,FWD-A,CN,12,3.7
+missing_document,Tanjung Perak,sizing_agent,1,true,elevated,FWD-E,US,7,4.5
+port_congestion,Belawan,caustic,0,false,high,FWD-D,CN,12,2.1
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,high,FWD-D,JP,8,4.4
+port_congestion,Tanjung Priok,caustic,0,false,high,FWD-B,KR,10,1.8
+port_congestion,Tanjung Priok,caustic,0,false,elevated,FWD-D,KR,11,1.8
+port_congestion,Tanjung Perak,sizing_agent,0,false,high,FWD-B,FI,11,1.7
+port_congestion,Tanjung Perak,retention_aid,0,false,elevated,FWD-D,KR,8,0.7
+customs_inspection,Tanjung Priok,retention_aid,0,false,elevated,FWD-D,US,8,2.4
+document_discrepancy,Tanjung Priok,caustic,0,true,elevated,FWD-E,CN,5,3.4
+missing_document,Belawan,caustic,1,false,normal,FWD-D,KR,6,3.5
+port_congestion,Belawan,bleaching_chemical,0,false,high,FWD-E,KR,2,2.3
+port_congestion,Belawan,retention_aid,0,false,high,FWD-E,CN,10,2.2
+customs_inspection,Tanjung Perak,bleaching_chemical,0,false,high,FWD-A,DE,5,2.5
+port_congestion,Tanjung Perak,bleaching_chemical,0,false,elevated,FWD-C,FI,5,1.8
+document_discrepancy,Tanjung Perak,sizing_agent,0,true,normal,FWD-B,DE,11,2.1
+document_discrepancy,Belawan,caustic,0,true,normal,FWD-E,US,3,2.1
+customs_inspection,Tanjung Priok,retention_aid,0,false,elevated,FWD-E,US,1,2.2
+missing_document,Tanjung Priok,bleaching_chemical,1,false,high,FWD-D,DE,7,4.4
+port_congestion,Tanjung Perak,bleaching_chemical,0,false,elevated,FWD-E,CN,8,1.2
+document_discrepancy,Tanjung Priok,retention_aid,0,true,elevated,FWD-B,DE,7,2.6
+document_discrepancy,Tanjung Priok,caustic,0,true,normal,FWD-B,DE,12,3.2
+port_congestion,Tanjung Perak,bleaching_chemical,0,false,elevated,FWD-E,FI,8,1.6
+document_discrepancy,Tanjung Perak,bleaching_chemical,0,true,high,FWD-B,CN,11,3.3
+customs_inspection,Tanjung Priok,bleaching_chemical,0,false,normal,FWD-A,JP,9,2.4
+customs_inspection,Tanjung Priok,caustic,0,false,normal,FWD-B,JP,7,2.1
+missing_document,Tanjung Perak,bleaching_chemical,1,false,elevated,FWD-B,KR,6,3.6
+port_congestion,Belawan,retention_aid,0,false,elevated,FWD-A,JP,5,0.6
+customs_inspection,Tanjung Priok,bleaching_chemical,0,false,normal,FWD-C,JP,3,2.4
+missing_document,Tanjung Priok,retention_aid,1,false,elevated,FWD-E,DE,2,4.1
+document_discrepancy,Tanjung Priok,sizing_agent,0,true,normal,FWD-D,CN,11,3.2
+port_congestion,Tanjung Priok,retention_aid,0,false,high,FWD-A,FI,3,1.8
+customs_inspection,Tanjung Perak,bleaching_chemical,0,false,normal,FWD-C,DE,4,2.4
+port_congestion,Tanjung Priok,caustic,0,false,high,FWD-E,JP,9,2.3
+document_discrepancy,Tanjung Priok,caustic,0,true,elevated,FWD-D,JP,11,3.2
+port_congestion,Tanjung Priok,caustic,0,false,elevated,FWD-D,CN,9,2.4
+port_congestion,Tanjung Priok,retention_aid,0,false,high,FWD-D,DE,10,2.2
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,normal,FWD-D,DE,11,3.1
+missing_document,Tanjung Priok,retention_aid,1,false,elevated,FWD-A,KR,7,3.7
+document_discrepancy,Tanjung Priok,sizing_agent,0,true,elevated,FWD-B,DE,2,2.8
+customs_inspection,Tanjung Perak,bleaching_chemical,0,false,normal,FWD-B,DE,10,2.0
+customs_inspection,Tanjung Priok,bleaching_chemical,0,false,normal,FWD-C,FI,11,2.6
+document_discrepancy,Tanjung Perak,caustic,0,true,normal,FWD-B,DE,3,3.2
+missing_document,Tanjung Perak,bleaching_chemical,1,false,normal,FWD-C,CN,4,3.5
+customs_inspection,Tanjung Priok,caustic,0,false,normal,FWD-E,CN,9,2.2
+customs_inspection,Tanjung Perak,caustic,0,false,normal,FWD-D,JP,12,1.6
+customs_inspection,Tanjung Perak,sizing_agent,0,false,elevated,FWD-E,US,4,1.5
+port_congestion,Tanjung Priok,bleaching_chemical,0,false,high,FWD-D,DE,4,2.7
+customs_inspection,Tanjung Priok,bleaching_chemical,0,false,normal,FWD-D,CN,12,2.4
+missing_document,Tanjung Perak,sizing_agent,1,true,elevated,FWD-C,CN,7,4.7
+missing_document,Tanjung Priok,sizing_agent,1,false,normal,FWD-E,DE,5,3.1
+customs_inspection,Tanjung Perak,retention_aid,0,false,normal,FWD-C,US,10,1.8
+customs_inspection,Belawan,bleaching_chemical,0,false,elevated,FWD-D,DE,12,2.3
+document_discrepancy,Tanjung Priok,retention_aid,0,true,elevated,FWD-D,CN,10,3.4
+document_discrepancy,Tanjung Priok,sizing_agent,0,true,normal,FWD-C,JP,12,3.3
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,high,FWD-E,JP,10,4.2
+document_discrepancy,Tanjung Perak,caustic,0,true,high,FWD-B,JP,5,3.0
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,normal,FWD-A,CN,3,2.9
+missing_document,Tanjung Priok,sizing_agent,1,false,high,FWD-C,DE,9,4.9
+port_congestion,Tanjung Priok,bleaching_chemical,0,false,elevated,FWD-C,JP,1,1.8
+port_congestion,Tanjung Priok,sizing_agent,0,false,elevated,FWD-D,US,2,1.4
+missing_document,Tanjung Priok,caustic,2,true,elevated,FWD-B,KR,6,5.6
+missing_document,Belawan,sizing_agent,2,true,normal,FWD-D,DE,11,4.2
+document_discrepancy,Tanjung Perak,caustic,0,true,normal,FWD-E,DE,3,2.3
+missing_document,Tanjung Priok,caustic,1,false,normal,FWD-B,US,2,2.8
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,normal,FWD-C,US,5,3.4
+document_discrepancy,Tanjung Priok,sizing_agent,0,true,normal,FWD-A,US,2,2.6
+port_congestion,Tanjung Perak,caustic,0,false,high,FWD-B,KR,11,2.5
+missing_document,Tanjung Priok,bleaching_chemical,1,false,normal,FWD-A,CN,12,3.3
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,normal,FWD-D,DE,4,2.6
+missing_document,Tanjung Priok,sizing_agent,2,false,normal,FWD-A,JP,5,4.2
+document_discrepancy,Tanjung Priok,caustic,0,true,high,FWD-C,CN,11,4.6
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,normal,FWD-A,DE,11,3.5
+missing_document,Belawan,caustic,1,false,high,FWD-C,CN,1,4.4
+customs_inspection,Tanjung Priok,sizing_agent,0,false,elevated,FWD-A,CN,9,2.1
+missing_document,Tanjung Perak,caustic,1,false,high,FWD-E,KR,5,4.0
+port_congestion,Belawan,sizing_agent,0,false,high,FWD-D,US,2,1.3
+missing_document,Tanjung Priok,retention_aid,2,false,normal,FWD-E,US,5,4.0
+port_congestion,Belawan,bleaching_chemical,0,false,high,FWD-E,JP,6,2.0
+port_congestion,Tanjung Priok,sizing_agent,0,false,high,FWD-C,DE,12,1.8
+document_discrepancy,Tanjung Priok,retention_aid,0,true,normal,FWD-D,CN,6,3.3
+port_congestion,Tanjung Perak,caustic,0,false,elevated,FWD-C,KR,9,1.6
+document_discrepancy,Belawan,caustic,0,true,elevated,FWD-D,DE,8,3.6
+customs_inspection,Belawan,caustic,0,false,elevated,FWD-C,CN,3,3.8
+port_congestion,Tanjung Perak,bleaching_chemical,0,false,elevated,FWD-B,FI,3,1.5
+port_congestion,Tanjung Perak,caustic,0,false,elevated,FWD-D,DE,12,0.9
+document_discrepancy,Tanjung Priok,caustic,0,true,normal,FWD-E,DE,5,3.2
+port_congestion,Belawan,bleaching_chemical,0,false,high,FWD-D,FI,6,2.3
+port_congestion,Belawan,retention_aid,0,false,high,FWD-A,CN,7,1.2
+port_congestion,Tanjung Priok,bleaching_chemical,0,false,high,FWD-D,KR,4,2.7
+missing_document,Tanjung Priok,retention_aid,1,false,normal,FWD-C,FI,12,3.5
+port_congestion,Tanjung Priok,sizing_agent,0,false,high,FWD-D,CN,1,1.5
+missing_document,Tanjung Perak,retention_aid,1,false,normal,FWD-D,JP,7,3.1
+missing_document,Tanjung Priok,sizing_agent,1,false,high,FWD-C,US,4,4.7
+document_discrepancy,Tanjung Priok,sizing_agent,0,true,normal,FWD-D,FI,9,2.8
+port_congestion,Tanjung Perak,caustic,0,false,high,FWD-B,JP,7,1.8
+document_discrepancy,Tanjung Priok,caustic,0,true,normal,FWD-E,CN,7,3.4
+port_congestion,Tanjung Perak,caustic,0,false,elevated,FWD-A,JP,5,1.9
+document_discrepancy,Tanjung Perak,bleaching_chemical,0,true,high,FWD-D,JP,3,3.6
+missing_document,Tanjung Priok,retention_aid,1,false,normal,FWD-E,CN,9,3.1
+document_discrepancy,Belawan,bleaching_chemical,0,true,elevated,FWD-B,JP,10,3.5
+port_congestion,Belawan,caustic,0,false,elevated,FWD-B,DE,8,1.4
+document_discrepancy,Tanjung Perak,retention_aid,0,true,elevated,FWD-E,FI,6,2.3
+port_congestion,Belawan,bleaching_chemical,0,false,elevated,FWD-C,US,6,2.1
+customs_inspection,Tanjung Priok,caustic,0,false,normal,FWD-B,KR,6,2.0
+port_congestion,Tanjung Perak,bleaching_chemical,0,false,high,FWD-C,FI,5,2.5
+customs_inspection,Tanjung Priok,bleaching_chemical,0,false,normal,FWD-B,CN,11,2.3
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,high,FWD-D,FI,1,4.9
+customs_inspection,Tanjung Priok,sizing_agent,0,false,high,FWD-A,CN,7,3.4
+customs_inspection,Tanjung Perak,bleaching_chemical,0,false,normal,FWD-E,KR,5,1.9
+port_congestion,Tanjung Priok,caustic,0,false,high,FWD-E,US,7,1.5
+document_discrepancy,Belawan,caustic,0,true,normal,FWD-D,FI,11,2.6
+document_discrepancy,Belawan,sizing_agent,0,true,elevated,FWD-C,DE,10,3.6
+document_discrepancy,Tanjung Perak,caustic,0,true,normal,FWD-A,FI,3,2.1
+document_discrepancy,Tanjung Perak,bleaching_chemical,0,true,normal,FWD-D,FI,9,3.2
+document_discrepancy,Tanjung Perak,sizing_agent,0,true,normal,FWD-E,KR,3,1.9
+port_congestion,Belawan,sizing_agent,0,false,elevated,FWD-C,DE,6,1.4
+port_congestion,Tanjung Perak,bleaching_chemical,0,false,high,FWD-A,FI,10,2.4
+document_discrepancy,Belawan,bleaching_chemical,0,true,elevated,FWD-D,JP,11,2.8
+port_congestion,Belawan,caustic,0,false,elevated,FWD-A,JP,1,1.0
+missing_document,Tanjung Perak,caustic,1,false,normal,FWD-B,JP,10,2.6
+port_congestion,Tanjung Priok,bleaching_chemical,0,false,elevated,FWD-D,FI,7,1.3
+document_discrepancy,Tanjung Perak,caustic,0,true,elevated,FWD-A,KR,8,2.9
+missing_document,Tanjung Perak,caustic,2,false,elevated,FWD-E,FI,11,4.0
+customs_inspection,Tanjung Perak,retention_aid,0,false,elevated,FWD-D,DE,7,2.1
+port_congestion,Tanjung Priok,caustic,0,false,high,FWD-B,US,5,1.7
+missing_document,Tanjung Perak,retention_aid,2,false,high,FWD-A,KR,9,4.4
+document_discrepancy,Tanjung Priok,sizing_agent,0,true,normal,FWD-D,FI,1,2.6
+port_congestion,Tanjung Priok,bleaching_chemical,0,false,elevated,FWD-C,KR,4,1.9
+document_discrepancy,Belawan,caustic,0,true,elevated,FWD-A,CN,1,3.2
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,normal,FWD-D,FI,10,2.9
+missing_document,Tanjung Perak,caustic,1,false,high,FWD-D,KR,11,4.5
+missing_document,Belawan,sizing_agent,1,true,normal,FWD-B,KR,5,3.3
+customs_inspection,Tanjung Priok,retention_aid,0,false,normal,FWD-A,US,6,2.2
+customs_inspection,Tanjung Priok,sizing_agent,0,false,normal,FWD-C,FI,5,2.5
+document_discrepancy,Tanjung Priok,retention_aid,0,true,elevated,FWD-B,FI,1,3.5
+missing_document,Tanjung Priok,caustic,1,false,elevated,FWD-E,KR,5,3.0
+port_congestion,Tanjung Priok,bleaching_chemical,0,false,elevated,FWD-C,US,4,2.1
+missing_document,Tanjung Priok,caustic,1,true,elevated,FWD-E,CN,2,4.5
+document_discrepancy,Tanjung Priok,caustic,0,true,elevated,FWD-D,KR,4,3.3
+missing_document,Tanjung Priok,bleaching_chemical,1,false,normal,FWD-E,CN,11,3.8
+customs_inspection,Tanjung Perak,bleaching_chemical,0,false,high,FWD-B,FI,11,3.2
+missing_document,Tanjung Priok,bleaching_chemical,2,false,high,FWD-B,JP,4,5.2
+port_congestion,Belawan,sizing_agent,0,false,high,FWD-C,US,8,2.0
+document_discrepancy,Tanjung Priok,caustic,0,true,normal,FWD-E,KR,9,2.8
+port_congestion,Tanjung Perak,sizing_agent,0,false,high,FWD-A,US,2,1.9
+document_discrepancy,Tanjung Perak,bleaching_chemical,0,true,elevated,FWD-A,US,5,3.2
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,normal,FWD-C,KR,3,3.1
+missing_document,Tanjung Priok,retention_aid,1,false,normal,FWD-E,FI,6,3.1
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,normal,FWD-E,JP,2,3.8
+port_congestion,Tanjung Priok,caustic,0,false,high,FWD-C,FI,10,2.5
+missing_document,Tanjung Perak,bleaching_chemical,1,true,normal,FWD-B,JP,4,3.9
+document_discrepancy,Tanjung Perak,caustic,0,true,elevated,FWD-A,US,3,3.6
+document_discrepancy,Tanjung Priok,sizing_agent,0,true,normal,FWD-C,JP,3,2.6
+port_congestion,Tanjung Priok,bleaching_chemical,0,false,high,FWD-E,US,10,2.5
+document_discrepancy,Tanjung Priok,caustic,0,true,normal,FWD-E,CN,3,2.9
+customs_inspection,Belawan,retention_aid,0,false,elevated,FWD-A,US,3,1.7
+customs_inspection,Tanjung Priok,caustic,0,false,normal,FWD-A,JP,5,1.9
+port_congestion,Tanjung Perak,retention_aid,0,false,high,FWD-E,JP,9,1.3
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,elevated,FWD-C,CN,10,4.1
+port_congestion,Tanjung Priok,retention_aid,0,false,high,FWD-D,DE,12,2.7
+document_discrepancy,Tanjung Perak,caustic,0,true,high,FWD-E,DE,11,3.5
+port_congestion,Tanjung Priok,bleaching_chemical,0,false,high,FWD-C,US,6,2.7
+port_congestion,Belawan,caustic,0,false,high,FWD-A,KR,5,2.0
+missing_document,Tanjung Priok,caustic,1,false,high,FWD-B,DE,6,4.5
+missing_document,Tanjung Priok,caustic,2,false,high,FWD-C,JP,2,5.3
+document_discrepancy,Tanjung Priok,retention_aid,0,true,normal,FWD-A,FI,10,3.2
+customs_inspection,Tanjung Priok,bleaching_chemical,0,false,normal,FWD-D,FI,5,2.1
+document_discrepancy,Tanjung Priok,caustic,0,true,elevated,FWD-E,FI,11,4.2
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,normal,FWD-B,FI,8,3.3
+customs_inspection,Tanjung Priok,sizing_agent,0,false,high,FWD-C,DE,9,3.4
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,normal,FWD-C,CN,3,3.8
+document_discrepancy,Tanjung Perak,bleaching_chemical,0,true,high,FWD-D,FI,7,3.3
+port_congestion,Belawan,bleaching_chemical,0,false,high,FWD-A,JP,7,1.3
+customs_inspection,Tanjung Priok,sizing_agent,0,false,normal,FWD-E,CN,1,2.9
+port_congestion,Tanjung Perak,bleaching_chemical,0,false,elevated,FWD-B,DE,7,1.6
+port_congestion,Tanjung Perak,caustic,0,false,high,FWD-C,FI,11,2.7
+document_discrepancy,Tanjung Priok,caustic,0,true,normal,FWD-D,FI,11,3.2
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,normal,FWD-E,FI,9,3.8
+customs_inspection,Tanjung Priok,sizing_agent,0,false,normal,FWD-B,US,2,2.2
+port_congestion,Tanjung Priok,bleaching_chemical,0,false,high,FWD-D,FI,11,2.1
+document_discrepancy,Tanjung Perak,sizing_agent,0,true,elevated,FWD-A,JP,10,2.8
+customs_inspection,Belawan,bleaching_chemical,0,false,elevated,FWD-D,JP,4,2.4
+missing_document,Tanjung Perak,bleaching_chemical,1,true,normal,FWD-D,FI,12,3.9
+port_congestion,Tanjung Priok,bleaching_chemical,0,false,elevated,FWD-E,US,9,1.6
+port_congestion,Belawan,sizing_agent,0,false,high,FWD-A,FI,6,0.8
+port_congestion,Tanjung Perak,bleaching_chemical,0,false,high,FWD-D,CN,12,2.2
+missing_document,Tanjung Priok,caustic,1,false,high,FWD-B,US,4,4.4
+port_congestion,Tanjung Priok,sizing_agent,0,false,high,FWD-E,JP,8,1.9
+port_congestion,Tanjung Perak,sizing_agent,0,false,elevated,FWD-E,CN,2,0.5
+port_congestion,Belawan,caustic,0,false,elevated,FWD-B,CN,3,1.2
+document_discrepancy,Tanjung Perak,sizing_agent,0,true,normal,FWD-E,US,9,2.6
+document_discrepancy,Tanjung Perak,sizing_agent,0,true,normal,FWD-B,FI,1,2.4
+port_congestion,Tanjung Priok,sizing_agent,0,false,elevated,FWD-D,CN,2,1.4
+missing_document,Tanjung Priok,bleaching_chemical,1,true,normal,FWD-C,JP,9,4.5
+document_discrepancy,Tanjung Priok,caustic,0,true,elevated,FWD-B,JP,11,3.0
+port_congestion,Tanjung Perak,caustic,0,false,high,FWD-C,KR,4,1.5
+port_congestion,Tanjung Perak,retention_aid,0,false,high,FWD-A,CN,1,1.4
+document_discrepancy,Tanjung Perak,retention_aid,0,true,normal,FWD-A,US,1,2.6
+customs_inspection,Tanjung Perak,caustic,0,false,elevated,FWD-B,JP,11,2.8
+port_congestion,Tanjung Priok,caustic,0,false,high,FWD-C,US,1,2.8
+document_discrepancy,Tanjung Priok,sizing_agent,0,true,normal,FWD-A,JP,10,2.5
+port_congestion,Tanjung Priok,sizing_agent,0,false,high,FWD-D,US,4,2.2
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,normal,FWD-A,KR,8,2.4
+port_congestion,Tanjung Perak,retention_aid,0,false,high,FWD-A,KR,10,0.9
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,normal,FWD-B,JP,1,2.8
+port_congestion,Tanjung Priok,caustic,0,false,high,FWD-A,JP,12,1.8
+port_congestion,Belawan,sizing_agent,0,false,high,FWD-B,JP,2,1.0
+document_discrepancy,Belawan,caustic,0,true,normal,FWD-B,KR,2,2.6
+document_discrepancy,Tanjung Priok,retention_aid,0,true,high,FWD-A,US,9,3.2
+missing_document,Belawan,caustic,1,false,normal,FWD-A,CN,6,2.5
+port_congestion,Tanjung Priok,caustic,0,false,high,FWD-B,DE,11,1.6
+port_congestion,Tanjung Priok,caustic,0,false,high,FWD-B,DE,9,1.4
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,normal,FWD-C,FI,8,3.6
+customs_inspection,Tanjung Priok,sizing_agent,0,false,high,FWD-C,JP,4,3.8
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,normal,FWD-C,DE,2,3.1
+port_congestion,Tanjung Priok,sizing_agent,0,false,elevated,FWD-E,KR,9,1.6
+port_congestion,Tanjung Priok,sizing_agent,0,false,high,FWD-E,DE,9,1.6
+missing_document,Tanjung Priok,retention_aid,1,false,elevated,FWD-E,FI,6,3.7
+port_congestion,Tanjung Perak,retention_aid,0,false,high,FWD-D,CN,1,1.6
+customs_inspection,Tanjung Priok,bleaching_chemical,0,false,high,FWD-E,CN,5,3.4
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,elevated,FWD-D,JP,7,3.1
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,elevated,FWD-A,JP,6,3.0
+port_congestion,Tanjung Perak,sizing_agent,0,false,elevated,FWD-B,KR,2,1.2
+missing_document,Tanjung Perak,caustic,2,true,normal,FWD-E,FI,4,5.1
+port_congestion,Tanjung Priok,bleaching_chemical,0,false,high,FWD-A,US,7,2.1
+document_discrepancy,Tanjung Priok,caustic,0,true,high,FWD-C,DE,9,4.0
+missing_document,Tanjung Priok,retention_aid,1,false,normal,FWD-C,DE,6,4.0
+port_congestion,Tanjung Priok,sizing_agent,0,false,elevated,FWD-E,KR,8,1.8
+missing_document,Belawan,retention_aid,1,true,normal,FWD-A,DE,5,3.3
+customs_inspection,Tanjung Priok,caustic,0,false,elevated,FWD-D,US,2,3.1
+port_congestion,Tanjung Priok,caustic,0,false,high,FWD-A,CN,3,1.9
+port_congestion,Tanjung Priok,retention_aid,0,false,elevated,FWD-A,DE,12,1.5
+customs_inspection,Tanjung Perak,bleaching_chemical,0,false,normal,FWD-D,US,3,2.0
+port_congestion,Tanjung Priok,retention_aid,0,false,elevated,FWD-B,FI,8,1.1
+port_congestion,Tanjung Perak,caustic,0,false,high,FWD-B,DE,9,1.3
+customs_inspection,Tanjung Perak,caustic,0,false,high,FWD-B,DE,3,3.4
+port_congestion,Tanjung Perak,sizing_agent,0,false,high,FWD-B,CN,5,1.6
+port_congestion,Tanjung Priok,caustic,0,false,high,FWD-D,CN,6,1.9
+port_congestion,Tanjung Priok,caustic,0,false,high,FWD-E,JP,10,2.4
+port_congestion,Tanjung Priok,retention_aid,0,false,elevated,FWD-C,JP,9,1.8
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,high,FWD-A,JP,9,3.9
+missing_document,Tanjung Priok,caustic,1,false,high,FWD-A,CN,10,4.5
+port_congestion,Tanjung Priok,sizing_agent,0,false,high,FWD-A,US,8,1.8
+missing_document,Tanjung Priok,caustic,2,false,normal,FWD-D,JP,4,4.1
+port_congestion,Tanjung Priok,sizing_agent,0,false,high,FWD-B,US,7,1.8
+port_congestion,Tanjung Perak,sizing_agent,0,false,high,FWD-B,CN,8,1.3
+port_congestion,Tanjung Priok,sizing_agent,0,false,elevated,FWD-B,US,7,1.5
+document_discrepancy,Tanjung Perak,retention_aid,0,true,normal,FWD-D,US,12,2.6
+document_discrepancy,Tanjung Priok,sizing_agent,0,true,normal,FWD-D,FI,7,2.4
+customs_inspection,Tanjung Priok,sizing_agent,0,false,normal,FWD-C,JP,4,2.7
+missing_document,Tanjung Priok,caustic,1,true,elevated,FWD-A,CN,2,4.4
+port_congestion,Tanjung Perak,caustic,0,false,high,FWD-D,KR,3,1.9
+missing_document,Tanjung Priok,sizing_agent,1,false,normal,FWD-C,JP,4,3.7
+port_congestion,Tanjung Priok,caustic,0,false,elevated,FWD-E,FI,12,1.3
+document_discrepancy,Tanjung Perak,sizing_agent,0,true,normal,FWD-B,US,3,2.8
+document_discrepancy,Tanjung Priok,caustic,0,true,high,FWD-D,KR,1,4.4
+missing_document,Tanjung Priok,bleaching_chemical,2,false,normal,FWD-A,KR,9,3.7
+port_congestion,Tanjung Priok,caustic,0,false,high,FWD-D,KR,12,2.1
+missing_document,Tanjung Priok,bleaching_chemical,1,false,elevated,FWD-D,FI,2,4.5
+customs_inspection,Belawan,sizing_agent,0,false,normal,FWD-D,FI,3,1.1
+port_congestion,Tanjung Perak,retention_aid,0,false,high,FWD-C,FI,12,1.5
+document_discrepancy,Tanjung Perak,bleaching_chemical,0,true,normal,FWD-A,DE,5,2.6
+missing_document,Tanjung Priok,bleaching_chemical,1,false,normal,FWD-B,JP,6,3.5
+port_congestion,Tanjung Perak,caustic,0,false,elevated,FWD-D,KR,3,1.0
+missing_document,Tanjung Perak,retention_aid,1,false,normal,FWD-C,DE,9,3.4
+document_discrepancy,Tanjung Perak,bleaching_chemical,0,true,normal,FWD-E,JP,4,3.2
+document_discrepancy,Tanjung Priok,retention_aid,0,true,normal,FWD-B,CN,4,2.8
+document_discrepancy,Tanjung Priok,sizing_agent,0,true,high,FWD-D,CN,2,3.4
+document_discrepancy,Tanjung Priok,caustic,0,true,elevated,FWD-B,US,2,3.6
+document_discrepancy,Tanjung Priok,caustic,0,true,normal,FWD-C,JP,9,3.6
+port_congestion,Tanjung Perak,bleaching_chemical,0,false,high,FWD-D,CN,6,1.2
+document_discrepancy,Belawan,retention_aid,0,true,high,FWD-B,CN,7,3.2
+customs_inspection,Tanjung Priok,bleaching_chemical,0,false,normal,FWD-B,US,8,2.4
+document_discrepancy,Tanjung Perak,sizing_agent,0,true,elevated,FWD-E,US,12,2.7
+port_congestion,Tanjung Priok,retention_aid,0,false,high,FWD-D,JP,2,2.1
+customs_inspection,Tanjung Priok,caustic,0,false,high,FWD-D,FI,3,3.6
+document_discrepancy,Tanjung Priok,retention_aid,0,true,normal,FWD-E,US,12,2.6
+port_congestion,Tanjung Priok,caustic,0,false,elevated,FWD-E,DE,9,1.5
+document_discrepancy,Tanjung Priok,sizing_agent,0,true,normal,FWD-C,CN,3,3.1
+missing_document,Tanjung Priok,sizing_agent,1,false,normal,FWD-A,DE,3,2.8
+missing_document,Tanjung Priok,sizing_agent,1,false,normal,FWD-E,DE,1,3.5
+missing_document,Tanjung Priok,sizing_agent,1,true,normal,FWD-E,KR,11,3.8
+customs_inspection,Tanjung Perak,caustic,0,false,elevated,FWD-E,DE,8,2.7
+customs_inspection,Tanjung Priok,retention_aid,0,false,normal,FWD-B,KR,9,2.1
+port_congestion,Tanjung Priok,sizing_agent,0,false,high,FWD-C,KR,4,2.9
+document_discrepancy,Tanjung Priok,retention_aid,0,true,normal,FWD-D,KR,6,2.8
+port_congestion,Tanjung Priok,caustic,0,false,high,FWD-A,JP,10,2.3
+port_congestion,Tanjung Perak,retention_aid,0,false,high,FWD-B,DE,6,1.4
+port_congestion,Tanjung Perak,sizing_agent,0,false,elevated,FWD-D,KR,2,1.1
+port_congestion,Tanjung Priok,bleaching_chemical,0,false,high,FWD-D,CN,8,2.8
+document_discrepancy,Tanjung Perak,retention_aid,0,true,elevated,FWD-C,US,12,3.1
+document_discrepancy,Tanjung Priok,sizing_agent,0,true,normal,FWD-D,US,9,3.0
+missing_document,Tanjung Priok,retention_aid,1,true,normal,FWD-A,CN,4,4.0
+document_discrepancy,Belawan,retention_aid,0,true,normal,FWD-B,KR,4,2.3
+missing_document,Belawan,bleaching_chemical,2,false,high,FWD-C,CN,6,5.8
+port_congestion,Tanjung Perak,bleaching_chemical,0,false,high,FWD-E,DE,10,1.6
+document_discrepancy,Tanjung Perak,caustic,0,true,normal,FWD-B,KR,1,3.0
+missing_document,Tanjung Priok,bleaching_chemical,1,false,normal,FWD-E,DE,5,3.8
+missing_document,Tanjung Priok,sizing_agent,1,false,elevated,FWD-B,JP,2,4.0
+port_congestion,Tanjung Priok,caustic,0,false,high,FWD-C,KR,2,2.6
+missing_document,Tanjung Perak,caustic,2,false,normal,FWD-D,CN,10,4.5
+document_discrepancy,Tanjung Priok,sizing_agent,0,true,elevated,FWD-E,FI,12,3.5
+document_discrepancy,Belawan,retention_aid,0,true,normal,FWD-E,US,4,2.3
+port_congestion,Tanjung Perak,caustic,0,false,elevated,FWD-E,JP,1,1.1
+missing_document,Tanjung Priok,bleaching_chemical,1,false,normal,FWD-A,KR,6,3.6
+document_discrepancy,Tanjung Priok,retention_aid,0,true,normal,FWD-C,KR,1,3.0
+customs_inspection,Tanjung Priok,sizing_agent,0,false,normal,FWD-B,FI,12,2.4
+document_discrepancy,Tanjung Priok,sizing_agent,0,true,high,FWD-B,FI,6,3.5
+customs_inspection,Tanjung Priok,caustic,0,false,elevated,FWD-A,CN,8,1.9
+customs_inspection,Tanjung Priok,bleaching_chemical,0,false,normal,FWD-C,US,6,3.2
+document_discrepancy,Tanjung Perak,sizing_agent,0,true,normal,FWD-C,DE,6,2.8
+document_discrepancy,Tanjung Perak,bleaching_chemical,0,true,elevated,FWD-A,FI,4,2.8
+document_discrepancy,Tanjung Perak,caustic,0,true,normal,FWD-E,FI,3,2.3
+port_congestion,Belawan,caustic,0,false,high,FWD-A,CN,11,0.6
+port_congestion,Tanjung Perak,sizing_agent,0,false,high,FWD-A,FI,12,1.8
+document_discrepancy,Tanjung Priok,sizing_agent,0,true,high,FWD-E,CN,5,3.7
+customs_inspection,Tanjung Perak,bleaching_chemical,0,false,normal,FWD-D,JP,7,2.2
+document_discrepancy,Tanjung Priok,retention_aid,0,true,normal,FWD-A,CN,8,2.7
+missing_document,Tanjung Perak,caustic,1,false,elevated,FWD-B,JP,11,3.7
+customs_inspection,Tanjung Priok,bleaching_chemical,0,false,normal,FWD-C,FI,7,2.8
+port_congestion,Tanjung Priok,bleaching_chemical,0,false,elevated,FWD-B,JP,9,1.6
+port_congestion,Tanjung Perak,bleaching_chemical,0,false,high,FWD-C,DE,7,2.7
+missing_document,Tanjung Perak,retention_aid,1,false,elevated,FWD-C,US,11,3.6
+document_discrepancy,Tanjung Perak,retention_aid,0,true,high,FWD-C,DE,11,4.5
+document_discrepancy,Tanjung Perak,bleaching_chemical,0,true,normal,FWD-A,FI,2,3.0
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,normal,FWD-A,CN,2,2.8
+document_discrepancy,Tanjung Perak,bleaching_chemical,0,true,normal,FWD-C,CN,2,3.2
+document_discrepancy,Belawan,retention_aid,0,true,elevated,FWD-A,DE,3,3.2
+document_discrepancy,Tanjung Priok,retention_aid,0,true,normal,FWD-C,KR,7,3.4
+customs_inspection,Tanjung Perak,retention_aid,0,false,normal,FWD-D,FI,8,2.1
+customs_inspection,Tanjung Priok,caustic,0,false,high,FWD-A,US,4,3.4
+customs_inspection,Tanjung Priok,bleaching_chemical,0,false,normal,FWD-E,JP,1,3.0
+missing_document,Belawan,bleaching_chemical,1,false,elevated,FWD-D,CN,7,3.3
+port_congestion,Belawan,caustic,0,false,high,FWD-B,KR,7,2.1
+document_discrepancy,Belawan,caustic,0,true,normal,FWD-E,KR,5,2.4
+missing_document,Tanjung Priok,sizing_agent,2,false,normal,FWD-C,US,10,4.0
+port_congestion,Tanjung Priok,bleaching_chemical,0,false,high,FWD-A,FI,10,1.9
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,normal,FWD-C,KR,11,3.0
+port_congestion,Tanjung Priok,retention_aid,0,false,high,FWD-D,FI,11,1.6
+port_congestion,Tanjung Priok,sizing_agent,0,false,high,FWD-A,JP,10,2.3
+port_congestion,Tanjung Priok,caustic,0,false,high,FWD-A,DE,3,1.8
+document_discrepancy,Belawan,bleaching_chemical,0,true,normal,FWD-D,FI,4,2.6
+customs_inspection,Tanjung Perak,bleaching_chemical,0,false,high,FWD-B,FI,12,3.4
+document_discrepancy,Tanjung Priok,caustic,0,true,normal,FWD-E,KR,1,2.6
+document_discrepancy,Tanjung Perak,retention_aid,0,true,normal,FWD-A,KR,11,2.0
+missing_document,Tanjung Priok,caustic,2,false,normal,FWD-D,US,8,4.5
+customs_inspection,Belawan,sizing_agent,0,false,high,FWD-B,KR,9,2.5
+port_congestion,Belawan,caustic,0,false,elevated,FWD-B,FI,10,0.5
+document_discrepancy,Tanjung Perak,bleaching_chemical,0,true,elevated,FWD-D,KR,1,3.9
+document_discrepancy,Tanjung Priok,caustic,0,true,normal,FWD-D,FI,12,3.1
+document_discrepancy,Tanjung Priok,sizing_agent,0,true,high,FWD-C,KR,2,4.1
+customs_inspection,Tanjung Priok,sizing_agent,0,false,normal,FWD-E,KR,2,1.9
+document_discrepancy,Tanjung Perak,caustic,0,true,normal,FWD-C,KR,2,2.5
+port_congestion,Belawan,caustic,0,false,elevated,FWD-E,US,3,1.4
+customs_inspection,Tanjung Perak,bleaching_chemical,0,false,normal,FWD-E,DE,2,2.2
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,normal,FWD-D,DE,11,2.9
+port_congestion,Tanjung Priok,sizing_agent,0,false,high,FWD-A,DE,5,2.6
+customs_inspection,Tanjung Priok,sizing_agent,0,false,normal,FWD-C,US,2,2.1
+document_discrepancy,Tanjung Perak,bleaching_chemical,0,true,elevated,FWD-C,JP,12,3.6
+customs_inspection,Tanjung Priok,bleaching_chemical,0,false,normal,FWD-D,FI,7,1.9
+document_discrepancy,Tanjung Perak,bleaching_chemical,0,true,high,FWD-A,DE,10,3.9
+document_discrepancy,Tanjung Perak,retention_aid,0,true,elevated,FWD-B,FI,5,3.1
+missing_document,Tanjung Priok,caustic,1,false,normal,FWD-B,KR,1,4.2
+missing_document,Tanjung Perak,caustic,1,false,normal,FWD-D,US,4,3.3
+document_discrepancy,Belawan,caustic,0,true,normal,FWD-E,KR,6,2.7
+customs_inspection,Tanjung Priok,bleaching_chemical,0,false,elevated,FWD-B,FI,3,2.8
+customs_inspection,Tanjung Perak,bleaching_chemical,0,false,normal,FWD-A,KR,9,1.5
+document_discrepancy,Belawan,sizing_agent,0,true,elevated,FWD-A,CN,12,2.5
+missing_document,Tanjung Perak,retention_aid,1,false,normal,FWD-B,US,4,3.6
+port_congestion,Tanjung Perak,sizing_agent,0,false,high,FWD-B,FI,12,2.0
+document_discrepancy,Tanjung Perak,caustic,0,true,normal,FWD-E,DE,1,2.8
+document_discrepancy,Tanjung Priok,sizing_agent,0,true,elevated,FWD-E,FI,4,3.0
+port_congestion,Belawan,bleaching_chemical,0,false,elevated,FWD-E,KR,9,1.2
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,normal,FWD-A,FI,3,2.9
+port_congestion,Tanjung Priok,caustic,0,false,high,FWD-E,FI,9,2.1
+missing_document,Tanjung Priok,retention_aid,2,false,normal,FWD-B,KR,9,3.8
+missing_document,Tanjung Perak,sizing_agent,2,true,normal,FWD-D,CN,1,4.0
+customs_inspection,Tanjung Priok,sizing_agent,0,false,elevated,FWD-C,CN,11,3.2
+document_discrepancy,Tanjung Priok,sizing_agent,0,true,normal,FWD-C,FI,6,4.0
+document_discrepancy,Tanjung Perak,caustic,0,true,normal,FWD-B,DE,2,2.8
+missing_document,Tanjung Priok,sizing_agent,1,false,elevated,FWD-E,DE,11,3.6
+port_congestion,Tanjung Priok,bleaching_chemical,0,false,elevated,FWD-E,KR,7,1.7
+port_congestion,Tanjung Priok,sizing_agent,0,false,high,FWD-D,DE,3,2.0
+document_discrepancy,Tanjung Priok,caustic,0,true,elevated,FWD-A,KR,3,3.7
+customs_inspection,Tanjung Priok,caustic,0,false,normal,FWD-D,DE,7,2.3
+port_congestion,Tanjung Perak,bleaching_chemical,0,false,high,FWD-B,KR,1,1.9
+missing_document,Tanjung Perak,bleaching_chemical,1,false,high,FWD-A,US,12,4.2
+document_discrepancy,Tanjung Priok,sizing_agent,0,true,normal,FWD-E,KR,10,2.1
+port_congestion,Tanjung Priok,bleaching_chemical,0,false,elevated,FWD-A,JP,3,1.4
+port_congestion,Tanjung Priok,caustic,0,false,high,FWD-C,CN,6,2.8
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,elevated,FWD-B,FI,10,3.9
+port_congestion,Tanjung Priok,retention_aid,0,false,elevated,FWD-D,CN,7,1.4
+document_discrepancy,Tanjung Priok,sizing_agent,0,true,elevated,FWD-A,JP,12,3.2
+port_congestion,Tanjung Priok,sizing_agent,0,false,high,FWD-E,JP,2,1.9
+missing_document,Tanjung Perak,sizing_agent,1,false,elevated,FWD-E,FI,1,3.2
+port_congestion,Belawan,retention_aid,0,false,high,FWD-B,KR,9,1.0
+port_congestion,Tanjung Perak,retention_aid,0,false,elevated,FWD-A,DE,8,1.2
+document_discrepancy,Tanjung Perak,bleaching_chemical,0,true,normal,FWD-B,FI,1,2.5
+missing_document,Tanjung Priok,bleaching_chemical,1,false,elevated,FWD-A,FI,2,4.1
+port_congestion,Belawan,bleaching_chemical,0,false,high,FWD-E,DE,11,1.4
+document_discrepancy,Tanjung Priok,caustic,0,true,elevated,FWD-D,FI,11,3.7
+port_congestion,Tanjung Priok,caustic,0,false,elevated,FWD-C,DE,3,1.6
+document_discrepancy,Tanjung Priok,sizing_agent,0,true,elevated,FWD-E,FI,5,3.9
+customs_inspection,Tanjung Priok,retention_aid,0,false,normal,FWD-A,DE,4,2.1
+document_discrepancy,Tanjung Perak,bleaching_chemical,0,true,high,FWD-A,CN,3,3.6
+customs_inspection,Tanjung Perak,bleaching_chemical,0,false,normal,FWD-E,US,5,2.2
+customs_inspection,Tanjung Perak,retention_aid,0,false,high,FWD-D,US,12,3.2
+document_discrepancy,Tanjung Perak,sizing_agent,0,true,normal,FWD-B,FI,10,2.0
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,normal,FWD-C,DE,11,3.8
+document_discrepancy,Tanjung Perak,bleaching_chemical,0,true,elevated,FWD-D,JP,11,3.2
+missing_document,Tanjung Priok,bleaching_chemical,1,false,elevated,FWD-D,CN,5,4.3
+customs_inspection,Tanjung Priok,bleaching_chemical,0,false,high,FWD-C,FI,3,3.4
+missing_document,Tanjung Priok,bleaching_chemical,2,false,normal,FWD-B,CN,2,4.1
+missing_document,Tanjung Perak,bleaching_chemical,1,false,normal,FWD-C,US,1,3.3
+missing_document,Tanjung Priok,caustic,1,false,high,FWD-B,DE,11,4.4
+port_congestion,Tanjung Priok,retention_aid,0,false,high,FWD-D,CN,11,1.2
+document_discrepancy,Belawan,retention_aid,0,true,elevated,FWD-A,DE,12,2.8
+document_discrepancy,Tanjung Priok,caustic,0,true,normal,FWD-B,DE,2,3.0
+port_congestion,Tanjung Perak,bleaching_chemical,0,false,high,FWD-C,DE,10,2.1
+customs_inspection,Tanjung Perak,bleaching_chemical,0,false,elevated,FWD-A,DE,1,3.0
+document_discrepancy,Tanjung Priok,retention_aid,0,true,elevated,FWD-B,US,9,3.5
+customs_inspection,Tanjung Perak,bleaching_chemical,0,false,normal,FWD-C,KR,4,2.6
+customs_inspection,Belawan,caustic,0,false,normal,FWD-E,JP,6,2.1
+document_discrepancy,Tanjung Perak,retention_aid,0,true,elevated,FWD-C,JP,5,3.5
+port_congestion,Tanjung Perak,caustic,0,false,high,FWD-B,KR,3,2.0
+port_congestion,Belawan,caustic,0,false,high,FWD-B,FI,4,2.0
+customs_inspection,Belawan,caustic,0,false,elevated,FWD-C,JP,12,3.0
+missing_document,Belawan,retention_aid,1,false,normal,FWD-B,CN,2,3.0
+missing_document,Belawan,caustic,1,true,normal,FWD-E,DE,2,3.5
+customs_inspection,Tanjung Perak,caustic,0,false,elevated,FWD-C,KR,11,2.6
+customs_inspection,Tanjung Priok,retention_aid,0,false,high,FWD-C,FI,10,3.9
+missing_document,Tanjung Priok,bleaching_chemical,1,false,normal,FWD-E,CN,6,3.6
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,high,FWD-A,US,11,4.0
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,elevated,FWD-B,KR,6,3.1
+customs_inspection,Tanjung Priok,bleaching_chemical,0,false,high,FWD-B,US,7,3.1
+port_congestion,Tanjung Priok,caustic,0,false,elevated,FWD-A,CN,2,1.2
+port_congestion,Tanjung Perak,caustic,0,false,high,FWD-D,JP,10,1.1
+document_discrepancy,Tanjung Perak,bleaching_chemical,0,true,elevated,FWD-C,DE,4,3.6
+missing_document,Tanjung Perak,caustic,1,false,elevated,FWD-B,KR,9,3.4
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,normal,FWD-A,US,7,3.1
+document_discrepancy,Tanjung Priok,sizing_agent,0,true,normal,FWD-B,KR,11,2.6
+document_discrepancy,Belawan,bleaching_chemical,0,true,high,FWD-A,CN,1,3.1
+document_discrepancy,Tanjung Perak,retention_aid,0,true,high,FWD-C,US,9,4.3
+missing_document,Tanjung Perak,sizing_agent,1,true,elevated,FWD-C,KR,3,4.7
+document_discrepancy,Tanjung Priok,retention_aid,0,true,normal,FWD-B,FI,7,2.5
+port_congestion,Tanjung Priok,retention_aid,0,false,high,FWD-B,KR,6,1.9
+document_discrepancy,Tanjung Perak,bleaching_chemical,0,true,elevated,FWD-A,US,8,3.6
+port_congestion,Tanjung Priok,retention_aid,0,false,high,FWD-B,FI,7,1.7
+port_congestion,Belawan,sizing_agent,0,false,high,FWD-B,JP,12,1.4
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,elevated,FWD-C,FI,7,4.0
+port_congestion,Tanjung Perak,sizing_agent,0,false,elevated,FWD-A,CN,10,0.5
+missing_document,Tanjung Priok,caustic,1,false,elevated,FWD-C,JP,12,4.4
+customs_inspection,Tanjung Perak,sizing_agent,0,false,normal,FWD-C,FI,9,2.6
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,normal,FWD-C,CN,1,3.1
+document_discrepancy,Tanjung Perak,bleaching_chemical,0,true,elevated,FWD-E,JP,10,3.4
+missing_document,Tanjung Priok,bleaching_chemical,2,true,normal,FWD-B,KR,2,4.6
+document_discrepancy,Tanjung Priok,caustic,0,true,normal,FWD-E,DE,3,3.0
+document_discrepancy,Tanjung Priok,caustic,0,true,normal,FWD-D,JP,2,3.4
+port_congestion,Tanjung Priok,sizing_agent,0,false,elevated,FWD-A,DE,10,1.6
+document_discrepancy,Tanjung Priok,caustic,0,true,elevated,FWD-D,JP,1,3.9
+customs_inspection,Tanjung Priok,sizing_agent,0,false,normal,FWD-E,KR,5,2.9
+document_discrepancy,Tanjung Perak,sizing_agent,0,true,normal,FWD-A,CN,1,2.2
+missing_document,Tanjung Priok,bleaching_chemical,1,false,normal,FWD-C,CN,8,3.5
+port_congestion,Tanjung Priok,caustic,0,false,high,FWD-E,KR,6,2.7
+port_congestion,Tanjung Priok,sizing_agent,0,false,high,FWD-B,FI,8,2.5
+customs_inspection,Tanjung Priok,caustic,0,false,elevated,FWD-C,CN,7,3.4
+port_congestion,Tanjung Perak,sizing_agent,0,false,high,FWD-B,FI,8,1.6
+document_discrepancy,Tanjung Priok,sizing_agent,0,true,normal,FWD-E,JP,8,2.6
+missing_document,Tanjung Priok,sizing_agent,2,true,elevated,FWD-C,JP,10,5.8
+customs_inspection,Tanjung Priok,bleaching_chemical,0,false,normal,FWD-A,FI,1,2.1
+customs_inspection,Tanjung Perak,bleaching_chemical,0,false,elevated,FWD-E,JP,7,2.8
+missing_document,Tanjung Priok,caustic,2,false,elevated,FWD-C,US,10,4.3
+port_congestion,Tanjung Priok,retention_aid,0,false,high,FWD-E,DE,12,2.4
+customs_inspection,Tanjung Priok,caustic,0,false,high,FWD-B,DE,4,2.8
+port_congestion,Tanjung Perak,bleaching_chemical,0,false,elevated,FWD-E,US,6,2.1
+document_discrepancy,Belawan,retention_aid,0,true,elevated,FWD-C,CN,4,3.0
+missing_document,Tanjung Priok,retention_aid,2,false,normal,FWD-E,KR,2,3.8
+document_discrepancy,Belawan,retention_aid,0,true,normal,FWD-A,KR,4,2.0
+document_discrepancy,Tanjung Priok,sizing_agent,0,true,high,FWD-E,DE,1,4.1
+port_congestion,Tanjung Priok,bleaching_chemical,0,false,elevated,FWD-E,JP,1,1.6
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,high,FWD-A,FI,2,4.4
+missing_document,Tanjung Priok,sizing_agent,1,false,elevated,FWD-A,DE,3,3.7
+port_congestion,Tanjung Priok,retention_aid,0,false,high,FWD-C,DE,1,2.2
+document_discrepancy,Tanjung Priok,caustic,0,true,normal,FWD-D,FI,7,3.6
+document_discrepancy,Tanjung Priok,caustic,0,true,normal,FWD-B,KR,2,3.0
+missing_document,Tanjung Perak,caustic,1,false,high,FWD-D,KR,2,4.4
+customs_inspection,Tanjung Priok,sizing_agent,0,false,elevated,FWD-B,CN,1,2.8
+port_congestion,Tanjung Perak,bleaching_chemical,0,false,high,FWD-A,FI,6,1.5
+document_discrepancy,Tanjung Priok,retention_aid,0,true,elevated,FWD-B,US,3,3.1
+port_congestion,Tanjung Priok,sizing_agent,0,false,high,FWD-E,FI,3,1.9
+port_congestion,Tanjung Priok,sizing_agent,0,false,high,FWD-E,FI,5,1.8
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,normal,FWD-A,KR,8,3.1
+document_discrepancy,Tanjung Perak,bleaching_chemical,0,true,normal,FWD-C,DE,7,3.4
+missing_document,Tanjung Perak,sizing_agent,1,false,normal,FWD-E,US,2,3.0
+port_congestion,Tanjung Perak,caustic,0,false,elevated,FWD-C,FI,3,1.8
+document_discrepancy,Tanjung Perak,caustic,0,true,normal,FWD-E,DE,7,2.7
+customs_inspection,Tanjung Perak,bleaching_chemical,0,false,normal,FWD-E,DE,3,1.7
+document_discrepancy,Tanjung Perak,bleaching_chemical,0,true,high,FWD-D,DE,5,3.7
+missing_document,Tanjung Priok,caustic,1,false,normal,FWD-E,CN,1,3.7
+document_discrepancy,Belawan,caustic,0,true,normal,FWD-C,JP,4,2.9
+missing_document,Tanjung Priok,bleaching_chemical,2,true,elevated,FWD-C,CN,11,5.4
+port_congestion,Tanjung Perak,caustic,0,false,high,FWD-B,CN,12,2.2
+customs_inspection,Belawan,retention_aid,0,false,normal,FWD-B,CN,12,1.3
+document_discrepancy,Tanjung Priok,sizing_agent,0,true,elevated,FWD-D,FI,11,3.8
+port_congestion,Tanjung Perak,retention_aid,0,false,elevated,FWD-A,US,12,0.7
+port_congestion,Tanjung Priok,sizing_agent,0,false,elevated,FWD-D,JP,2,1.8
+document_discrepancy,Belawan,caustic,0,true,elevated,FWD-E,FI,7,3.1
+port_congestion,Tanjung Priok,caustic,0,false,elevated,FWD-E,CN,10,1.9
+port_congestion,Tanjung Perak,caustic,0,false,high,FWD-B,KR,6,2.0
+missing_document,Tanjung Priok,caustic,1,false,elevated,FWD-E,DE,5,3.3
+document_discrepancy,Belawan,bleaching_chemical,0,true,normal,FWD-A,US,9,2.6
+missing_document,Tanjung Priok,sizing_agent,1,true,high,FWD-D,DE,11,4.9
+port_congestion,Tanjung Priok,bleaching_chemical,0,false,elevated,FWD-E,KR,8,2.2
+missing_document,Tanjung Priok,retention_aid,1,true,normal,FWD-E,DE,8,3.9
+missing_document,Belawan,bleaching_chemical,2,true,normal,FWD-C,FI,2,4.9
+document_discrepancy,Tanjung Priok,retention_aid,0,true,elevated,FWD-E,CN,1,4.1
+document_discrepancy,Tanjung Priok,retention_aid,0,true,normal,FWD-E,US,10,2.7
+port_congestion,Tanjung Priok,bleaching_chemical,0,false,high,FWD-D,CN,9,1.9
+document_discrepancy,Tanjung Perak,caustic,0,true,high,FWD-E,US,10,3.3
+missing_document,Belawan,retention_aid,1,false,normal,FWD-A,DE,12,2.8
+document_discrepancy,Tanjung Perak,sizing_agent,0,true,normal,FWD-B,DE,9,2.0
+customs_inspection,Belawan,caustic,0,false,normal,FWD-E,FI,10,1.5
+port_congestion,Tanjung Priok,retention_aid,0,false,high,FWD-D,CN,7,1.7
+document_discrepancy,Belawan,caustic,0,true,normal,FWD-E,CN,7,2.9
+customs_inspection,Tanjung Priok,bleaching_chemical,0,false,normal,FWD-B,FI,11,2.6
+customs_inspection,Tanjung Priok,bleaching_chemical,0,false,normal,FWD-C,DE,9,2.4
+document_discrepancy,Tanjung Perak,caustic,0,true,normal,FWD-C,JP,2,3.3
+port_congestion,Tanjung Perak,caustic,0,false,high,FWD-E,DE,1,1.8
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,normal,FWD-B,CN,5,2.9
+document_discrepancy,Tanjung Priok,retention_aid,0,true,high,FWD-B,US,12,4.0
+port_congestion,Tanjung Priok,retention_aid,0,false,high,FWD-D,US,10,1.9
+port_congestion,Tanjung Perak,bleaching_chemical,0,false,elevated,FWD-E,CN,3,1.7
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,normal,FWD-A,CN,5,3.4
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,elevated,FWD-C,JP,1,4.2
+missing_document,Tanjung Perak,retention_aid,2,false,high,FWD-C,FI,3,5.9
+missing_document,Tanjung Priok,sizing_agent,1,true,normal,FWD-E,CN,4,3.8
+document_discrepancy,Tanjung Perak,sizing_agent,0,true,elevated,FWD-C,US,9,3.3
+document_discrepancy,Tanjung Priok,caustic,0,true,normal,FWD-C,JP,4,2.9
+document_discrepancy,Tanjung Priok,sizing_agent,0,true,normal,FWD-C,KR,5,3.3
+customs_inspection,Tanjung Priok,bleaching_chemical,0,false,elevated,FWD-A,KR,9,2.5
+port_congestion,Tanjung Priok,caustic,0,false,high,FWD-A,KR,5,1.5
+document_discrepancy,Belawan,bleaching_chemical,0,true,normal,FWD-C,US,10,3.0
+customs_inspection,Tanjung Priok,bleaching_chemical,0,false,normal,FWD-B,FI,4,2.2
+customs_inspection,Belawan,bleaching_chemical,0,false,normal,FWD-C,DE,1,2.5
+missing_document,Tanjung Priok,caustic,1,true,normal,FWD-D,CN,4,3.8
+port_congestion,Tanjung Perak,sizing_agent,0,false,high,FWD-A,CN,12,1.3
+document_discrepancy,Tanjung Priok,sizing_agent,0,true,high,FWD-C,US,1,3.9
+document_discrepancy,Tanjung Perak,caustic,0,true,normal,FWD-B,DE,8,2.5
+missing_document,Tanjung Priok,bleaching_chemical,2,false,elevated,FWD-E,JP,6,5.4
+customs_inspection,Tanjung Priok,caustic,0,false,normal,FWD-D,DE,8,2.1
+port_congestion,Tanjung Perak,retention_aid,0,false,high,FWD-D,US,7,1.9
+port_congestion,Tanjung Perak,caustic,0,false,elevated,FWD-C,US,3,1.5
+missing_document,Tanjung Priok,caustic,1,true,elevated,FWD-B,DE,12,5.1
+customs_inspection,Tanjung Priok,retention_aid,0,false,normal,FWD-A,KR,8,2.4
+missing_document,Tanjung Priok,caustic,2,false,elevated,FWD-B,CN,5,5.0
+missing_document,Belawan,retention_aid,1,false,normal,FWD-C,FI,4,3.5
+document_discrepancy,Belawan,retention_aid,0,true,elevated,FWD-A,US,5,2.8
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,normal,FWD-E,CN,10,3.5
+port_congestion,Belawan,bleaching_chemical,0,false,elevated,FWD-D,CN,7,1.9
+port_congestion,Tanjung Perak,caustic,0,false,elevated,FWD-E,CN,2,1.2
+document_discrepancy,Tanjung Priok,caustic,0,true,normal,FWD-D,JP,4,3.3
+customs_inspection,Belawan,bleaching_chemical,0,false,normal,FWD-E,JP,12,1.9
+port_congestion,Tanjung Priok,sizing_agent,0,false,high,FWD-C,KR,11,2.9
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,normal,FWD-A,DE,4,3.3
+port_congestion,Tanjung Perak,retention_aid,0,false,elevated,FWD-E,JP,9,1.3
+customs_inspection,Tanjung Priok,retention_aid,0,false,high,FWD-B,US,8,3.3
+port_congestion,Tanjung Priok,sizing_agent,0,false,high,FWD-C,CN,3,2.3
+port_congestion,Tanjung Priok,caustic,0,false,elevated,FWD-A,KR,12,1.4
+port_congestion,Tanjung Priok,sizing_agent,0,false,high,FWD-A,FI,5,1.3
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,normal,FWD-A,KR,11,2.7
+document_discrepancy,Tanjung Perak,caustic,0,true,high,FWD-C,DE,11,4.4
+document_discrepancy,Belawan,bleaching_chemical,0,true,elevated,FWD-B,US,7,2.5
+port_congestion,Tanjung Priok,retention_aid,0,false,high,FWD-E,FI,3,1.8
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,normal,FWD-A,KR,8,2.0
+document_discrepancy,Tanjung Perak,retention_aid,0,true,elevated,FWD-B,KR,2,2.8
+customs_inspection,Tanjung Priok,bleaching_chemical,0,false,high,FWD-E,FI,10,3.4
+document_discrepancy,Tanjung Priok,caustic,0,true,normal,FWD-D,US,11,3.6
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,normal,FWD-B,US,8,3.5
+port_congestion,Tanjung Perak,retention_aid,0,false,elevated,FWD-C,JP,3,2.1
+port_congestion,Tanjung Priok,bleaching_chemical,0,false,elevated,FWD-C,JP,11,1.9
+document_discrepancy,Tanjung Perak,caustic,0,true,normal,FWD-C,US,4,3.5
+port_congestion,Tanjung Perak,bleaching_chemical,0,false,high,FWD-B,US,4,1.7
+port_congestion,Tanjung Perak,sizing_agent,0,false,elevated,FWD-A,JP,2,1.0
+customs_inspection,Tanjung Perak,caustic,0,false,high,FWD-A,CN,6,3.5
+missing_document,Tanjung Perak,sizing_agent,2,false,elevated,FWD-D,CN,12,3.8
+missing_document,Tanjung Priok,retention_aid,1,false,elevated,FWD-B,FI,10,4.3
+missing_document,Tanjung Perak,caustic,1,false,normal,FWD-C,FI,1,3.3
+port_congestion,Tanjung Priok,sizing_agent,0,false,elevated,FWD-A,JP,1,0.9
+missing_document,Tanjung Priok,caustic,1,false,normal,FWD-C,US,9,4.2
+missing_document,Tanjung Priok,caustic,1,false,normal,FWD-C,KR,4,3.5
+port_congestion,Belawan,caustic,0,false,elevated,FWD-E,CN,11,1.5
+port_congestion,Tanjung Priok,retention_aid,0,false,high,FWD-B,FI,3,2.3
+customs_inspection,Tanjung Priok,caustic,0,false,normal,FWD-D,KR,3,2.0
+port_congestion,Tanjung Priok,retention_aid,0,false,high,FWD-D,US,11,1.8
+port_congestion,Tanjung Priok,caustic,0,false,high,FWD-D,CN,5,2.1
+missing_document,Belawan,bleaching_chemical,1,true,elevated,FWD-B,JP,10,4.1
+missing_document,Tanjung Priok,caustic,1,false,normal,FWD-B,CN,8,3.5
+missing_document,Tanjung Priok,bleaching_chemical,1,true,normal,FWD-D,KR,10,4.3
+document_discrepancy,Tanjung Priok,sizing_agent,0,true,normal,FWD-B,CN,8,3.0
+document_discrepancy,Tanjung Perak,retention_aid,0,true,normal,FWD-A,JP,5,2.4
+missing_document,Tanjung Priok,retention_aid,2,false,normal,FWD-D,CN,1,4.8
+port_congestion,Tanjung Perak,caustic,0,false,high,FWD-C,US,5,2.2
+port_congestion,Tanjung Priok,caustic,0,false,high,FWD-B,CN,4,2.0
+document_discrepancy,Tanjung Perak,caustic,0,true,normal,FWD-A,DE,4,2.4
+customs_inspection,Tanjung Perak,sizing_agent,0,false,normal,FWD-B,JP,2,1.7
+customs_inspection,Tanjung Priok,retention_aid,0,false,high,FWD-C,US,2,3.2
+missing_document,Tanjung Priok,retention_aid,1,true,high,FWD-A,US,11,4.5
+document_discrepancy,Tanjung Priok,sizing_agent,0,true,normal,FWD-A,DE,3,2.5
+customs_inspection,Tanjung Priok,retention_aid,0,false,elevated,FWD-C,US,7,3.0
+document_discrepancy,Tanjung Priok,caustic,0,true,normal,FWD-A,DE,2,2.5
+customs_inspection,Belawan,bleaching_chemical,0,false,normal,FWD-B,FI,9,2.0
+port_congestion,Tanjung Priok,bleaching_chemical,0,false,elevated,FWD-D,JP,8,1.8
+customs_inspection,Tanjung Perak,retention_aid,0,false,elevated,FWD-D,JP,12,2.6
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,elevated,FWD-C,FI,7,4.5
+port_congestion,Tanjung Priok,retention_aid,0,false,high,FWD-A,FI,10,1.9
+customs_inspection,Tanjung Priok,retention_aid,0,false,elevated,FWD-C,DE,2,3.5
+missing_document,Belawan,caustic,1,false,normal,FWD-A,CN,12,3.0
+customs_inspection,Tanjung Priok,bleaching_chemical,0,false,high,FWD-E,FI,3,3.6
+missing_document,Tanjung Priok,bleaching_chemical,2,false,elevated,FWD-B,DE,4,5.4
+port_congestion,Tanjung Priok,retention_aid,0,false,elevated,FWD-E,CN,5,1.5
+missing_document,Tanjung Perak,bleaching_chemical,1,false,normal,FWD-B,DE,2,3.3
+port_congestion,Tanjung Perak,retention_aid,0,false,elevated,FWD-D,DE,6,1.6
+missing_document,Tanjung Priok,bleaching_chemical,1,false,high,FWD-E,DE,2,5.9
+port_congestion,Belawan,sizing_agent,0,false,high,FWD-D,DE,1,1.2
+document_discrepancy,Tanjung Priok,caustic,0,true,normal,FWD-A,DE,5,2.4
+port_congestion,Tanjung Priok,caustic,0,false,high,FWD-D,KR,10,2.3
+customs_inspection,Tanjung Priok,retention_aid,0,false,elevated,FWD-A,KR,3,2.6
+document_discrepancy,Belawan,caustic,0,true,normal,FWD-C,FI,9,3.1
+port_congestion,Tanjung Priok,caustic,0,false,elevated,FWD-D,KR,10,1.7
+customs_inspection,Tanjung Priok,bleaching_chemical,0,false,normal,FWD-E,JP,3,2.2
+document_discrepancy,Tanjung Priok,sizing_agent,0,true,high,FWD-A,KR,9,3.9
+missing_document,Tanjung Perak,retention_aid,1,false,normal,FWD-E,JP,1,3.0
+port_congestion,Tanjung Priok,retention_aid,0,false,high,FWD-E,KR,10,2.1
+document_discrepancy,Tanjung Perak,caustic,0,true,elevated,FWD-C,KR,12,3.8
+customs_inspection,Tanjung Priok,caustic,0,false,normal,FWD-B,FI,4,2.0
+port_congestion,Tanjung Priok,caustic,0,false,high,FWD-B,FI,5,2.3
+port_congestion,Tanjung Perak,retention_aid,0,false,elevated,FWD-E,US,8,1.2
+missing_document,Tanjung Priok,bleaching_chemical,2,true,normal,FWD-D,DE,1,5.0
+port_congestion,Tanjung Priok,caustic,0,false,high,FWD-B,CN,3,2.0
+missing_document,Tanjung Perak,bleaching_chemical,1,false,elevated,FWD-D,JP,7,4.2
+missing_document,Tanjung Perak,caustic,1,false,elevated,FWD-B,DE,8,4.0
+port_congestion,Tanjung Priok,bleaching_chemical,0,false,high,FWD-C,CN,8,3.0
+missing_document,Tanjung Perak,retention_aid,2,false,normal,FWD-D,US,10,3.9
+document_discrepancy,Tanjung Perak,sizing_agent,0,true,high,FWD-D,US,4,3.9
+port_congestion,Tanjung Priok,retention_aid,0,false,high,FWD-E,KR,5,2.2
+document_discrepancy,Tanjung Perak,sizing_agent,0,true,normal,FWD-A,FI,12,1.7
+port_congestion,Tanjung Perak,bleaching_chemical,0,false,high,FWD-A,CN,6,2.2
+missing_document,Tanjung Priok,bleaching_chemical,1,true,normal,FWD-E,US,12,4.4
+port_congestion,Belawan,caustic,0,false,elevated,FWD-A,CN,8,1.1
+customs_inspection,Tanjung Priok,retention_aid,0,false,normal,FWD-D,FI,2,1.8
+port_congestion,Tanjung Perak,bleaching_chemical,0,false,elevated,FWD-B,US,6,1.4
+document_discrepancy,Tanjung Perak,bleaching_chemical,0,true,normal,FWD-E,US,1,3.0
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,elevated,FWD-E,FI,9,3.4
+document_discrepancy,Tanjung Priok,caustic,0,true,normal,FWD-E,DE,1,3.0
+customs_inspection,Belawan,bleaching_chemical,0,false,high,FWD-B,KR,11,3.6
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,normal,FWD-A,DE,10,2.6
+port_congestion,Tanjung Priok,bleaching_chemical,0,false,high,FWD-A,FI,11,1.9
+port_congestion,Belawan,sizing_agent,0,false,high,FWD-B,KR,11,1.2
+missing_document,Tanjung Priok,bleaching_chemical,1,false,normal,FWD-C,DE,6,4.8
+port_congestion,Tanjung Priok,caustic,0,false,elevated,FWD-A,KR,5,1.8
+port_congestion,Tanjung Priok,bleaching_chemical,0,false,high,FWD-C,JP,7,2.3
+document_discrepancy,Tanjung Priok,sizing_agent,0,true,normal,FWD-E,JP,10,3.5
+document_discrepancy,Tanjung Priok,caustic,0,true,normal,FWD-E,US,3,3.3
+missing_document,Tanjung Perak,bleaching_chemical,1,false,normal,FWD-E,FI,7,3.5
+customs_inspection,Belawan,caustic,0,false,normal,FWD-B,FI,6,2.6
+missing_document,Tanjung Perak,caustic,1,false,normal,FWD-A,CN,8,3.8
+customs_inspection,Tanjung Priok,retention_aid,0,false,elevated,FWD-C,DE,3,3.0
+port_congestion,Tanjung Priok,sizing_agent,0,false,high,FWD-B,FI,4,1.8
+port_congestion,Tanjung Perak,bleaching_chemical,0,false,elevated,FWD-A,US,3,1.2
+missing_document,Tanjung Priok,caustic,2,false,normal,FWD-A,DE,8,4.4
+document_discrepancy,Tanjung Perak,sizing_agent,0,true,normal,FWD-D,KR,1,2.5
+port_congestion,Tanjung Perak,caustic,0,false,high,FWD-C,US,12,2.2
+port_congestion,Tanjung Perak,bleaching_chemical,0,false,high,FWD-E,FI,10,1.8
+document_discrepancy,Belawan,bleaching_chemical,0,true,high,FWD-C,JP,5,4.2
+missing_document,Tanjung Perak,sizing_agent,1,true,normal,FWD-B,US,4,4.0
+document_discrepancy,Belawan,bleaching_chemical,0,true,high,FWD-B,JP,3,4.0
+customs_inspection,Belawan,retention_aid,0,false,elevated,FWD-A,FI,12,1.6
+port_congestion,Tanjung Perak,caustic,0,false,high,FWD-A,US,12,1.3
+document_discrepancy,Tanjung Perak,bleaching_chemical,0,true,normal,FWD-E,CN,8,2.8
+missing_document,Belawan,bleaching_chemical,1,false,normal,FWD-D,CN,5,2.9
+document_discrepancy,Tanjung Priok,sizing_agent,0,true,normal,FWD-C,FI,4,3.5
+document_discrepancy,Tanjung Perak,bleaching_chemical,0,true,elevated,FWD-A,FI,9,3.1
+customs_inspection,Tanjung Perak,retention_aid,0,false,normal,FWD-C,US,6,2.0
+document_discrepancy,Tanjung Priok,caustic,0,true,normal,FWD-E,KR,10,3.2
+document_discrepancy,Tanjung Perak,retention_aid,0,true,high,FWD-B,FI,3,3.6
+customs_inspection,Tanjung Perak,retention_aid,0,false,normal,FWD-D,JP,10,1.6
+document_discrepancy,Tanjung Perak,retention_aid,0,true,elevated,FWD-C,CN,2,3.4
+port_congestion,Tanjung Priok,sizing_agent,0,false,elevated,FWD-B,CN,12,1.3
+port_congestion,Belawan,sizing_agent,0,false,elevated,FWD-B,DE,11,0.5
+customs_inspection,Tanjung Perak,caustic,0,false,normal,FWD-B,DE,9,1.5
+missing_document,Tanjung Perak,caustic,1,false,normal,FWD-B,CN,10,2.7
+port_congestion,Tanjung Priok,caustic,0,false,high,FWD-D,CN,3,2.2
+document_discrepancy,Belawan,caustic,0,true,elevated,FWD-C,KR,10,3.3
+port_congestion,Tanjung Priok,caustic,0,false,high,FWD-A,DE,5,2.0
+missing_document,Tanjung Perak,retention_aid,2,true,normal,FWD-B,FI,1,4.3
+document_discrepancy,Tanjung Perak,bleaching_chemical,0,true,normal,FWD-A,KR,7,2.8
+customs_inspection,Tanjung Priok,retention_aid,0,false,high,FWD-E,US,9,3.4
+port_congestion,Tanjung Perak,bleaching_chemical,0,false,elevated,FWD-C,FI,1,1.6
+document_discrepancy,Tanjung Priok,sizing_agent,0,true,normal,FWD-D,JP,8,2.5
+missing_document,Tanjung Priok,caustic,1,true,normal,FWD-C,US,6,4.7
+port_congestion,Tanjung Priok,caustic,0,false,high,FWD-E,DE,6,2.0
+document_discrepancy,Tanjung Priok,bleaching_chemical,0,true,elevated,FWD-C,JP,12,3.6
+missing_document,Tanjung Priok,bleaching_chemical,1,false,normal,FWD-B,CN,5,3.9
+document_discrepancy,Tanjung Priok,caustic,0,true,normal,FWD-A,US,1,2.8
+missing_document,Belawan,caustic,1,false,elevated,FWD-A,FI,9,3.2
+missing_document,Tanjung Perak,sizing_agent,1,false,elevated,FWD-E,FI,6,3.6
+port_congestion,Tanjung Perak,bleaching_chemical,0,false,elevated,FWD-E,US,8,1.2

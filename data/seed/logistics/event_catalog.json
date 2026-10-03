@@ -1,0 +1,42 @@
+[
+  {
+    "event_id": "S1-DOC-HOLD",
+    "scenario": "S1",
+    "type": "customs_document_hold",
+    "shipment_id": "SHP-1001",
+    "occurred_at": "2026-10-30T09:15:00+07:00",
+    "description": "Pre-arrival customs check flagged SHP-1001: the shipping documents do not agree on quantity.",
+    "details": {
+      "exception_type": "document_discrepancy",
+      "congestion_level": "normal",
+      "missing_documents": 0,
+      "has_document_discrepancy": true
+    }
+  },
+  {
+    "event_id": "S1-ETA-SLIP",
+    "scenario": "S1",
+    "type": "eta_change",
+    "shipment_id": "SHP-1001",
+    "occurred_at": "2026-10-30T15:40:00+07:00",
+    "description": "Berth congestion at Tanjung Priok: the carrier moved the ETA of MV Northern Lumen back by one day.",
+    "details": {
+      "new_eta": "2026-11-01T14:00:00+07:00",
+      "congestion_level": "high"
+    }
+  },
+  {
+    "event_id": "S2-CONGESTION",
+    "scenario": "S2",
+    "type": "port_congestion",
+    "shipment_id": "SHP-1002",
+    "occurred_at": "2026-10-30T11:00:00+07:00",
+    "description": "Yard congestion at Tanjung Priok is delaying discharge of SHP-1002.",
+    "details": {
+      "exception_type": "port_congestion",
+      "congestion_level": "high",
+      "missing_documents": 0,
+      "has_document_discrepancy": false
+    }
+  }
+]

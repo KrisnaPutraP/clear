@@ -1,0 +1,30 @@
+[
+  {
+    "Material": "CHEM-BX40",
+    "Plant": "1100",
+    "InventoryStockType": "01",
+    "MaterialBaseUnit": "TO",
+    "MatlWrhsStkQtyInMatlBaseUnit": 190
+  },
+  {
+    "Material": "CHEM-BX40",
+    "Plant": "1200",
+    "InventoryStockType": "01",
+    "MaterialBaseUnit": "TO",
+    "MatlWrhsStkQtyInMatlBaseUnit": 300
+  },
+  {
+    "Material": "CHEM-CX20",
+    "Plant": "1100",
+    "InventoryStockType": "01",
+    "MaterialBaseUnit": "TO",
+    "MatlWrhsStkQtyInMatlBaseUnit": 300
+  },
+  {
+    "Material": "CHEM-CX20",
+    "Plant": "1200",
+    "InventoryStockType": "01",
+    "MaterialBaseUnit": "TO",
+    "MatlWrhsStkQtyInMatlBaseUnit": 140
+  }
+]

@@ -1,0 +1,20 @@
+[
+  {
+    "PurchaseOrder": "4500001021",
+    "PurchaseOrderItem": "10",
+    "PurchaseOrderItemText": "Bleaching agent BX-40",
+    "Material": "CHEM-BX40",
+    "Plant": "1100",
+    "OrderQuantity": 600,
+    "PurchaseOrderQuantityUnit": "TO"
+  },
+  {
+    "PurchaseOrder": "4500001022",
+    "PurchaseOrderItem": "10",
+    "PurchaseOrderItemText": "Caustic agent CX-20",
+    "Material": "CHEM-CX20",
+    "Plant": "1100",
+    "OrderQuantity": 350,
+    "PurchaseOrderQuantityUnit": "TO"
+  }
+]

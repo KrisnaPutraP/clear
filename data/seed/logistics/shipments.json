@@ -1,0 +1,62 @@
+[
+  {
+    "shipment_id": "SHP-1001",
+    "scenario": "S1",
+    "purchase_order": "4500001021",
+    "status": "in_transit",
+    "mode": "sea",
+    "vessel": "MV Northern Lumen",
+    "voyage": "NL-2641",
+    "port_of_loading": "Hamburg",
+    "port_of_discharge": "Tanjung Priok",
+    "eta": "2026-10-31T14:00:00+07:00",
+    "forwarder": "FWD-B",
+    "origin_country": "DE",
+    "cargo_category": "bleaching_chemical",
+    "required_documents": [
+      "commercial_invoice",
+      "packing_list",
+      "bill_of_lading",
+      "certificate_of_analysis"
+    ],
+    "exception": null,
+    "events": [
+      {
+        "event_id": "EV-1001-01",
+        "type": "departed",
+        "occurred_at": "2026-10-03T18:00:00+02:00",
+        "description": "Departed Hamburg."
+      }
+    ]
+  },
+  {
+    "shipment_id": "SHP-1002",
+    "scenario": "S2",
+    "purchase_order": "4500001022",
+    "status": "in_transit",
+    "mode": "sea",
+    "vessel": "MV Jade Meridian",
+    "voyage": "JM-0917",
+    "port_of_loading": "Qingdao",
+    "port_of_discharge": "Tanjung Priok",
+    "eta": "2026-10-30T08:00:00+07:00",
+    "forwarder": "FWD-D",
+    "origin_country": "CN",
+    "cargo_category": "caustic",
+    "required_documents": [
+      "commercial_invoice",
+      "packing_list",
+      "bill_of_lading",
+      "certificate_of_analysis"
+    ],
+    "exception": null,
+    "events": [
+      {
+        "event_id": "EV-1002-01",
+        "type": "departed",
+        "occurred_at": "2026-10-19T21:00:00+08:00",
+        "description": "Departed Qingdao."
+      }
+    ]
+  }
+]

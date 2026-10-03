@@ -1,0 +1,101 @@
+[
+  {
+    "order_id": "PRD-1101",
+    "plant": "1100",
+    "product": "Liquid packaging board",
+    "customer_segment": "Export key account",
+    "priority": "critical",
+    "consumption_t_per_day": {
+      "CHEM-BX40": 25,
+      "CHEM-CX20": 12
+    }
+  },
+  {
+    "order_id": "PRD-1102",
+    "plant": "1100",
+    "product": "Food-grade folding box board",
+    "customer_segment": "Domestic key account",
+    "priority": "critical",
+    "consumption_t_per_day": {
+      "CHEM-BX40": 20,
+      "CHEM-CX20": 10
+    }
+  },
+  {
+    "order_id": "PRD-1103",
+    "plant": "1100",
+    "product": "Medical-grade tissue",
+    "customer_segment": "Healthcare contract",
+    "priority": "critical",
+    "consumption_t_per_day": {
+      "CHEM-BX40": 15,
+      "CHEM-CX20": 8
+    }
+  },
+  {
+    "order_id": "PRD-1104",
+    "plant": "1100",
+    "product": "Copy paper A4 80 gsm",
+    "customer_segment": "Export distributor",
+    "priority": "high",
+    "consumption_t_per_day": {
+      "CHEM-BX40": 9,
+      "CHEM-CX20": 5
+    }
+  },
+  {
+    "order_id": "PRD-1105",
+    "plant": "1100",
+    "product": "Coated art paper 120 gsm",
+    "customer_segment": "Domestic distributor",
+    "priority": "high",
+    "consumption_t_per_day": {
+      "CHEM-BX40": 6,
+      "CHEM-CX20": 4
+    }
+  },
+  {
+    "order_id": "PRD-1106",
+    "plant": "1100",
+    "product": "Uncoated woodfree 70 gsm",
+    "customer_segment": "Domestic distributor",
+    "priority": "normal",
+    "consumption_t_per_day": {
+      "CHEM-BX40": 15,
+      "CHEM-CX20": 6
+    }
+  },
+  {
+    "order_id": "PRD-1107",
+    "plant": "1100",
+    "product": "Newsprint 45 gsm",
+    "customer_segment": "Spot market",
+    "priority": "normal",
+    "consumption_t_per_day": {
+      "CHEM-BX40": 10,
+      "CHEM-CX20": 5
+    }
+  },
+  {
+    "order_id": "PRD-1201",
+    "plant": "1200",
+    "product": "Corrugating medium",
+    "customer_segment": "Domestic key account",
+    "priority": "critical",
+    "consumption_t_per_day": {
+      "CHEM-BX40": 35,
+      "CHEM-CX20": 15
+    }
+  },
+  {
+    "order_id": "PRD-1202",
+    "plant": "1200",
+    "product": "Kraft liner",
+    "customer_segment": "Spot market",
+    "priority": "normal",
+    "consumption_t_per_day": {
+      "CHEM-BX40": 25,
+      "CHEM-CX20": 10
+    }
+  }
+]

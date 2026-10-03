@@ -1,0 +1,21 @@
+COMMERCIAL INVOICE
+
+Invoice No.: INV-SV-26-1188
+Invoice Date: 2026-10-16
+
+Seller: Sorvane Industrial Co., Ltd., Qingdao, China
+Buyer: PT Arunika Pulp & Paper, Arunika West Mill, Indonesia
+
+Buyer PO No.: 4500001022
+Buyer Material No.: CHEM-CX20
+Description of Goods: Caustic agent CX-20
+Quantity: 350 MT
+Unit Price: USD 410.00 per MT
+Total Amount: USD 143,500.00
+Incoterms: CIF Tanjung Priok
+
+Vessel / Voyage: MV Jade Meridian / JM-0917
+Port of Loading: Qingdao
+Port of Discharge: Tanjung Priok
+
+We certify that this invoice is true and correct.

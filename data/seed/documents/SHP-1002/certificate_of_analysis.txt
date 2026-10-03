@@ -1,0 +1,14 @@
+CERTIFICATE OF ANALYSIS
+
+Certificate No.: COA-SV-26-1188
+Product: Caustic agent CX-20
+Buyer Material No.: CHEM-CX20
+Batch No.: CX20-2610-07
+Date of Analysis: 2026-10-16
+
+Parameter             Specification   Result
+Assay (as NaOH)       >= 48.0 %       49.2 %
+Sodium chloride       <= 0.02 %       0.011 %
+Iron (Fe)             <= 5 ppm        2 ppm
+
+Conclusion: The batch conforms to the agreed specification.

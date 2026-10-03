@@ -1,0 +1,16 @@
+[
+  {
+    "PurchaseOrder": "4500001021",
+    "PurchaseOrderType": "NB",
+    "PurchaseOrderDate": "2026-09-07",
+    "Supplier": "17300101",
+    "SupplyingPlant": ""
+  },
+  {
+    "PurchaseOrder": "4500001022",
+    "PurchaseOrderType": "NB",
+    "PurchaseOrderDate": "2026-09-28",
+    "Supplier": "17300102",
+    "SupplyingPlant": ""
+  }
+]

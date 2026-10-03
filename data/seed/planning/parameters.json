@@ -1,0 +1,36 @@
+{
+  "note": "Scenario assumptions, not measured values.",
+  "plants": {
+    "1100": {
+      "name": "Arunika West Mill",
+      "region": "West Java, near Tanjung Priok"
+    },
+    "1200": {
+      "name": "Arunika East Mill",
+      "region": "East Java"
+    }
+  },
+  "port_to_plant_transit_days": {
+    "Tanjung Priok": {
+      "1100": 0.5,
+      "1200": 2.0
+    }
+  },
+  "sto_lead_time_days": {
+    "1200": {
+      "1100": 1.0
+    },
+    "1100": {
+      "1200": 1.0
+    }
+  },
+  "transfer_cost_usd_per_t": {
+    "1200": {
+      "1100": 45.0
+    },
+    "1100": {
+      "1200": 45.0
+    }
+  },
+  "baseline_min_group_size": 10
+}

@@ -1,0 +1,26 @@
+[
+  {
+    "Product": "CHEM-BX40",
+    "Plant": "1100",
+    "SafetyStockQuantity": 150,
+    "BaseUnit": "TO"
+  },
+  {
+    "Product": "CHEM-BX40",
+    "Plant": "1200",
+    "SafetyStockQuantity": 200,
+    "BaseUnit": "TO"
+  },
+  {
+    "Product": "CHEM-CX20",
+    "Plant": "1100",
+    "SafetyStockQuantity": 100,
+    "BaseUnit": "TO"
+  },
+  {
+    "Product": "CHEM-CX20",
+    "Plant": "1200",
+    "SafetyStockQuantity": 80,
+    "BaseUnit": "TO"
+  }
+]
