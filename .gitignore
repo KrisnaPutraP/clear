@@ -1,0 +1,23 @@
+# Confidential hackathon material: local context only, never committed
+/docs/reference/
+
+# Runtime state, recreated from data/seed/ by scripts/reset_data.py
+/data/runtime/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+build/
+dist/
+.pytest_cache/
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "clear"
+version = "0.1.0"
+description = "CLEAR: Cross-Border Supply Chain Exception Resolution Agent"
+readme = "README.md"
+requires-python = ">=3.12"
+# Add runtime dependencies only when needed. clear_tools itself stays standard
+# library only (docs/PLAN.md §5b), guarded by tests/test_architecture.py.
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
