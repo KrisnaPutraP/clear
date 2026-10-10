@@ -35,27 +35,32 @@ def predict_resolution_time(store: JsonStore, shipment_id: str) -> dict:
         raise ValueError(f"{shipment_id} has no active exception to predict")
     features = _features(case, exception)
 
-    rows = store.read_csv(HISTORY)
-    min_cases = planning.baseline_min_group_size(store)
-    for keys in GROUPINGS:
-        days = [float(row["resolution_days"]) for row in rows if all(row[k] == features[k] for k in keys)]
-        if len(days) >= min_cases:
-            break
-    else:
-        raise LookupError(f"Fewer than {min_cases} past cases of {features['exception_type']}")
-
+    days, grouped_by, cases_used = baseline_median(
+        store.read_csv(HISTORY), features, planning.baseline_min_group_size(store)
+    )
     return records.add(store, "prediction", {
         "shipment_id": shipment_id,
-        "predicted_days": round(statistics.median(days), 1),
+        "predicted_days": days,
         "source": SOURCE,
         "basis": {
             "method": "median resolution_days of similar past exceptions",
-            "grouped_by": {k: features[k] for k in keys},
-            "cases": len(days),
+            "grouped_by": grouped_by,
+            "cases": cases_used,
         },
         "features": features,
         "drivers": None,
     })
+
+
+def baseline_median(
+    rows: list[dict[str, str]], features: dict[str, str], min_cases: int
+) -> tuple[float, dict[str, str], int]:
+    """Median resolution days of past exceptions like this one, the grouping used, and its size."""
+    for keys in GROUPINGS:
+        days = [float(row["resolution_days"]) for row in rows if all(row[k] == features[k] for k in keys)]
+        if len(days) >= min_cases:
+            return round(statistics.median(days), 1), {k: features[k] for k in keys}, len(days)
+    raise LookupError(f"Fewer than {min_cases} past cases of {features['exception_type']}")
 
 
 def _features(case: cases.Case, exception: dict) -> dict[str, str]:
