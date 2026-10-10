@@ -14,12 +14,12 @@ Usage: python scripts/check_rpt_quality.py
 """
 
 import csv
-import os
 import statistics
 import tempfile
 from collections import defaultdict
 from pathlib import Path
 
+from clear_app.settings import load_env
 from clear_tools import records, sap_rpt
 from clear_tools.approvals import record_approval
 from clear_tools.events import prepared_event, record_event
@@ -37,7 +37,7 @@ SIMILAR_CASES = 8
 
 
 def main() -> None:
-    load_env(REPO_ROOT / ".env")
+    load_env()
     config = sap_rpt.Config.from_env()
     token = sap_rpt.access_token(config)
     train = read_rows("exception_history_train")
@@ -126,16 +126,6 @@ def check_story(config: sap_rpt.Config, token: str, context: list[dict]):
 def read_rows(name: str) -> list[dict[str, str]]:
     with (SEED_DIR / "history" / f"{name}.csv").open(encoding="utf-8", newline="") as f:
         return list(csv.DictReader(f))
-
-
-def load_env(path: Path) -> None:
-    """Load KEY=VALUE lines into os.environ without overriding what is already set."""
-    if not path.exists():
-        return
-    for line in path.read_text(encoding="utf-8").splitlines():
-        if "=" in line and not line.lstrip().startswith("#"):
-            key, value = line.split("=", 1)
-            os.environ.setdefault(key.strip(), value.strip())
 
 
 if __name__ == "__main__":

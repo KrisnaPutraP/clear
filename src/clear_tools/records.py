@@ -11,17 +11,23 @@ from datetime import datetime, timezone
 
 from clear_tools.store import JsonStore
 
-_PREFIX = {"prediction": "PRED", "assessment": "ASM", "validation": "VAL", "approval": "APR", "case": "CASE"}
+_PREFIX = {"prediction": "PRED", "assessment": "ASM", "validation": "VAL", "approval": "APR",
+           "reconciliation": "REC", "case": "CASE"}
 
 
 def add(store: JsonStore, kind: str, record: dict) -> dict:
     """Store a new record of the given kind and return it with its ID."""
     name = f"records/{kind}s"
     items = store.read(name)
-    stored = {f"{kind}_id": f"{_PREFIX[kind]}-{len(items) + 1:04d}", **record, "created_at": now()}
+    stored = {f"{kind}_id": next_id(store, kind), **record, "created_at": now()}
     items.append(stored)
     store.write(name, items)
     return stored
+
+
+def next_id(store: JsonStore, kind: str, ahead: int = 1) -> str:
+    """The ID that the ahead-th next record of this kind will get."""
+    return f"{_PREFIX[kind]}-{len(store.read(f'records/{kind}s')) + ahead:04d}"
 
 
 def get(store: JsonStore, kind: str, record_id: str) -> dict:

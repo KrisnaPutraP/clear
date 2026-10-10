@@ -1,22 +1,23 @@
 # CLEAR UI contract
 
-A front end for CLEAR needs five calls: four operations plus the list of
-prepared events. Today they are methods of `clear_app.contract.Clear`
-(Python, used by the Streamlit app). A custom front end gets the same calls
-over HTTP; the routes below are the proposed mapping.
+A front end for CLEAR needs four operations plus two lists (prepared events
+and cases). Today they are methods of `clear_app.contract.Clear` (Python,
+used by the Streamlit app in `app/streamlit_app.py`). A custom front end gets
+the same calls over HTTP; the routes below are the proposed mapping.
 
 [`examples/case_s1.json`](examples/case_s1.json) holds the exact output of
-every call during scenario S1, so you can build screens before the agents
-run on the cloud. The agent wording in it is illustrative; the shapes are
-exact.
+every call during scenario S1: the exception, the planner's approval, and the
+ETA slip. You can build screens before the agents run on the cloud. The agent
+wording in it is illustrative; the shapes are exact.
 
 ## Calls
 
 | Call | Python | Proposed HTTP | Returns |
 |---|---|---|---|
 | List prepared events | `list_events()` | `GET /events` | `[{event_id, scenario, type, shipment_id, description}]` |
+| List cases | `list_cases()` | `GET /cases` | `[{case_id, shipment_id, status}]`, newest first |
 | Send an event | `send_event(event_id)` | `POST /events/{event_id}` | `case_id`; the agents keep working in the background |
-| Read a case | `get_case(case_id)` | `GET /cases/{case_id}` | Status, shipment, and the plan with all numbers filled in |
+| Read a case | `get_case(case_id)` | `GET /cases/{case_id}` | Status, shipment, documents, stock, and the plan with all numbers filled in |
 | Read the timeline | `get_case_log(case_id, after_seq=0)` | `GET /cases/{case_id}/log?after_seq=N` | Log entries with `seq` greater than `N` |
 | Decide on an STO | `submit_decision(case_id, validation_id, approver, decision, reason=None)` | `POST /cases/{case_id}/decisions` | The approval record |
 
@@ -53,6 +54,19 @@ you have>)` every one or two seconds and append what comes back. When
   `business rules`. Show it next to the summary.
 - `flag`: `rejected` (the validator refused an action; make it stand out),
   `discrepancy` (documents disagree), `write` (an ERP write), or `error`.
+
+## Case extras
+
+Besides the status and plan, `get_case` returns what the side panels need:
+
+- `documents`: `{required_documents, documents: [{document_type, text}]}`.
+- `reconciliation`: the latest document check, or `null`. Each entry of
+  `discrepancies` names a `field` and its `mismatched_documents`;
+  `verified_extractions` holds the exact `quote` each value was read from, so
+  you can highlight the line that differs (and the agreeing line in the
+  other documents for comparison).
+- `inventory`: stock, stock in transit, safety stock, and daily use at each
+  priority level, per plant.
 
 ## Plan
 

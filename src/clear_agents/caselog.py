@@ -140,18 +140,29 @@ def _inventory(r: dict) -> Summary:
 
 def _reconcile(r: dict) -> Summary:
     if r["consistent"]:
-        return "Documents agree with each other and with the purchase order", "deterministic check", None
+        return f"{r['reconciliation_id']}: documents agree with each other and with the purchase order", \
+            "deterministic check", None
     findings = [f"{d['field']} differs in {', '.join(d['mismatched_documents'])}" for d in r["discrepancies"]]
     if r["missing_documents"]:
         findings.append("missing " + ", ".join(r["missing_documents"]))
     if r["not_extracted"] or r["unverified_extractions"]:
         findings.append(f"{len(r['not_extracted'])} fields not extracted, "
                         f"{len(r['unverified_extractions'])} extractions unverified")
-    return "; ".join(findings), "deterministic check", "discrepancy" if r["discrepancies"] else None
+    return (f"{r['reconciliation_id']}: " + "; ".join(findings), "deterministic check",
+            "discrepancy" if r["discrepancies"] else None)
 
 
 def _prediction(r: dict) -> Summary:
-    return f"{r['prediction_id']}: {r['predicted_days']:g} days ({r['basis']['cases']} similar past cases)", r["source"], None
+    basis = r["basis"]
+    if basis.get("interval_days"):
+        low, high = basis["interval_days"]
+        detail = f"likely {low:g}-{high:g}, from {basis['context_cases']} past exceptions"
+    else:
+        detail = f"median of {basis['cases']} similar past cases"
+    if basis.get("fallback_reason"):
+        detail += f"; SAP-RPT unavailable: {basis['fallback_reason']}"
+    flag = "fallback" if basis.get("fallback_reason") else None
+    return f"{r['prediction_id']}: {r['predicted_days']:g} days ({detail})", r["source"], flag
 
 
 def _supply_risk(r: dict) -> Summary:

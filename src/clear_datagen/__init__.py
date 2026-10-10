@@ -14,7 +14,8 @@ from clear_tools import cases, events, planning
 from clear_tools.store import JsonStore
 
 EMPTY_RECORDS = [
-    "predictions", "assessments", "validations", "approvals", "stock_transport_orders", "cases", "case_log",
+    "predictions", "assessments", "validations", "approvals", "reconciliations", "stock_transport_orders",
+    "cases", "case_log",
 ]
 
 

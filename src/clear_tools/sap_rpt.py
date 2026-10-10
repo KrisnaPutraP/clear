@@ -15,6 +15,7 @@ read from environment variables. Standard library only.
 import base64
 import json
 import os
+import time
 import urllib.parse
 import urllib.request
 from dataclasses import dataclass
@@ -60,8 +61,14 @@ class Prediction:
     similar_rows: list[int] | None  # Indices into the context rows, most relevant first.
 
 
+_tokens: dict[str, tuple[str, float]] = {}  # client_id -> (token, expiry as time.monotonic())
+
+
 def access_token(config: Config, timeout: float = 10) -> str:
-    """OAuth access token for the service key (client credentials grant)."""
+    """OAuth access token for the service key (client credentials grant), reused until shortly before expiry."""
+    cached = _tokens.get(config.client_id)
+    if cached and cached[1] > time.monotonic():
+        return cached[0]
     key = base64.b64encode(f"{config.client_id}:{config.client_secret}".encode()).decode()
     response = _post(
         f"{config.auth_url.rstrip('/')}/oauth/token",
@@ -69,6 +76,8 @@ def access_token(config: Config, timeout: float = 10) -> str:
         {"Authorization": f"Basic {key}", "Content-Type": "application/x-www-form-urlencoded"},
         timeout,
     )
+    lifetime = float(response.get("expires_in", 3600))
+    _tokens[config.client_id] = (response["access_token"], time.monotonic() + max(0.0, lifetime - 60))
     return response["access_token"]
 
 

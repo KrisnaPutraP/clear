@@ -26,7 +26,7 @@ python scripts/reset_data.py
 | `planning/demand_orders.json` | Orders with priority and daily chemical use | Own schema |
 | `planning/parameters.json` | Transit times, STO lead times, transfer cost | Scenario assumptions |
 | `history/exception_history_*.csv` | Past exceptions and their resolution time | 800 train + 200 holdout rows |
-| `records/*.json` | Predictions, validations, approvals, executed STOs | Empty in the seed |
+| `records/*.json` | Predictions, assessments, reconciliations, validations, approvals, executed STOs, cases, case log | Empty in the seed |
 
 The mock S/4HANA uses the entity and field names of the API definitions SAP
 publishes for `API_PURCHASEORDER_PROCESS_SRV`, `API_MATERIAL_STOCK_SRV`,

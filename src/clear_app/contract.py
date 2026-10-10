@@ -1,7 +1,7 @@
 """UI contract (docs/PLAN.md §7b): the four operations a front end needs.
 
-send_event, get_case, get_case_log, and submit_decision, plus list_events to
-fill the event feed from the prepared catalog. Streamlit imports this
+send_event, get_case, get_case_log, and submit_decision, plus list_events and
+list_cases to fill the event feed and a case picker. Streamlit imports this
 module; a custom front end can get the same operations over HTTP later
 (docs/ui-contract.md). Agent runs happen in a background thread, so a UI can
 poll get_case_log for a live timeline. One run at a time: the JSON store has
@@ -37,17 +37,34 @@ class Clear:
         self._start(lambda: runner.work_event(self.store, case_id, event, self.model_for), wait)
         return case_id
 
+    @property
+    def running(self) -> bool:
+        """Whether an agent run is in progress."""
+        return self._busy.locked()
+
+    def list_cases(self) -> list[dict]:
+        """All cases, newest first, for a case picker."""
+        keys = ("case_id", "shipment_id", "status")
+        return [{k: case[k] for k in keys} for case in reversed(self.store.read(caselog.CASES))]
+
     def get_case(self, case_id: str) -> dict:
-        """Case status, shipment, and the current plan with every cited number filled in."""
+        """Case status, shipment, documents, stock, and the plan with every cited number filled in."""
         case = caselog.get_case(self.store, case_id)
+        shipment = read.get_shipment(self.store, case["shipment_id"])
+        material = read.get_purchase_order(self.store, shipment["purchase_order"])["A_PurchaseOrderItem"][0]["Material"]
+        reconciliations = [r for r in self.store.read("records/reconciliations")
+                           if r["shipment_id"] == case["shipment_id"]]
         return {
             "case_id": case_id,
             "shipment_id": case["shipment_id"],
             "status": case["status"],
             "status_reason": case["status_reason"],
             "updated_at": case.get("updated_at", case["created_at"]),
-            "running": self._busy.locked(),
-            "shipment": read.get_shipment(self.store, case["shipment_id"]),
+            "running": self.running,
+            "shipment": shipment,
+            "documents": read.get_documents(self.store, case["shipment_id"]),
+            "reconciliation": reconciliations[-1] if reconciliations else None,
+            "inventory": read.get_inventory(self.store, material),
             "plan": render(self.store, RecoveryPlan.model_validate(case["plan"])) if case["plan"] else None,
         }
 

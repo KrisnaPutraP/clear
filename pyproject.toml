@@ -12,6 +12,7 @@ requires-python = ">=3.12"
 # library only (docs/PLAN.md §5b), guarded by tests/test_architecture.py.
 dependencies = [
     "strands-agents>=1.57,<2",  # Agents (docs/PLAN.md §2b)
+    "streamlit>=1.40,<2",  # Demo UI (docs/PLAN.md §7b)
 ]
 
 [project.optional-dependencies]

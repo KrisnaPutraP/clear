@@ -8,12 +8,13 @@ documents.
 An extraction is trusted only if its quote appears in the document and its
 value appears in the quote. Anything else is returned as unverified and left
 out of the comparison, so a misread or invented value cannot create or hide
-a discrepancy.
+a discrepancy. Each result is stored with a reconciliation_id, together with
+the verified quotes, so the UI can highlight the lines that disagree.
 """
 
 import re
 
-from clear_tools import cases, s4
+from clear_tools import cases, records, s4
 from clear_tools.read import get_documents
 from clear_tools.store import JsonStore
 
@@ -49,13 +50,15 @@ def reconcile_documents(store: JsonStore, shipment_id: str, extractions: list[di
     }
 
     verified: dict[tuple[str, str], object] = {}
+    quotes: dict[tuple[str, str], str] = {}
     unverified = []
     for extraction in extractions:
         problem = _problem(extraction, texts)
         if problem:
             unverified.append({**extraction, "problem": problem})
         else:
-            verified[(extraction["document_type"], extraction["field"])] = _normalized(extraction)
+            key = (extraction["document_type"], extraction["field"])
+            verified[key], quotes[key] = _normalized(extraction), str(extraction["quote"]).strip()
 
     discrepancies = []
     for field in FIELDS:
@@ -76,15 +79,19 @@ def reconcile_documents(store: JsonStore, shipment_id: str, extractions: list[di
         for field in EXPECTED_FIELDS.get(doc, ())
         if (doc, field) not in verified
     ]
-    return {
+    return records.add(store, "reconciliation", {
         "shipment_id": shipment_id,
         "consistent": not (discrepancies or missing or not_extracted),
         "discrepancies": discrepancies,
         "missing_documents": missing,
         "unverified_extractions": unverified,
         "not_extracted": not_extracted,
+        "verified_extractions": [
+            {"document_type": doc, "field": field, "value": value, "quote": quotes[(doc, field)]}
+            for (doc, field), value in verified.items()
+        ],
         "purchase_order": {"source": f"S/4HANA (mock) {s4.PO_ITEMS.removeprefix('s4/')}", **reference},
-    }
+    })
 
 
 def _problem(extraction: dict, texts: dict[str, str]) -> str | None:

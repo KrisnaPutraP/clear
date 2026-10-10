@@ -4,7 +4,7 @@ agents, tools, hooks, plan checks, and case log are the real ones."""
 
 from clear_agents import runner
 from clear_agents.plan import RecoveryPlan, check_references
-from clear_agents.testing import ScriptedModel, s1_approval, s1_event, s2_event, scripted
+from clear_agents.testing import ScriptedDirector, ScriptedModel
 from clear_app.contract import Clear
 
 
@@ -18,21 +18,19 @@ def test_only_the_action_agent_can_write(store):
         assert "validate_action" not in reader.tool_names
 
 
-def test_s1_stops_for_approval_then_executes_the_approved_sto(store):
-    clear = Clear(store, scripted(s1_event(store)))
+def test_s1_from_exception_to_approved_sto_to_eta_slip(store):
+    clear = Clear(store, ScriptedDirector(store))
     case_id = clear.send_event("S1-DOC-HOLD", wait=True)
-    case = clear.get_case(case_id)
-    log = clear.get_case_log(case_id)
+    case, log = clear.get_case(case_id), clear.get_case_log(case_id)
 
     assert case["status"] == "awaiting_approval"
     assert [e["tool"] for e in log if e.get("flag") == "rejected"] == ["validate_action"]
     assert [e["tool"] for e in log if e.get("flag") == "discrepancy"] == ["reconcile_documents"]
     [action] = case["plan"]["actions"]
-    assert action["validation"]["quantity"] == 100  # Filled in from VAL-0002, not typed by the model.
+    assert action["validation"]["quantity"] == 100  # Filled in from the validation record, not typed by the model.
     assert case["plan"]["impact"]["prediction"]["source"] == "baseline-median"
 
-    clear.model_for = scripted(s1_approval(store))
-    clear.submit_decision(case_id, "VAL-0002", "Demo Planner", "approved", wait=True)
+    clear.submit_decision(case_id, action["validation_id"], "Demo Planner", "approved", wait=True)
     case = clear.get_case(case_id)
 
     assert case["status"] == "monitoring"
@@ -42,21 +40,35 @@ def test_s1_stops_for_approval_then_executes_the_approved_sto(store):
     assert plants["1200"]["unrestricted_t"] == plants["1200"]["safety_stock_t"]
     assert plants["1100"]["in_transit_t"] == 100
 
+    assert clear.send_event("S1-ETA-SLIP", wait=True) == case_id  # Same exception, same case.
+    case = clear.get_case(case_id)
 
-def test_s2_keeps_the_plan(store):
-    clear = Clear(store, scripted(s2_event(store)))
+    assert case["status"] == "needs_human_decision"
+    assert "emergency sourcing" in case["status_reason"]
+    covered = {o["name"]: o["assessment"]["covered"] for o in case["plan"]["options"]}
+    assert covered == {"Critical and high orders, transfer in transit": False,
+                       "Critical orders only, transfer in transit": True}
+
+
+def test_s2_keeps_the_plan_even_after_s1(store):
+    clear = Clear(store, ScriptedDirector(store))
+    clear.send_event("S1-DOC-HOLD", wait=True)
+
     case = clear.get_case(clear.send_event("S2-CONGESTION", wait=True))
 
+    assert case["case_id"] == "CASE-0002"
     assert case["status"] == "monitoring"
     assert case["plan"]["actions"] == []
     assert case["plan"]["impact"]["covered"]
 
 
 def test_rejection_moves_the_case_to_a_human_decision(store):
-    clear = Clear(store, scripted(s1_event(store)))
+    clear = Clear(store, ScriptedDirector(store))
     case_id = clear.send_event("S1-DOC-HOLD", wait=True)
+    [action] = clear.get_case(case_id)["plan"]["actions"]
 
-    clear.submit_decision(case_id, "VAL-0002", "Demo Planner", "rejected", reason="Prefer emergency sourcing")
+    clear.submit_decision(case_id, action["validation_id"], "Demo Planner", "rejected",
+                          reason="Prefer emergency sourcing")
 
     case = clear.get_case(case_id)
     assert case["status"] == "needs_human_decision"
