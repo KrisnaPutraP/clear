@@ -1,0 +1,851 @@
+{
+  "note": "Produced by a scripted run of S1 (scripts/make_ui_example.py). Shapes are exact; agent wording is illustrative.",
+  "list_events": [
+    {
+      "event_id": "S1-DOC-HOLD",
+      "scenario": "S1",
+      "type": "customs_document_hold",
+      "shipment_id": "SHP-1001",
+      "description": "Pre-arrival customs check flagged SHP-1001: the shipping documents do not agree on quantity."
+    },
+    {
+      "event_id": "S1-ETA-SLIP",
+      "scenario": "S1",
+      "type": "eta_change",
+      "shipment_id": "SHP-1001",
+      "description": "Berth congestion at Tanjung Priok: the carrier moved the ETA of MV Northern Lumen back by one day."
+    },
+    {
+      "event_id": "S2-CONGESTION",
+      "scenario": "S2",
+      "type": "port_congestion",
+      "shipment_id": "SHP-1002",
+      "description": "Yard congestion at Tanjung Priok is delaying discharge of SHP-1002."
+    }
+  ],
+  "get_case_awaiting_approval": {
+    "case_id": "CASE-0001",
+    "shipment_id": "SHP-1001",
+    "status": "awaiting_approval",
+    "status_reason": null,
+    "updated_at": "2026-10-10T15:15:35+00:00",
+    "running": false,
+    "shipment": {
+      "shipment_id": "SHP-1001",
+      "scenario": "S1",
+      "purchase_order": "4500001021",
+      "status": "exception",
+      "mode": "sea",
+      "vessel": "MV Northern Lumen",
+      "voyage": "NL-2641",
+      "port_of_loading": "Hamburg",
+      "port_of_discharge": "Tanjung Priok",
+      "eta": "2026-10-31T14:00:00+07:00",
+      "forwarder": "FWD-B",
+      "origin_country": "DE",
+      "cargo_category": "bleaching_chemical",
+      "required_documents": [
+        "commercial_invoice",
+        "packing_list",
+        "bill_of_lading",
+        "certificate_of_analysis"
+      ],
+      "exception": {
+        "exception_type": "document_discrepancy",
+        "congestion_level": "normal",
+        "missing_documents": 0,
+        "has_document_discrepancy": true,
+        "raised_at": "2026-10-30T09:15:00+07:00",
+        "description": "Pre-arrival customs check flagged SHP-1001: the shipping documents do not agree on quantity."
+      },
+      "events": [
+        {
+          "event_id": "EV-1001-01",
+          "type": "departed",
+          "occurred_at": "2026-10-03T18:00:00+02:00",
+          "description": "Departed Hamburg."
+        },
+        {
+          "event_id": "S1-DOC-HOLD",
+          "type": "customs_document_hold",
+          "occurred_at": "2026-10-30T09:15:00+07:00",
+          "description": "Pre-arrival customs check flagged SHP-1001: the shipping documents do not agree on quantity."
+        }
+      ]
+    },
+    "plan": {
+      "case_id": "CASE-0001",
+      "exception": "Customs document hold: the packing list states a lower quantity than the invoice and PO.",
+      "evidence": [
+        {
+          "fact": "Packing list quantity differs from the invoice and the purchase order.",
+          "source": "reconcile_documents"
+        },
+        {
+          "fact": "Plant 1200 holds the material above its safety stock.",
+          "source": "get_inventory"
+        }
+      ],
+      "impact": {
+        "prediction": {
+          "prediction_id": "PRED-0001",
+          "predicted_days": 3.0,
+          "source": "baseline-median",
+          "basis": {
+            "method": "median resolution_days of similar past exceptions",
+            "grouped_by": {
+              "exception_type": "document_discrepancy",
+              "port": "Tanjung Priok",
+              "congestion_level": "normal"
+            },
+            "cases": 93
+          }
+        },
+        "assessment_id": "ASM-0001",
+        "priority_level": "all",
+        "coverage_days": 1.9,
+        "required_coverage_days": 3.5,
+        "covered": false,
+        "shortage_t": 160.0,
+        "transfer": null,
+        "deferred_orders": [],
+        "sources": {
+          "stock": "S/4HANA (mock) API_MATERIAL_STOCK_SRV/A_MatlStkInAcctMod",
+          "consumption": "planning/demand_orders (scenario data)",
+          "prediction": "baseline-median",
+          "transit_and_transfer": "planning/parameters (scenario assumptions)"
+        }
+      },
+      "options": [
+        {
+          "name": "Transfer 100 t from 1200",
+          "assessment_id": "ASM-0002",
+          "validation_id": null,
+          "note": "The feasible transfer alone still leaves a shortage.",
+          "assessment": {
+            "assessment_id": "ASM-0002",
+            "priority_level": "all",
+            "coverage_days": 2.9,
+            "required_coverage_days": 3.5,
+            "covered": false,
+            "shortage_t": 60.0,
+            "transfer": {
+              "status": "proposed",
+              "quantity_t": 100.0,
+              "source_plant": "1200",
+              "lead_time_days": 1.0,
+              "cost_usd": 4500.0
+            },
+            "deferred_orders": [],
+            "sources": {
+              "stock": "S/4HANA (mock) API_MATERIAL_STOCK_SRV/A_MatlStkInAcctMod",
+              "consumption": "planning/demand_orders (scenario data)",
+              "prediction": "baseline-median",
+              "transit_and_transfer": "planning/parameters (scenario assumptions)"
+            }
+          },
+          "validation": null
+        },
+        {
+          "name": "Transfer 100 t from 1200 + critical and high orders",
+          "assessment_id": "ASM-0003",
+          "validation_id": "VAL-0002",
+          "note": "Covers the requirement; normal-priority orders wait.",
+          "assessment": {
+            "assessment_id": "ASM-0003",
+            "priority_level": "critical_high",
+            "coverage_days": 3.87,
+            "required_coverage_days": 3.5,
+            "covered": true,
+            "shortage_t": 0.0,
+            "transfer": {
+              "status": "proposed",
+              "quantity_t": 100.0,
+              "source_plant": "1200",
+              "lead_time_days": 1.0,
+              "cost_usd": 4500.0
+            },
+            "deferred_orders": [
+              {
+                "order_id": "PRD-1106",
+                "product": "Uncoated woodfree 70 gsm",
+                "priority": "normal",
+                "consumption_t_per_day": 15
+              },
+              {
+                "order_id": "PRD-1107",
+                "product": "Newsprint 45 gsm",
+                "priority": "normal",
+                "consumption_t_per_day": 10
+              }
+            ],
+            "sources": {
+              "stock": "S/4HANA (mock) API_MATERIAL_STOCK_SRV/A_MatlStkInAcctMod",
+              "consumption": "planning/demand_orders (scenario data)",
+              "prediction": "baseline-median",
+              "transit_and_transfer": "planning/parameters (scenario assumptions)"
+            }
+          },
+          "validation": {
+            "validation_id": "VAL-0002",
+            "valid": true,
+            "quantity": 100.0,
+            "source_plant": "1200",
+            "destination_plant": "1100",
+            "violations": [],
+            "max_feasible_quantity": 100
+          }
+        }
+      ],
+      "recommendation": "Transfer the feasible quantity from plant 1200 and serve critical and high orders until the shipment clears; the full transfer was rejected by the safety-stock rule.",
+      "recommended_option": "Transfer 100 t from 1200 + critical and high orders",
+      "actions": [
+        {
+          "validation_id": "VAL-0002",
+          "status": "awaiting_approval",
+          "purchase_order": null,
+          "validation": {
+            "validation_id": "VAL-0002",
+            "valid": true,
+            "quantity": 100.0,
+            "source_plant": "1200",
+            "destination_plant": "1100",
+            "violations": [],
+            "max_feasible_quantity": 100
+          },
+          "approval": null,
+          "sto": null
+        }
+      ],
+      "verification": null,
+      "escalation": null,
+      "next_check": "Customs response to the corrected packing list, and the vessel ETA."
+    }
+  },
+  "get_case_after_approval": {
+    "case_id": "CASE-0001",
+    "shipment_id": "SHP-1001",
+    "status": "monitoring",
+    "status_reason": null,
+    "updated_at": "2026-10-10T15:15:35+00:00",
+    "running": false,
+    "shipment": {
+      "shipment_id": "SHP-1001",
+      "scenario": "S1",
+      "purchase_order": "4500001021",
+      "status": "exception",
+      "mode": "sea",
+      "vessel": "MV Northern Lumen",
+      "voyage": "NL-2641",
+      "port_of_loading": "Hamburg",
+      "port_of_discharge": "Tanjung Priok",
+      "eta": "2026-10-31T14:00:00+07:00",
+      "forwarder": "FWD-B",
+      "origin_country": "DE",
+      "cargo_category": "bleaching_chemical",
+      "required_documents": [
+        "commercial_invoice",
+        "packing_list",
+        "bill_of_lading",
+        "certificate_of_analysis"
+      ],
+      "exception": {
+        "exception_type": "document_discrepancy",
+        "congestion_level": "normal",
+        "missing_documents": 0,
+        "has_document_discrepancy": true,
+        "raised_at": "2026-10-30T09:15:00+07:00",
+        "description": "Pre-arrival customs check flagged SHP-1001: the shipping documents do not agree on quantity."
+      },
+      "events": [
+        {
+          "event_id": "EV-1001-01",
+          "type": "departed",
+          "occurred_at": "2026-10-03T18:00:00+02:00",
+          "description": "Departed Hamburg."
+        },
+        {
+          "event_id": "S1-DOC-HOLD",
+          "type": "customs_document_hold",
+          "occurred_at": "2026-10-30T09:15:00+07:00",
+          "description": "Pre-arrival customs check flagged SHP-1001: the shipping documents do not agree on quantity."
+        }
+      ]
+    },
+    "plan": {
+      "case_id": "CASE-0001",
+      "exception": "Customs document hold: the packing list states a lower quantity than the invoice and PO.",
+      "evidence": [
+        {
+          "fact": "Packing list quantity differs from the invoice and the purchase order.",
+          "source": "reconcile_documents"
+        },
+        {
+          "fact": "Plant 1200 holds the material above its safety stock.",
+          "source": "get_inventory"
+        }
+      ],
+      "impact": {
+        "prediction": {
+          "prediction_id": "PRED-0001",
+          "predicted_days": 3.0,
+          "source": "baseline-median",
+          "basis": {
+            "method": "median resolution_days of similar past exceptions",
+            "grouped_by": {
+              "exception_type": "document_discrepancy",
+              "port": "Tanjung Priok",
+              "congestion_level": "normal"
+            },
+            "cases": 93
+          }
+        },
+        "assessment_id": "ASM-0001",
+        "priority_level": "all",
+        "coverage_days": 1.9,
+        "required_coverage_days": 3.5,
+        "covered": false,
+        "shortage_t": 160.0,
+        "transfer": null,
+        "deferred_orders": [],
+        "sources": {
+          "stock": "S/4HANA (mock) API_MATERIAL_STOCK_SRV/A_MatlStkInAcctMod",
+          "consumption": "planning/demand_orders (scenario data)",
+          "prediction": "baseline-median",
+          "transit_and_transfer": "planning/parameters (scenario assumptions)"
+        }
+      },
+      "options": [
+        {
+          "name": "Transfer 100 t from 1200",
+          "assessment_id": "ASM-0002",
+          "validation_id": null,
+          "note": "The feasible transfer alone still leaves a shortage.",
+          "assessment": {
+            "assessment_id": "ASM-0002",
+            "priority_level": "all",
+            "coverage_days": 2.9,
+            "required_coverage_days": 3.5,
+            "covered": false,
+            "shortage_t": 60.0,
+            "transfer": {
+              "status": "proposed",
+              "quantity_t": 100.0,
+              "source_plant": "1200",
+              "lead_time_days": 1.0,
+              "cost_usd": 4500.0
+            },
+            "deferred_orders": [],
+            "sources": {
+              "stock": "S/4HANA (mock) API_MATERIAL_STOCK_SRV/A_MatlStkInAcctMod",
+              "consumption": "planning/demand_orders (scenario data)",
+              "prediction": "baseline-median",
+              "transit_and_transfer": "planning/parameters (scenario assumptions)"
+            }
+          },
+          "validation": null
+        },
+        {
+          "name": "Transfer 100 t from 1200 + critical and high orders",
+          "assessment_id": "ASM-0003",
+          "validation_id": "VAL-0002",
+          "note": "Covers the requirement; normal-priority orders wait.",
+          "assessment": {
+            "assessment_id": "ASM-0003",
+            "priority_level": "critical_high",
+            "coverage_days": 3.87,
+            "required_coverage_days": 3.5,
+            "covered": true,
+            "shortage_t": 0.0,
+            "transfer": {
+              "status": "proposed",
+              "quantity_t": 100.0,
+              "source_plant": "1200",
+              "lead_time_days": 1.0,
+              "cost_usd": 4500.0
+            },
+            "deferred_orders": [
+              {
+                "order_id": "PRD-1106",
+                "product": "Uncoated woodfree 70 gsm",
+                "priority": "normal",
+                "consumption_t_per_day": 15
+              },
+              {
+                "order_id": "PRD-1107",
+                "product": "Newsprint 45 gsm",
+                "priority": "normal",
+                "consumption_t_per_day": 10
+              }
+            ],
+            "sources": {
+              "stock": "S/4HANA (mock) API_MATERIAL_STOCK_SRV/A_MatlStkInAcctMod",
+              "consumption": "planning/demand_orders (scenario data)",
+              "prediction": "baseline-median",
+              "transit_and_transfer": "planning/parameters (scenario assumptions)"
+            }
+          },
+          "validation": {
+            "validation_id": "VAL-0002",
+            "valid": true,
+            "quantity": 100.0,
+            "source_plant": "1200",
+            "destination_plant": "1100",
+            "violations": [],
+            "max_feasible_quantity": 100
+          }
+        }
+      ],
+      "recommendation": "Transfer the feasible quantity from plant 1200 and serve critical and high orders until the shipment clears; the full transfer was rejected by the safety-stock rule.",
+      "recommended_option": "Transfer 100 t from 1200 + critical and high orders",
+      "actions": [
+        {
+          "validation_id": "VAL-0002",
+          "status": "executed",
+          "purchase_order": "4500001023",
+          "validation": {
+            "validation_id": "VAL-0002",
+            "valid": true,
+            "quantity": 100.0,
+            "source_plant": "1200",
+            "destination_plant": "1100",
+            "violations": [],
+            "max_feasible_quantity": 100
+          },
+          "approval": {
+            "approval_id": "APR-0001",
+            "validation_id": "VAL-0002",
+            "approver": "Demo Planner",
+            "decision": "approved",
+            "reason": null,
+            "created_at": "2026-10-10T15:15:35+00:00"
+          },
+          "sto": {
+            "purchase_order": "4500001023",
+            "purchase_order_type": "UB",
+            "material": "CHEM-BX40",
+            "quantity_t": 100.0,
+            "source_plant": "1200",
+            "destination_plant": "1100",
+            "lead_time_days": 1.0,
+            "validation_id": "VAL-0002",
+            "approval_id": "APR-0001",
+            "created_at": "2026-10-10T15:15:35+00:00"
+          }
+        }
+      ],
+      "verification": {
+        "material": "CHEM-BX40",
+        "plants": [
+          {
+            "plant": "1100",
+            "unrestricted_t": 190,
+            "in_transit_t": 100.0,
+            "safety_stock_t": 150,
+            "consumption_t_per_day": {
+              "all": 100,
+              "critical_high": 75,
+              "critical": 60
+            },
+            "orders": [
+              {
+                "order_id": "PRD-1101",
+                "product": "Liquid packaging board",
+                "priority": "critical",
+                "consumption_t_per_day": 25
+              },
+              {
+                "order_id": "PRD-1102",
+                "product": "Food-grade folding box board",
+                "priority": "critical",
+                "consumption_t_per_day": 20
+              },
+              {
+                "order_id": "PRD-1103",
+                "product": "Medical-grade tissue",
+                "priority": "critical",
+                "consumption_t_per_day": 15
+              },
+              {
+                "order_id": "PRD-1104",
+                "product": "Copy paper A4 80 gsm",
+                "priority": "high",
+                "consumption_t_per_day": 9
+              },
+              {
+                "order_id": "PRD-1105",
+                "product": "Coated art paper 120 gsm",
+                "priority": "high",
+                "consumption_t_per_day": 6
+              },
+              {
+                "order_id": "PRD-1106",
+                "product": "Uncoated woodfree 70 gsm",
+                "priority": "normal",
+                "consumption_t_per_day": 15
+              },
+              {
+                "order_id": "PRD-1107",
+                "product": "Newsprint 45 gsm",
+                "priority": "normal",
+                "consumption_t_per_day": 10
+              }
+            ]
+          },
+          {
+            "plant": "1200",
+            "unrestricted_t": 200.0,
+            "in_transit_t": 0,
+            "safety_stock_t": 200,
+            "consumption_t_per_day": {
+              "all": 60,
+              "critical_high": 35,
+              "critical": 35
+            },
+            "orders": [
+              {
+                "order_id": "PRD-1201",
+                "product": "Corrugating medium",
+                "priority": "critical",
+                "consumption_t_per_day": 35
+              },
+              {
+                "order_id": "PRD-1202",
+                "product": "Kraft liner",
+                "priority": "normal",
+                "consumption_t_per_day": 25
+              }
+            ]
+          }
+        ],
+        "sources": {
+          "stock": "S/4HANA (mock) API_MATERIAL_STOCK_SRV/A_MatlStkInAcctMod",
+          "safety_stock": "S/4HANA (mock) API_PRODUCT_SRV/A_ProductSupplyPlanning",
+          "consumption": "planning/demand_orders (scenario data)"
+        }
+      },
+      "escalation": null,
+      "next_check": "Arrival of the transfer at plant 1100, and the customs response."
+    }
+  },
+  "get_case_log": [
+    {
+      "seq": 1,
+      "case_id": "CASE-0001",
+      "at": "2026-10-10T15:15:34+00:00",
+      "actor": "Event feed",
+      "kind": "event",
+      "summary": "Pre-arrival customs check flagged SHP-1001: the shipping documents do not agree on quantity.",
+      "source": "logistics event feed (simulated)",
+      "event_id": "S1-DOC-HOLD"
+    },
+    {
+      "seq": 2,
+      "case_id": "CASE-0001",
+      "at": "2026-10-10T15:15:34+00:00",
+      "actor": "Orchestrator",
+      "kind": "note",
+      "summary": "A customs document hold: start with document reconciliation."
+    },
+    {
+      "seq": 3,
+      "case_id": "CASE-0001",
+      "at": "2026-10-10T15:15:34+00:00",
+      "actor": "Orchestrator",
+      "kind": "delegation",
+      "summary": "Asked Evidence: Shipment SHP-1001 is on a customs document hold. Get the shipment, its purchase order, the material's inventory, and its documents; extract and reconcile the document fields.",
+      "tool": "evidence_agent"
+    },
+    {
+      "seq": 4,
+      "case_id": "CASE-0001",
+      "at": "2026-10-10T15:15:34+00:00",
+      "actor": "Evidence",
+      "kind": "tool",
+      "summary": "SHP-1001: exception, ETA 2026-10-31T14:00:00+07:00; document_discrepancy (normal congestion)",
+      "tool": "get_shipment",
+      "source": "logistics event feed (simulated)"
+    },
+    {
+      "seq": 5,
+      "case_id": "CASE-0001",
+      "at": "2026-10-10T15:15:34+00:00",
+      "actor": "Evidence",
+      "kind": "tool",
+      "summary": "PO 4500001021: 600 TO CHEM-BX40 for plant 1100 from Veltrona Chemicals GmbH",
+      "tool": "get_purchase_order",
+      "source": "S/4HANA (mock)"
+    },
+    {
+      "seq": 6,
+      "case_id": "CASE-0001",
+      "at": "2026-10-10T15:15:34+00:00",
+      "actor": "Evidence",
+      "kind": "tool",
+      "summary": "CHEM-BX40: 1100 190 t (safety 150); 1200 300 t (safety 200)",
+      "tool": "get_inventory",
+      "source": "S/4HANA (mock)"
+    },
+    {
+      "seq": 7,
+      "case_id": "CASE-0001",
+      "at": "2026-10-10T15:15:34+00:00",
+      "actor": "Evidence",
+      "kind": "tool",
+      "summary": "4 of 4 required documents",
+      "tool": "get_documents",
+      "source": "shipping documents"
+    },
+    {
+      "seq": 8,
+      "case_id": "CASE-0001",
+      "at": "2026-10-10T15:15:34+00:00",
+      "actor": "Evidence",
+      "kind": "tool",
+      "summary": "quantity differs in packing_list",
+      "tool": "reconcile_documents",
+      "source": "deterministic check",
+      "flag": "discrepancy"
+    },
+    {
+      "seq": 9,
+      "case_id": "CASE-0001",
+      "at": "2026-10-10T15:15:34+00:00",
+      "actor": "Evidence",
+      "kind": "note",
+      "summary": "- The packing list quantity differs from the invoice and the PO (reconcile_documents). - Plant 1200 holds CHEM-BX40 above its safety stock (get_inventory)."
+    },
+    {
+      "seq": 10,
+      "case_id": "CASE-0001",
+      "at": "2026-10-10T15:15:34+00:00",
+      "actor": "Orchestrator",
+      "kind": "note",
+      "summary": "The quantity discrepancy is confirmed. Quantify the impact."
+    },
+    {
+      "seq": 11,
+      "case_id": "CASE-0001",
+      "at": "2026-10-10T15:15:34+00:00",
+      "actor": "Orchestrator",
+      "kind": "delegation",
+      "summary": "Asked Impact & Options: Predict the resolution time for SHP-1001 and assess the current plan: all orders, no transfer.",
+      "tool": "impact_agent"
+    },
+    {
+      "seq": 12,
+      "case_id": "CASE-0001",
+      "at": "2026-10-10T15:15:34+00:00",
+      "actor": "Impact & Options",
+      "kind": "tool",
+      "summary": "PRED-0001: 3 days (93 similar past cases)",
+      "tool": "predict_resolution_time",
+      "source": "baseline-median"
+    },
+    {
+      "seq": 13,
+      "case_id": "CASE-0001",
+      "at": "2026-10-10T15:15:34+00:00",
+      "actor": "Impact & Options",
+      "kind": "tool",
+      "summary": "ASM-0001 all orders: coverage 1.9 of 3.5 days needed, short 160 t",
+      "tool": "calculate_supply_risk",
+      "source": "deterministic calculation"
+    },
+    {
+      "seq": 14,
+      "case_id": "CASE-0001",
+      "at": "2026-10-10T15:15:34+00:00",
+      "actor": "Impact & Options",
+      "kind": "note",
+      "summary": "PRED-0001 (baseline-median). ASM-0001: the current plan leaves a shortage."
+    },
+    {
+      "seq": 15,
+      "case_id": "CASE-0001",
+      "at": "2026-10-10T15:15:34+00:00",
+      "actor": "Orchestrator",
+      "kind": "note",
+      "summary": "There is a shortage and plant 1200 holds stock. Validate a transfer of the full shortage."
+    },
+    {
+      "seq": 16,
+      "case_id": "CASE-0001",
+      "at": "2026-10-10T15:15:34+00:00",
+      "actor": "Orchestrator",
+      "kind": "delegation",
+      "summary": "Asked Action: Validate an STO of 160 t from plant 1200 for SHP-1001 with prediction PRED-0001.",
+      "tool": "action_agent"
+    },
+    {
+      "seq": 17,
+      "case_id": "CASE-0001",
+      "at": "2026-10-10T15:15:34+00:00",
+      "actor": "Action",
+      "kind": "tool",
+      "summary": "VAL-0001 REJECTED: Plant 1200 would fall to 140 t, below its safety stock of 200 t. Max feasible 100 t.",
+      "tool": "validate_action",
+      "source": "business rules",
+      "flag": "rejected"
+    },
+    {
+      "seq": 18,
+      "case_id": "CASE-0001",
+      "at": "2026-10-10T15:15:34+00:00",
+      "actor": "Action",
+      "kind": "note",
+      "summary": "VAL-0001 rejected: plant 1200 would fall below its safety stock."
+    },
+    {
+      "seq": 19,
+      "case_id": "CASE-0001",
+      "at": "2026-10-10T15:15:34+00:00",
+      "actor": "Orchestrator",
+      "kind": "note",
+      "summary": "Rejected by the safety-stock rule. Assess the feasible quantity, alone and with priorities."
+    },
+    {
+      "seq": 20,
+      "case_id": "CASE-0001",
+      "at": "2026-10-10T15:15:34+00:00",
+      "actor": "Orchestrator",
+      "kind": "delegation",
+      "summary": "Asked Impact & Options: With PRED-0001 for SHP-1001, assess a 100 t transfer from plant 1200 serving all orders, and the same transfer serving critical_high orders.",
+      "tool": "impact_agent"
+    },
+    {
+      "seq": 21,
+      "case_id": "CASE-0001",
+      "at": "2026-10-10T15:15:35+00:00",
+      "actor": "Impact & Options",
+      "kind": "tool",
+      "summary": "ASM-0002 +100 t from 1200, all orders: coverage 2.9 of 3.5 days needed, short 60 t",
+      "tool": "calculate_supply_risk",
+      "source": "deterministic calculation"
+    },
+    {
+      "seq": 22,
+      "case_id": "CASE-0001",
+      "at": "2026-10-10T15:15:35+00:00",
+      "actor": "Impact & Options",
+      "kind": "tool",
+      "summary": "ASM-0003 +100 t from 1200, critical_high orders: coverage 3.87 of 3.5 days needed, covered",
+      "tool": "calculate_supply_risk",
+      "source": "deterministic calculation"
+    },
+    {
+      "seq": 23,
+      "case_id": "CASE-0001",
+      "at": "2026-10-10T15:15:35+00:00",
+      "actor": "Impact & Options",
+      "kind": "note",
+      "summary": "ASM-0002: the transfer alone is short. ASM-0003: with critical and high orders it is covered."
+    },
+    {
+      "seq": 24,
+      "case_id": "CASE-0001",
+      "at": "2026-10-10T15:15:35+00:00",
+      "actor": "Orchestrator",
+      "kind": "note",
+      "summary": "The feasible transfer plus critical and high orders is covered. Validate it."
+    },
+    {
+      "seq": 25,
+      "case_id": "CASE-0001",
+      "at": "2026-10-10T15:15:35+00:00",
+      "actor": "Orchestrator",
+      "kind": "delegation",
+      "summary": "Asked Action: Validate an STO of 100 t from plant 1200 for SHP-1001 with prediction PRED-0001.",
+      "tool": "action_agent"
+    },
+    {
+      "seq": 26,
+      "case_id": "CASE-0001",
+      "at": "2026-10-10T15:15:35+00:00",
+      "actor": "Action",
+      "kind": "tool",
+      "summary": "VAL-0002 valid: 100 t from 1200",
+      "tool": "validate_action",
+      "source": "business rules"
+    },
+    {
+      "seq": 27,
+      "case_id": "CASE-0001",
+      "at": "2026-10-10T15:15:35+00:00",
+      "actor": "Action",
+      "kind": "note",
+      "summary": "VAL-0002 is valid."
+    },
+    {
+      "seq": 28,
+      "case_id": "CASE-0001",
+      "at": "2026-10-10T15:15:35+00:00",
+      "actor": "Orchestrator",
+      "kind": "status",
+      "summary": "Status: awaiting_approval"
+    },
+    {
+      "seq": 29,
+      "case_id": "CASE-0001",
+      "at": "2026-10-10T15:15:35+00:00",
+      "actor": "Demo Planner",
+      "kind": "approval",
+      "summary": "Approved VAL-0002",
+      "approval_id": "APR-0001"
+    },
+    {
+      "seq": 30,
+      "case_id": "CASE-0001",
+      "at": "2026-10-10T15:15:35+00:00",
+      "actor": "Orchestrator",
+      "kind": "note",
+      "summary": "Approved: create the STO and verify stock."
+    },
+    {
+      "seq": 31,
+      "case_id": "CASE-0001",
+      "at": "2026-10-10T15:15:35+00:00",
+      "actor": "Orchestrator",
+      "kind": "delegation",
+      "summary": "Asked Action: Create the STO for VAL-0002 with approval APR-0001, then verify stock positions for CHEM-BX40.",
+      "tool": "action_agent"
+    },
+    {
+      "seq": 32,
+      "case_id": "CASE-0001",
+      "at": "2026-10-10T15:15:35+00:00",
+      "actor": "Action",
+      "kind": "tool",
+      "summary": "STO 4500001023 created: 100 t 1200 -> 1100",
+      "tool": "create_stock_transport_order",
+      "source": "S/4HANA (mock)",
+      "flag": "write"
+    },
+    {
+      "seq": 33,
+      "case_id": "CASE-0001",
+      "at": "2026-10-10T15:15:35+00:00",
+      "actor": "Action",
+      "kind": "tool",
+      "summary": "CHEM-BX40: 1100 190 t (safety 150, 100 in transit); 1200 200 t (safety 200)",
+      "tool": "get_inventory",
+      "source": "S/4HANA (mock)"
+    },
+    {
+      "seq": 34,
+      "case_id": "CASE-0001",
+      "at": "2026-10-10T15:15:35+00:00",
+      "actor": "Action",
+      "kind": "note",
+      "summary": "STO 4500001023 created; plant 1200 is at its safety stock and plant 1100 has the transfer in transit."
+    },
+    {
+      "seq": 35,
+      "case_id": "CASE-0001",
+      "at": "2026-10-10T15:15:35+00:00",
+      "actor": "Orchestrator",
+      "kind": "status",
+      "summary": "Status: monitoring"
+    }
+  ]
+}

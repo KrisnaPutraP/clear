@@ -1,16 +1,17 @@
 """Records that chain the governed write path (docs/PLAN.md §5a, §6).
 
-Predictions, validations, and approvals each get a readable sequential ID.
-A later step references an earlier result by that ID instead of an LLM
-retyping its numbers: an STO is created from a validation_id plus an
-approval_id, and its quantity is read from the validation record.
+Predictions, assessments, validations, and approvals each get a readable
+sequential ID. A later step references an earlier result by that ID instead
+of an LLM retyping its numbers: an STO is created from a validation_id plus
+an approval_id, and a recovery plan cites assessment_ids for its options.
+Cases use the same mechanism.
 """
 
 from datetime import datetime, timezone
 
 from clear_tools.store import JsonStore
 
-_PREFIX = {"prediction": "PRED", "validation": "VAL", "approval": "APR"}
+_PREFIX = {"prediction": "PRED", "assessment": "ASM", "validation": "VAL", "approval": "APR", "case": "CASE"}
 
 
 def add(store: JsonStore, kind: str, record: dict) -> dict:

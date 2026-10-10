@@ -13,7 +13,9 @@ from clear_datagen import documents, history, scenarios
 from clear_tools import cases, events, planning
 from clear_tools.store import JsonStore
 
-EMPTY_RECORDS = ["predictions", "validations", "approvals", "stock_transport_orders"]
+EMPTY_RECORDS = [
+    "predictions", "assessments", "validations", "approvals", "stock_transport_orders", "cases", "case_log",
+]
 
 
 def generate_seed(out_dir: Path) -> None:

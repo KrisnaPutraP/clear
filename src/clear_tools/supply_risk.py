@@ -9,9 +9,12 @@ prediction_id.
 - Coverage = (stock on hand + transfers arriving before stock runs out)
   / consumption of the orders served at the chosen priority level.
 - Shortage = (required coverage - coverage) x consumption, if positive.
+
+Each assessment is stored with an assessment_id, so a recovery plan can cite
+it instead of repeating its numbers.
 """
 
-from clear_tools import cases, planning, s4, sto
+from clear_tools import cases, planning, records, s4, sto
 from clear_tools.store import JsonStore
 
 
@@ -30,7 +33,7 @@ def calculate_supply_risk(
     case = cases.case(store, shipment_id)
     prediction = cases.prediction(store, prediction_id, shipment_id)
     transfer = _proposed_transfer(store, case, transfer_quantity, source_plant)
-    return assess(store, case, prediction, priority_level, transfer)
+    return records.add(store, "assessment", assess(store, case, prediction, priority_level, transfer))
 
 
 def assess(

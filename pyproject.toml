@@ -10,7 +10,9 @@ readme = "README.md"
 requires-python = ">=3.12"
 # Add runtime dependencies only when needed. clear_tools itself stays standard
 # library only (docs/PLAN.md §5b), guarded by tests/test_architecture.py.
-dependencies = []
+dependencies = [
+    "strands-agents>=1.57,<2",  # Agents (docs/PLAN.md §2b)
+]
 
 [project.optional-dependencies]
 dev = ["pytest>=8"]
