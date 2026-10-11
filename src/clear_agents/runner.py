@@ -140,7 +140,9 @@ def work_approval(store: JsonStore, case_id: str, approval: dict, model_for: Mod
     prompt = (f"Case {case_id} for shipment {case['shipment_id']}: {approval['approver']} approved "
               f"{approval['validation_id']} (approval_id {approval['approval_id']}).\n"
               "Ask action_agent to create the stock transport order with these two IDs and to verify stock "
-              "positions. Then return the updated recovery plan with that action marked executed.\n"
+              "positions. Then return the plan before the approval with two changes only: that action "
+              "marked executed with its STO number, and next_check updated. The approval executes the plan "
+              "and does not re-plan it, so keep the escalation as it was.\n"
               f"Plan before the approval:\n{json.dumps(case['plan'])}")
     return _run(store, case_id, prompt, model_for, invoke_for)
 

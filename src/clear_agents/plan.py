@@ -49,7 +49,12 @@ class RecoveryPlan(BaseModel):
     recommendation: str = Field(description="Chosen course of action and why, in at most two sentences.")
     recommended_option: str | None = Field(default=None, description="Name of the chosen option, if any.")
     actions: list[Action] = Field(default_factory=list, description="STOs, only for validated transfers.")
-    escalation: str | None = Field(default=None, description="What a human must decide, if anything.")
+    escalation: str | None = Field(
+        default=None,
+        description="A decision only a human can make: emergency sourcing when no transfer is feasible and "
+                    "orders are deferred, or when no option covers the requirement; otherwise None. "
+                    "Contingencies and customs follow-up go in next_check.",
+    )
     next_check: str = Field(description="What to monitor next.")
 
 
