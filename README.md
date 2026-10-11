@@ -5,7 +5,8 @@ Agentic AI Hackathon 2026 · Track A: Intelligent Supply Chain · Team Cookusan
 > ERP runs the process. Humans chase the exceptions. CLEAR resolves them.
 
 CLEAR turns a cross-border shipment exception into an evidence-backed,
-validated recovery plan. A human approves every write action.
+validated recovery plan. A human approves every write action. How it works:
+[docs/architecture.md](docs/architecture.md).
 
 **Status:** work in progress. Locked decisions: `docs/PLAN.md`.
 
