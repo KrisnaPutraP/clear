@@ -43,7 +43,7 @@ def main() -> None:
     else:
         model_for = lambda store: runner.live_model  # noqa: E731
     with tempfile.TemporaryDirectory() as tmp:
-        report = harness.run_batch(specs, model_for, Path(tmp))
+        report = harness.run_batch(specs, model_for, Path(tmp), on_result=progress)
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     stamp = datetime.now().strftime("%Y%m%d-%H%M%S") + ("-scripted" if args.scripted else "")
@@ -52,6 +52,13 @@ def main() -> None:
     (OUT_DIR / f"eval-{stamp}.md").write_text(text, encoding="utf-8")
     print(text)
     print(f"Wrote data/eval/eval-{stamp}.json and .md")
+
+
+def progress(result: dict) -> None:
+    """One line per finished variant, so a long batch shows how it goes."""
+    failed = [check for check, ok in result["scores"].items() if not ok]
+    print(f"{result['variant']}: expected {result['expected']['decision']}, agents {result['outcome']['decision']}, "
+          f"{result['latency_s']} s, " + (f"failed: {', '.join(failed)}" if failed else "all checks pass"), flush=True)
 
 
 def markdown(report: dict) -> str:

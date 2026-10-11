@@ -25,6 +25,12 @@ def run_variant(spec: dict, model_for: ModelFor, workdir: Path) -> dict:
             "scores": scoring.score(expected, result), "latency_s": round(latency, 1)}
 
 
-def run_batch(specs: list[dict], model_for: ModelFor, workdir: Path) -> dict:
-    results = [run_variant(spec, model_for, workdir) for spec in specs]
+def run_batch(specs: list[dict], model_for: ModelFor, workdir: Path,
+              on_result: Callable[[dict], None] | None = None) -> dict:
+    """Run and score every variant; on_result sees each result as soon as its variant is done."""
+    results = []
+    for spec in specs:
+        results.append(run_variant(spec, model_for, workdir))
+        if on_result:
+            on_result(results[-1])
     return {"summary": scoring.summarize(results), "results": results}

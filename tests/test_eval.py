@@ -37,8 +37,11 @@ def test_oracle_leaves_the_run_store_untouched(tmp_path):
 
 
 def test_scripted_runs_pass_every_check(tmp_path):
-    report = harness.run_batch([variants.variant("A1"), variants.variant("E1")], ScriptedDirector, tmp_path)
+    seen = []
+    report = harness.run_batch([variants.variant("A1"), variants.variant("E1")], ScriptedDirector, tmp_path,
+                               on_result=seen.append)
 
+    assert seen == report["results"]
     for result in report["results"]:
         assert all(result["scores"].values()), (result["variant"], result["scores"])
     summary = report["summary"]
