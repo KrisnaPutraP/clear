@@ -45,6 +45,15 @@ start with `cookusanhackathon`.
 
 - The AWS account set up in us-west-2, with access to the chosen Bedrock
   model; `CLEAR_BEDROCK_MODEL_ID` set in `.env`.
+- Quotas above zero for that model and for AgentCore Runtime. A new account
+  can start with both at 0 (ours did, on the AWS Free plan): model calls then
+  fail with "Operation not allowed", and the deploy stops at the runtime with
+  "maxAgents limit exceeded" and rolls back. AWS Support raises them. To
+  check the runtime quota (the AWS default is 1000):
+
+  ```
+  aws service-quotas list-service-quotas --service-code bedrock-agentcore --query "Quotas[?QuotaName=='Total Agents per Account'].Value"
+  ```
 - AWS CLI 2.32 or later, signed in with `aws login --profile <name>`, and that
   profile in `AWS_PROFILE` in `.env`. The Python scripts need
   `pip install "botocore[crt]"` to use these credentials.
@@ -86,6 +95,22 @@ not in Git:
 
 Code changes only reach AWS through `build_deploy.py` followed by
 `agentcore deploy`.
+
+`agentcore deploy` bootstraps CDK without the project tags. To tag the
+bootstrap stack too, bootstrap it yourself before the first deploy, from
+`deploy/cookusanhackathon/agentcore/cdk`:
+
+```
+npx cdk bootstrap aws://<account>/us-west-2 --tags Project=ID-Hackathon-2026 --tags Team=Cookusan --tags DeleteAfter=2026-10-31
+```
+
+If the first deploy fails, CloudFormation rolls the stack back but keeps the
+Lambda function's log group, and the next deploy stops because that group
+already exists. Delete it before deploying again:
+
+```
+aws logs delete-log-group --log-group-name /aws/lambda/cookusanhackathon-clear-tools
+```
 
 ## Check and run
 
@@ -142,7 +167,10 @@ switch to `--policy enforce`, deploy again, and repeat the S1 run.
 
 ## To confirm on the first deploy
 
-These follow from the documentation but have not been run yet:
+These follow from the documentation but have not been run yet. The first
+deploy created the gateway and the Lambda function, then stopped at the
+runtime quota (see Prerequisites); the log group it left carried the project
+tags.
 
 - The gateway hands the Lambda function's JSON result to the agent as the
   tool result's text. AWS documents that the function must return valid
