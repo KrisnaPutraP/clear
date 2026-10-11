@@ -137,7 +137,7 @@ def impact_tools(invoke: Invoke) -> list:
             prediction_id: ID returned by predict_resolution_time.
             priority_level: Orders served: all, critical_high (critical and high), or critical.
             transfer_quantity_t: Tonnes to transfer from another plant, 0 for none.
-            source_plant: Plant the transfer comes from, required when transferring.
+            source_plant: Plant number the transfer comes from, e.g. 1200; required when transferring.
         """
         return invoke("calculate_supply_risk", {
             "shipment_id": shipment_id, "prediction_id": prediction_id, "priority_level": priority_level,
@@ -158,7 +158,7 @@ def action_tools(invoke: Invoke) -> list:
         Args:
             shipment_id: Shipment ID of the case.
             prediction_id: ID returned by predict_resolution_time.
-            source_plant: Plant the stock would come from.
+            source_plant: Plant number the stock would come from, e.g. 1200.
             quantity_t: Tonnes to transfer.
         """
         return invoke("validate_action", {"shipment_id": shipment_id, "prediction_id": prediction_id,
