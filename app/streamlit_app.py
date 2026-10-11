@@ -49,7 +49,7 @@ def get_clear() -> Clear:
     if not runtime.exists():
         reset_runtime(settings.SEED_DIR, runtime)
     store = JsonStore(runtime)
-    return Clear(store, ScriptedDirector(store) if SCRIPTED else runner.bedrock_model)
+    return Clear(store, ScriptedDirector(store) if SCRIPTED else runner.live_model)
 
 
 clear = get_clear()
@@ -74,8 +74,7 @@ def sidebar() -> None:
         st.subheader("Planner")
         st.session_state.planner = st.selectbox("Signed in as", PLANNERS)
         st.subheader("Engines")
-        model = "Scripted model (development)" if SCRIPTED else \
-            f"Amazon Bedrock · {os.environ.get('CLEAR_BEDROCK_MODEL_ID') or 'model not set'}"
+        model = "Scripted model (development)" if SCRIPTED else runner.live_model_name()
         if CLOUD:
             model = f"AgentCore Runtime · {model}"
         prediction = "SAP-RPT-1.6, baseline fallback" \

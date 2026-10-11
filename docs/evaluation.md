@@ -52,7 +52,7 @@ is stable; SAP-RPT-1.6 is evaluated on its own
 Run it:
 
 ```
-python scripts/run_eval.py              # all variants, agents on Bedrock
+python scripts/run_eval.py              # all variants, agents on the live model (CLEAR_LLM_BACKEND)
 python scripts/run_eval.py --scripted   # plumbing check without AWS (A1, E1)
 ```
 

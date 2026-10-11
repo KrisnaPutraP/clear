@@ -5,7 +5,7 @@ the plan is scored against the oracle. Predictions use the baseline, so the
 ground truth is stable. Reports go to data/eval/ (git-ignored).
 
 Usage:
-    python scripts/run_eval.py                    # all 20 variants, agents on Bedrock
+    python scripts/run_eval.py                    # all 20 variants, agents on the live model
     python scripts/run_eval.py --variants A1,F2   # a subset
     python scripts/run_eval.py --scripted         # plumbing check without AWS (variants A1 and E1)
 """
@@ -30,7 +30,7 @@ SCRIPTED_VARIANTS = ("A1", "E1")  # The scripted model only knows the base S1 an
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--variants", help="comma-separated variant IDs, default all")
-    parser.add_argument("--scripted", action="store_true", help="scripted model instead of Bedrock")
+    parser.add_argument("--scripted", action="store_true", help="scripted model instead of the live model")
     args = parser.parse_args()
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")  # Windows consoles default to cp1252.
 
@@ -41,7 +41,7 @@ def main() -> None:
         specs = [s for s in specs if s["id"] in SCRIPTED_VARIANTS]
         model_for = ScriptedDirector
     else:
-        model_for = lambda store: runner.bedrock_model  # noqa: E731
+        model_for = lambda store: runner.live_model  # noqa: E731
     with tempfile.TemporaryDirectory() as tmp:
         report = harness.run_batch(specs, model_for, Path(tmp))
 

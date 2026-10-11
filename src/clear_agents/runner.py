@@ -22,7 +22,7 @@ from strands.models import BedrockModel
 from strands.models.model import Model
 from strands.tools.executors import SequentialToolExecutor
 
-from clear_agents import caselog, prompts, tools
+from clear_agents import aicore, caselog, prompts, tools
 from clear_agents.plan import RecoveryPlan, check_references
 from clear_tools.approvals import record_approval
 from clear_tools.events import record_event
@@ -32,12 +32,33 @@ ModelFactory = Callable[[str], Model]  # Role (orchestrator, evidence, impact, a
 InvokeFactory = Callable[[str], tools.Invoke]  # Role (evidence, impact, action) -> where its tools run.
 
 
+def live_model(role: str) -> Model:
+    """One mid-size model for every agent (docs/PLAN.md §8b). CLEAR_LLM_BACKEND picks where it runs:
+    bedrock (the default) or aicore, Claude on SAP AI Core (clear_agents.aicore)."""
+    backend = _backend()
+    if backend == "aicore":
+        return aicore.model(role)
+    if backend != "bedrock":
+        raise LookupError(f"CLEAR_LLM_BACKEND must be bedrock or aicore, not {backend!r}.")
+    return bedrock_model(role)
+
+
+def live_model_name() -> str:
+    """What live_model runs on, for display."""
+    if _backend() == "aicore":
+        return f"SAP AI Core · {aicore.MODEL_NAME}"
+    return f"Amazon Bedrock · {os.environ.get('CLEAR_BEDROCK_MODEL_ID') or 'model not set'}"
+
+
 def bedrock_model(role: str) -> Model:
-    """One mid-size Bedrock model for every agent (docs/PLAN.md §8b)."""
     model_id = os.environ.get("CLEAR_BEDROCK_MODEL_ID")
     if not model_id:
         raise LookupError("Set CLEAR_BEDROCK_MODEL_ID to a model available in Bedrock us-west-2 (see .env.example).")
     return BedrockModel(model_id=model_id, region_name=os.environ.get("AWS_DEFAULT_REGION", "us-west-2"))
+
+
+def _backend() -> str:
+    return os.environ.get("CLEAR_LLM_BACKEND", "bedrock").strip().lower()
 
 
 @dataclass(frozen=True)
@@ -89,7 +110,7 @@ def open_case_for_event(store: JsonStore, event: dict) -> str:
     return case_id
 
 
-def work_event(store: JsonStore, case_id: str, event: dict, model_for: ModelFactory = bedrock_model,
+def work_event(store: JsonStore, case_id: str, event: dict, model_for: ModelFactory = live_model,
                invoke_for: InvokeFactory | None = None) -> dict:
     case = caselog.get_case(store, case_id)
     prompt = (f"Case {case_id} for shipment {case['shipment_id']}.\n"
@@ -113,7 +134,7 @@ def decide(store: JsonStore, case_id: str, validation_id: str, approver: str, de
     return approval
 
 
-def work_approval(store: JsonStore, case_id: str, approval: dict, model_for: ModelFactory = bedrock_model,
+def work_approval(store: JsonStore, case_id: str, approval: dict, model_for: ModelFactory = live_model,
                   invoke_for: InvokeFactory | None = None) -> dict:
     case = caselog.get_case(store, case_id)
     prompt = (f"Case {case_id} for shipment {case['shipment_id']}: {approval['approver']} approved "

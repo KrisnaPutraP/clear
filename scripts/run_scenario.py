@@ -1,7 +1,7 @@
-"""Run S1 or S2 end to end on Bedrock and print the case timeline.
+"""Run S1 or S2 end to end on the live model and print the case timeline.
 
-Resets data/runtime first. Needs AWS credentials and CLEAR_BEDROCK_MODEL_ID
-in the environment or in .env (see .env.example). With --cloud the agents
+Resets data/runtime first. Needs the model settings in the environment or in
+.env: CLEAR_LLM_BACKEND and what that backend needs (see .env.example). With --cloud the agents
 run on the deployment instead: AgentCore Runtime, the gateway, and the
 DynamoDB table, which is reset first (docs/deployment.md).
 
@@ -15,6 +15,7 @@ Usage:
 
 import argparse
 
+from clear_agents import runner
 from clear_app import settings
 from clear_app.contract import Clear
 from clear_tools.store import JsonStore, reset_runtime
@@ -42,6 +43,7 @@ def main() -> None:
         store = JsonStore(settings.runtime_dir())
         reset_runtime(settings.SEED_DIR, store.root)
         clear = Clear(store)
+        print(f"Agents: {runner.live_model_name()}")
     case_id = clear.send_event(FIRST_EVENT[args.scenario], wait=True)
     shown = show(clear, case_id, 0)
 

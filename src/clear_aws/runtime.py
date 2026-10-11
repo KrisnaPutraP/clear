@@ -21,7 +21,7 @@ from clear_tools.events import prepared_event
 RUNS = {"event": "event_id", "approval": "approval_id"}  # Run -> the ID it needs besides case_id.
 
 
-def handle(payload: dict, store=None, model_for: runner.ModelFactory = runner.bedrock_model,
+def handle(payload: dict, store=None, model_for: runner.ModelFactory = runner.live_model,
            gateway: Gateway | None = None) -> dict:
     run, case_id = _validated(payload)
     store = store or DynamoStore.from_env()

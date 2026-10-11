@@ -44,7 +44,10 @@ start with `cookusanhackathon`.
 ## Prerequisites
 
 - The AWS account set up in us-west-2, with access to the chosen Bedrock
-  model; `CLEAR_BEDROCK_MODEL_ID` set in `.env`.
+  model; `CLEAR_BEDROCK_MODEL_ID` set in `.env`. The deployed runtime still
+  runs its agents on Bedrock: running them on Claude in SAP AI Core
+  (`CLEAR_LLM_BACKEND=aicore`, as locally) also needs the AI Core key in the
+  runtime, which is not wired up yet.
 - Quotas above zero for that model and for AgentCore Runtime. A new account
   can start with both at 0 (ours did, on the AWS Free plan): model calls then
   fail with "Operation not allowed", and the deploy stops at the runtime with

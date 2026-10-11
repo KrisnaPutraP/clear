@@ -43,11 +43,13 @@ class Config:
     deployment_id: str
 
     @classmethod
-    def from_env(cls) -> "Config":
-        missing = [name for name in _SETTINGS.values() if not os.environ.get(name)]
+    def from_env(cls, deployment_setting: str = _SETTINGS["deployment_id"]) -> "Config":
+        """The service key and one deployment, whose ID is in the variable deployment_setting."""
+        names = {**_SETTINGS, "deployment_id": deployment_setting}
+        missing = [name for name in names.values() if not os.environ.get(name)]
         if missing:
             raise LookupError(f"SAP AI Core settings missing: {', '.join(missing)}")
-        return cls(**{field: os.environ[name] for field, name in _SETTINGS.items()})
+        return cls(**{field: os.environ[name] for field, name in names.items()})
 
     def __repr__(self) -> str:  # Never print the client secret.
         return f"Config(api_url={self.api_url!r}, deployment_id={self.deployment_id!r})"

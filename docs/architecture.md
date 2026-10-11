@@ -13,12 +13,12 @@ flowchart LR
     end
     subgraph aws["AWS, us-west-2"]
         rt["AgentCore Runtime<br/>Strands: orchestrator and<br/>Evidence, Impact & Options,<br/>Action agents"]
-        llm["Amazon Bedrock<br/>LLM"]
         gw["AgentCore Gateway<br/>AWS IAM authorization,<br/>Cedar policies"]
         fn["AWS Lambda<br/>nine tools"]
         db[("Amazon DynamoDB<br/>mock S/4HANA, documents,<br/>records, case log")]
     end
     subgraph sap["SAP BTP"]
+        llm["SAP AI Core<br/>Claude Sonnet 4.6, LLM"]
         rpt["SAP AI Core<br/>SAP-RPT-1.6"]
     end
     ui -- "event or decision" --> db
@@ -36,6 +36,7 @@ flowchart LR
 |---|---|
 | Logistics event feed (simulated) | Starts a case; in production the same payload would come from Amazon EventBridge |
 | AgentCore Runtime | Runs the four agents in one process, with a case-log hook on every agent |
+| LLM | Claude Sonnet 4.6 in SAP AI Core's generative AI hub, called with the Bedrock Converse API; one setting (`CLEAR_LLM_BACKEND`) switches the agents to Amazon Bedrock |
 | AgentCore Gateway | The only way to the tools; authorizes each call with IAM and Cedar policies |
 | Lambda tools | Deterministic Python: every number comes from data or from code, never from the LLM |
 | DynamoDB | Mock S/4HANA with the entity and field names of SAP's published APIs, plus documents, records, and the case log |

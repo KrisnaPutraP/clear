@@ -46,7 +46,7 @@ class LocalAgents:
 
 
 class Clear:
-    def __init__(self, store: JsonStore, model_for: runner.ModelFactory = runner.bedrock_model,
+    def __init__(self, store: JsonStore, model_for: runner.ModelFactory = runner.live_model,
                  agents: Agents | None = None):
         self.store = store
         self.agents = agents or LocalAgents(store, model_for)

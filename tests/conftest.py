@@ -11,9 +11,11 @@ SEED_DIR = Path(__file__).resolve().parents[1] / "data" / "seed"
 
 
 @pytest.fixture(autouse=True)
-def offline_predictions(monkeypatch):
-    """Tests use the deterministic baseline unless a test opts into SAP-RPT explicitly."""
+def offline_backends(monkeypatch):
+    """Tests use the deterministic baseline and the default model backend unless a test opts into SAP AI
+    Core explicitly. The app test loads .env, which may set either for the rest of the session."""
     monkeypatch.delenv("CLEAR_PREDICTION_BACKEND", raising=False)
+    monkeypatch.delenv("CLEAR_LLM_BACKEND", raising=False)
 
 
 @pytest.fixture

@@ -1,17 +1,28 @@
-"""S1 and S2 on the real Bedrock model (docs/PLAN.md §1b). Opt-in, because each
-run costs model usage: set CLEAR_LIVE_TESTS=1 with AWS credentials and
-CLEAR_BEDROCK_MODEL_ID in the environment."""
+"""S1 and S2 on the real model (docs/PLAN.md §1b). Opt-in, because each run costs model usage: set
+CLEAR_LIVE_TESTS=1. The model settings come from the environment or .env (see .env.example)."""
 
 import os
 
 import pytest
 
+from clear_app import settings
 from clear_app.contract import Clear
 
+LIVE = os.environ.get("CLEAR_LIVE_TESTS") == "1"
+if LIVE:
+    settings.load_env()
+BACKEND = os.environ.get("CLEAR_LLM_BACKEND", "bedrock").lower()  # conftest clears it per test; restored below.
+CONFIGURED = bool(os.environ.get("SAP_LLM_DEPLOYMENT_ID" if BACKEND == "aicore" else "CLEAR_BEDROCK_MODEL_ID"))
+
 pytestmark = pytest.mark.skipif(
-    os.environ.get("CLEAR_LIVE_TESTS") != "1" or not os.environ.get("CLEAR_BEDROCK_MODEL_ID"),
-    reason="live Bedrock test; set CLEAR_LIVE_TESTS=1 and CLEAR_BEDROCK_MODEL_ID to run",
+    not (LIVE and CONFIGURED),
+    reason="live model test; set CLEAR_LIVE_TESTS=1 and the model settings (see .env.example) to run",
 )
+
+
+@pytest.fixture(autouse=True)
+def live_backend(monkeypatch):
+    monkeypatch.setenv("CLEAR_LLM_BACKEND", BACKEND)
 
 
 def test_s1_rejects_the_full_transfer_and_waits_for_approval(store):
