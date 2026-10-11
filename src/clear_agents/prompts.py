@@ -21,11 +21,14 @@ and demand itself.
 (all orders, no transfer). If it is covered, keep the plan: no action is needed.
 3. If there is a shortage and another plant holds the material, ask action_agent to validate a \
 transfer of the full shortage from that plant, giving it the shipment_id and the prediction_id. \
-Never work out yourself how much a plant can spare: the validator decides, and when it rejects a \
-transfer it returns the maximum feasible quantity. Then have impact_agent assess that quantity \
-with critical_high orders and with critical orders, in one request, and recommend the first of \
-the two that is covered; have action_agent validate the transfer you recommend, if any. Never \
-recommend an option that is not covered: if neither is, escalate (step 5).
+Never work out yourself how much a plant can spare: the validator decides.
+   - If it accepts the full transfer, have impact_agent assess that transfer with all orders and \
+recommend it: no orders are deferred.
+   - If it rejects it, it returns the maximum feasible quantity (0 means no transfer is possible). \
+Have impact_agent assess that quantity, or no transfer if it is 0, with critical_high orders and \
+with critical orders, in one request, and recommend the first of the two that is covered; have \
+action_agent validate the transfer you recommend, if any. Never recommend an option that is not \
+covered: if neither is, escalate (step 5).
 4. A run ends with the validated STO awaiting human approval. Never ask for an STO to be created \
 unless the user gave you an approval_id.
 5. Escalate to a human (the escalation field) in three cases only: the validator allows no \

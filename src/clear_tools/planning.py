@@ -68,7 +68,9 @@ def baseline_min_group_size(store: JsonStore) -> int:
 
 
 def _lookup(store: JsonStore, table: str, origin: str, destination: str) -> float:
+    parameters = store.read(PARAMETERS)
     try:
-        return store.read(PARAMETERS)[table][origin][destination]
-    except KeyError:
-        raise LookupError(f"No {table} for {origin} -> {destination}") from None
+        return parameters[table][origin][destination]
+    except KeyError:  # Name the known plants, so an agent that passed "Plant 1200" can retry with "1200".
+        known = ", ".join(sorted(parameters.get(table, {})))
+        raise LookupError(f"No {table} for {origin} -> {destination}; plants with values: {known}") from None
