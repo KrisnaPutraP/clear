@@ -3,9 +3,10 @@ of Bedrock (docs/PLAN.md §2a, §5d, §6c, §7b-d). The model is scripted; the
 agents, tools, hooks, plan checks, and case log are the real ones."""
 
 from clear_agents import runner
-from clear_agents.plan import RecoveryPlan, check_references
+from clear_agents.plan import RecoveryPlan, check_escalation, check_references
 from clear_agents.testing import ScriptedDirector, ScriptedModel
 from clear_app.contract import Clear
+from clear_tools import records
 
 
 def test_only_the_action_agent_can_write(store):
@@ -93,3 +94,27 @@ def test_failed_run_leaves_a_readable_case(store, monkeypatch):
 
     assert case["status"] == "needs_human_decision"
     assert "CLEAR_BEDROCK_MODEL_ID" in case["status_reason"]
+
+
+def test_plan_deferring_orders_without_a_transfer_must_escalate(store):
+    current = records.add(store, "assessment", {"shipment_id": "SHP-1001", "priority_level": "all", "covered": False})
+    critical = records.add(store, "assessment", {"shipment_id": "SHP-1001", "priority_level": "critical",
+                                                 "covered": True})
+    plan = RecoveryPlan(case_id="CASE-0001", exception="x", evidence=[], prediction_id="PRED-0001",
+                        current_plan_assessment_id=current["assessment_id"], recommendation="x", next_check="x",
+                        options=[{"name": "Critical orders only", "assessment_id": critical["assessment_id"],
+                                  "note": "x"}],
+                        recommended_option="Critical orders only")
+
+    [problem] = check_escalation(store, plan)
+    assert critical["assessment_id"] in problem
+    assert check_escalation(store, plan.model_copy(update={"escalation": "Emergency sourcing for the rest"})) == []
+    assert check_escalation(store, plan.model_copy(update={"recommended_option": None, "options": []})) != []
+
+
+def test_plan_keeping_a_covered_current_plan_needs_no_escalation(store):
+    current = records.add(store, "assessment", {"shipment_id": "SHP-1002", "priority_level": "all", "covered": True})
+    plan = RecoveryPlan(case_id="CASE-0001", exception="x", evidence=[], prediction_id="PRED-0001",
+                        current_plan_assessment_id=current["assessment_id"], recommendation="x", next_check="x")
+
+    assert check_escalation(store, plan) == []

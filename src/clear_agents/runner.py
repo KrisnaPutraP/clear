@@ -23,7 +23,7 @@ from strands.models.model import Model
 from strands.tools.executors import SequentialToolExecutor
 
 from clear_agents import aicore, caselog, prompts, tools
-from clear_agents.plan import RecoveryPlan, check_references
+from clear_agents.plan import RecoveryPlan, check
 from clear_tools.approvals import record_approval
 from clear_tools.events import record_event
 from clear_tools.store import JsonStore
@@ -153,15 +153,15 @@ def _run(store: JsonStore, case_id: str, prompt: str, model_for: ModelFactory,
     try:
         orchestrator = build_agents(store, case_id, model_for, invoke_for).orchestrator
         plan = orchestrator(prompt, structured_output_model=RecoveryPlan).structured_output
-        problems = check_references(store, plan, shipment_id)
+        problems = check(store, plan, shipment_id)
         if problems:
-            caselog.log(store, case_id, "Plan check", "error", "Plan cites invalid IDs: " + "; ".join(problems),
+            caselog.log(store, case_id, "Plan check", "error", "Plan check failed: " + "; ".join(problems),
                         flag="error")
-            retry = f"Your plan cites invalid IDs: {'; '.join(problems)}. Fix the plan and return it again."
+            retry = f"Your plan fails the plan check: {'; '.join(problems)}. Fix the plan and return it again."
             plan = orchestrator(retry, structured_output_model=RecoveryPlan).structured_output
-            problems = check_references(store, plan, shipment_id)
+            problems = check(store, plan, shipment_id)
         if problems:
-            return fail(store, case_id, "Plan cites invalid IDs: " + "; ".join(problems))
+            return fail(store, case_id, "Plan check failed: " + "; ".join(problems))
     except Exception as error:  # A failed run must leave a readable case, never a stuck one.
         return fail(store, case_id, f"{type(error).__name__}: {error}")
 

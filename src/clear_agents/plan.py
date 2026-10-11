@@ -3,9 +3,10 @@
 The orchestrator returns a RecoveryPlan as structured output. The plan cites
 numbers by the IDs of the tool results that hold them (prediction_id,
 assessment_id, validation_id) instead of typing them, so the LLM cannot
-mistype a business number. check_references() rejects IDs that do not exist
-or belong to another shipment, and render() fills in the numbers from the
-stored records for the approval card and the UI.
+mistype a business number. check() rejects IDs that do not exist or belong
+to another shipment, and a plan that defers orders or leaves a shortage
+without a transfer and without telling a human (§6d). render() fills in the
+numbers from the stored records for the approval card and the UI.
 """
 
 from typing import Literal
@@ -57,6 +58,24 @@ class RecoveryPlan(BaseModel):
                     "follow-up go in next_check.",
     )
     next_check: str = Field(description="What to monitor next.")
+
+
+def check(store: JsonStore, plan: RecoveryPlan, shipment_id: str) -> list[str]:
+    """Problems with a plan; an empty list means it can be shown and acted on."""
+    return check_references(store, plan, shipment_id) or check_escalation(store, plan)
+
+
+def check_escalation(store: JsonStore, plan: RecoveryPlan) -> list[str]:
+    """Without a transfer, a course that defers orders or leaves a shortage needs a human decision (§6d)."""
+    if plan.actions or plan.escalation:
+        return []
+    recommended = next((o for o in plan.options if o.name == plan.recommended_option), None)
+    chosen = records.get(store, "assessment",
+                         recommended.assessment_id if recommended else plan.current_plan_assessment_id)
+    if chosen["covered"] and chosen["priority_level"] == "all":
+        return []
+    return [f"{chosen['assessment_id']} defers orders or leaves a shortage and the plan has no transfer action: add "
+            "the validated transfer, or state in escalation what a human must decide (emergency sourcing)"]
 
 
 def check_references(store: JsonStore, plan: RecoveryPlan, shipment_id: str) -> list[str]:

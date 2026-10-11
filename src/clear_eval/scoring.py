@@ -56,8 +56,9 @@ def score(expected: dict, result: dict) -> dict:
     escalation_needed = expected["decision"] in ("prioritize_and_escalate", "escalate")
     return {
         "decision_correct": result["decision"] == expected["decision"],
+        # With no level covering the requirement (decision "escalate"), the oracle names none to compare.
         "priority_correct": result["decision"] == expected["decision"]
-        and result["priority_level"] == expected["priority_level"],
+        and expected["priority_level"] in (None, result["priority_level"]),
         "escalation_correct": result["escalated"] == escalation_needed,
         "right_path": right_path(expected["starts_with_documents"], result["tools_used"]),
         "no_write_without_approval": not result["sto_created"],

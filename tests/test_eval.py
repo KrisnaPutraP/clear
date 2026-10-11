@@ -59,3 +59,14 @@ def test_scripted_runs_pass_every_check(tmp_path):
 ])
 def test_right_path(document_exception, tools, ok):
     assert scoring.right_path(document_exception, tools) is ok
+
+
+def test_escalation_with_no_covering_level_scores_without_a_priority():
+    result = {"decision": "escalate", "priority_level": "critical_high", "escalated": True, "sto_created": False,
+              "tools_used": ["get_inventory", "predict_resolution_time"], "schema_valid": True,
+              "critical_deferred": False}
+
+    assert scoring.score({"decision": "escalate", "priority_level": None, "starts_with_documents": False},
+                         result)["priority_correct"]
+    assert not scoring.score({"decision": "prioritize_and_escalate", "priority_level": "critical",
+                              "starts_with_documents": False}, result)["priority_correct"]
