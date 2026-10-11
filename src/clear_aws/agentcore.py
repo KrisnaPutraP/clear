@@ -10,6 +10,8 @@
   type and description, and which are required. The full schemas stay with
   the agents, because their tools run locally and only the calls travel
   (clear_aws.gateway).
+- With policy settings, a Cedar policy engine on the gateway (clear_aws.policy),
+  in LOG_ONLY mode to observe decisions or ENFORCE to apply them.
 
 build() writes agentcore.json and both code locations into the project
 directory that `agentcore create` made (docs/deployment.md).
@@ -20,6 +22,7 @@ import shutil
 from pathlib import Path
 
 from clear_agents import tools
+from clear_aws import policy as cedar
 from clear_aws import settings
 
 SCHEMA = "https://schema.agentcore.aws.dev/v1/agentcore.json"
@@ -39,17 +42,24 @@ BUNDLES = {
 }
 
 
-def project(model_id: str) -> dict:
-    """agentcore.json for agents on the Bedrock model model_id."""
-    return {
+def project(model_id: str, policy: dict | None = None) -> dict:
+    """agentcore.json for agents on the Bedrock model model_id.
+
+    policy, if given, holds gateway_arn and runtime_role_arn of the deployed project and the mode,
+    LOG_ONLY or ENFORCE, in which the gateway applies the Cedar policies.
+    """
+    spec = {
         "$schema": SCHEMA,
         "name": settings.PROJECT,
         "version": 1,
         "managedBy": "CDK",
         "tags": dict(settings.TAGS),
         "runtimes": [runtime(model_id)],
-        "agentCoreGateways": [gateway()],
+        "agentCoreGateways": [gateway(policy["mode"] if policy else None)],
     }
+    if policy:
+        spec["policyEngines"] = [cedar.engine(policy["gateway_arn"], policy["runtime_role_arn"])]
+    return spec
 
 
 def runtime(model_id: str) -> dict:
@@ -73,8 +83,8 @@ def runtime(model_id: str) -> dict:
     }
 
 
-def gateway() -> dict:
-    return {
+def gateway(policy_mode: str | None = None) -> dict:
+    spec = {
         "name": settings.GATEWAY,
         "description": "CLEAR tools: mock S/4HANA, documents, prediction, supply risk, validation, STO",
         "protocolType": "MCP",
@@ -96,6 +106,9 @@ def gateway() -> dict:
             },
         }],
     }
+    if policy_mode:
+        spec["policyEngineConfiguration"] = {"policyEngineName": cedar.ENGINE, "mode": policy_mode}
+    return spec
 
 
 def runtime_policy() -> dict:
@@ -127,7 +140,7 @@ def tool_definitions() -> list[dict]:
              "inputSchema": _input_schema(spec["inputSchema"]["json"])} for name, spec in specs.items()]
 
 
-def build(project_dir: Path, model_id: str, repo_root: Path) -> None:
+def build(project_dir: Path, model_id: str, repo_root: Path, policy: dict | None = None) -> None:
     """Write agentcore.json and both code locations into the CLI project directory."""
     for location, (template, packages) in BUNDLES.items():
         target = project_dir / location
@@ -143,7 +156,7 @@ def build(project_dir: Path, model_id: str, repo_root: Path) -> None:
                 for module in modules:
                     shutil.copy2(source / module, target / package / module)
     _write_json(project_dir / RUNTIME_DIR / RUNTIME_POLICY, runtime_policy())
-    _write_json(project_dir / "agentcore" / "agentcore.json", project(model_id))
+    _write_json(project_dir / "agentcore" / "agentcore.json", project(model_id, policy))
 
 
 def _input_schema(schema: dict) -> dict:

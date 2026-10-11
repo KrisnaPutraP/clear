@@ -109,6 +109,37 @@ $context = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes('{"custom":{
 aws lambda invoke --function-name cookusanhackathon-clear-tools --client-context $context --cli-binary-format raw-in-base64-out --payload '{\"shipment_id\":\"SHP-1001\"}' out.json
 ```
 
+## Cedar policies on the gateway
+
+Company rules are enforced outside the agents, at the gateway
+(`src/clear_aws/policy.py`). The gateway denies every tool call that no
+policy permits, and a `forbid` always wins over a `permit`:
+
+| Policy | Rule |
+|---|---|
+| `agents_read_and_assess` | The runtime's own role (Evidence and Impact agents) may call the read and assessment tools |
+| `action_agent_tools` | The Action agent's role may call `validate_action`, `create_stock_transport_order`, and `get_inventory` |
+| `sto_needs_action_agent_and_approval` | `create_stock_transport_order` is forbidden unless the caller is the Action agent's role and the call carries an approval ID (`APR-…`) |
+
+Each role gets exactly the tools its agents hold in code
+(`tests/test_policy.py`), and the code still checks the approval record
+itself (`src/clear_tools/sto.py`). Even an administrator calling the gateway
+directly cannot create a stock transport order.
+
+A policy that names specific tools has to name the gateway's ARN, and the
+CLI creates the runtime's role, so attach the policies after the first
+deploy works:
+
+```
+python scripts/build_deploy.py --policy log-only   # reads both ARNs from the CLI's state
+cd deploy/cookusanhackathon && agentcore validate && agentcore deploy
+cd ../.. && python scripts/run_scenario.py S1 --approve --cloud
+```
+
+In `LOG_ONLY` mode the gateway evaluates and records every decision without
+applying it; check in CloudWatch that S1's calls would all be allowed. Then
+switch to `--policy enforce`, deploy again, and repeat the S1 run.
+
 ## To confirm on the first deploy
 
 These follow from the documentation but have not been run yet:
@@ -122,6 +153,10 @@ These follow from the documentation but have not been run yet:
   (Resource Groups & Tag Editor in the console).
 - The Lambda timeout of 60 seconds covers a cold start plus SAP-RPT-1.6,
   which the tool itself limits to 15 seconds before falling back.
+- The Cedar policies pass AgentCore's own validation. AgentCore generates the
+  schema from the gateway's tools; locally the policies passed Cedar's
+  validator and eight allow/deny cases against an approximation of that
+  schema, which the real one may differ from.
 
 ## Clean up
 

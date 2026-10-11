@@ -217,12 +217,16 @@ def test_dry_run_changes_nothing(capsys):
     assert "Dry run: nothing changed" in capsys.readouterr().out
 
 
-def test_runtime_arn_comes_from_the_cli_state(tmp_path):
-    assert provision.runtime_arn(tmp_path) is None
+def test_deployed_arns_come_from_the_cli_state(tmp_path):
+    assert provision.deployed(tmp_path) == {}
     state = tmp_path / "agentcore" / ".cli" / "deployed-state.json"
     state.parent.mkdir(parents=True)
-    arn = f"arn:aws:bedrock-agentcore:us-west-2:{ACCOUNT}:runtime/{settings.PROJECT}_clear-AbCdEf1234"
-    state.write_text(json.dumps({"targets": {"default": {"resources": {"runtimes": {settings.RUNTIME: {
-        "runtimeId": "x", "runtimeArn": arn, "roleArn": "y"}}}}}}), encoding="utf-8")
+    runtime = f"arn:aws:bedrock-agentcore:us-west-2:{ACCOUNT}:runtime/{settings.PROJECT}_clear-AbCdEf1234"
+    role = f"arn:aws:iam::{ACCOUNT}:role/AgentCore-{settings.PROJECT}-RuntimeRole-XYZ"
+    gateway = f"arn:aws:bedrock-agentcore:us-west-2:{ACCOUNT}:gateway/{settings.PROJECT}-tools-abc123"
+    state.write_text(json.dumps({"targets": {"default": {"resources": {
+        "runtimes": {settings.RUNTIME: {"runtimeId": "x", "runtimeArn": runtime, "roleArn": role}},
+        "mcp": {"gateways": {settings.GATEWAY: {"gatewayId": "abc123", "gatewayArn": gateway}}},
+    }}}}), encoding="utf-8")
 
-    assert provision.runtime_arn(tmp_path) == arn
+    assert provision.deployed(tmp_path) == {"runtime_arn": runtime, "runtime_role_arn": role, "gateway_arn": gateway}

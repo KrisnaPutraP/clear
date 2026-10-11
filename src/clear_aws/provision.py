@@ -72,16 +72,25 @@ def run(steps: list[Step], apply: bool) -> None:
         print("Dry run: nothing changed. Run again with --apply to make these changes.")
 
 
-def runtime_arn(project_dir: Path) -> str | None:
-    """The deployed runtime's ARN from the AgentCore CLI's state file, if deployed."""
+def deployed(project_dir: Path) -> dict[str, str]:
+    """ARNs of the deployed runtime, its role, and the gateway, from the AgentCore CLI's state file.
+
+    Empty before the first deploy; a key is missing while its resource is not deployed.
+    """
     path = project_dir / "agentcore" / ".cli" / "deployed-state.json"
     if not path.exists():
-        return None
+        return {}
+    found = {}
     for target in json.loads(path.read_text(encoding="utf-8")).get("targets", {}).values():
-        runtime = (target.get("resources") or {}).get("runtimes", {}).get(settings.RUNTIME)
+        resources = target.get("resources") or {}
+        runtime = resources.get("runtimes", {}).get(settings.RUNTIME)
         if runtime:
-            return runtime["runtimeArn"]
-    return None
+            found.update(runtime_arn=runtime["runtimeArn"], runtime_role_arn=runtime["roleArn"])
+        gateways = (resources.get("mcp") or {}).get("gateways") or resources.get("gateways") or {}
+        gateway = gateways.get(settings.GATEWAY)
+        if gateway:
+            found["gateway_arn"] = gateway["gatewayArn"]
+    return found
 
 
 def _table_step(dynamodb) -> Step:

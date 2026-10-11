@@ -34,7 +34,7 @@ def main() -> None:
     steps = provision.setup_steps(session.client, identity["Account"], sap_key, app_settings.SEED_DIR)
     provision.run(steps, args.apply)
 
-    arn = provision.runtime_arn(app_settings.REPO_ROOT / "deploy" / settings.PROJECT)
+    arn = provision.deployed(app_settings.REPO_ROOT / "deploy" / settings.PROJECT).get("runtime_arn")
     if arn:
         print(f"\nFor the UI, add to .env:\n{settings.RUNTIME_ARN_SETTING}={arn}")
 
