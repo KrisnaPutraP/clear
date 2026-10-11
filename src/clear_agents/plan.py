@@ -51,9 +51,10 @@ class RecoveryPlan(BaseModel):
     actions: list[Action] = Field(default_factory=list, description="STOs, only for validated transfers.")
     escalation: str | None = Field(
         default=None,
-        description="A decision only a human can make: emergency sourcing when no transfer is feasible and "
-                    "orders are deferred, or when no option covers the requirement; otherwise None. "
-                    "Contingencies and customs follow-up go in next_check.",
+        description="A decision only a human can make: emergency sourcing when the validator allows no transfer "
+                    "at all and orders are deferred, or when no option covers the requirement; otherwise None. "
+                    "Orders deferred behind a feasible transfer need no escalation. Contingencies and customs "
+                    "follow-up go in next_check.",
     )
     next_check: str = Field(description="What to monitor next.")
 

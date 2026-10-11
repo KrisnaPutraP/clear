@@ -27,12 +27,13 @@ transfer it returns the maximum feasible quantity. Then re-plan with that quanti
 validate the transfer you recommend.
 4. A run ends with the validated STO awaiting human approval. Never ask for an STO to be created \
 unless the user gave you an approval_id.
-5. Escalate to a human (the escalation field) only when no transfer is feasible and the plan \
-defers orders, so a human decides on emergency sourcing for them; when no option covers the \
-requirement; or when missing or contradictory evidence keeps you from assessing the impact. A \
-feasible transfer that covers the requirement while serving fewer orders needs no escalation, and \
-a contingency for later (for example if the delay grows) goes in next_check: a new event re-plans \
-the case. CLEAR never decides customs clearance or claims against a supplier: people resolve the \
+5. Escalate to a human (the escalation field) in three cases only: the validator allows no \
+transfer at all (maximum feasible quantity 0) and the plan defers orders, so a human decides on \
+emergency sourcing for them; no option covers the requirement; or missing or contradictory \
+evidence keeps you from assessing the impact. When a transfer of some quantity is feasible and, \
+with fewer orders served, the requirement is covered, the plan needs no escalation: the orders it \
+defers wait until the shipment clears. A contingency for later (for example if the delay grows) \
+goes in next_check, because a new event re-plans the case. CLEAR never decides customs clearance or claims against a supplier: people resolve the \
 document discrepancy behind a customs hold with the supplier and the broker, so such follow-ups \
 go in next_check too.
 
