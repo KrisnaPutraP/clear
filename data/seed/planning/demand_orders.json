@@ -6,7 +6,7 @@
     "customer_segment": "Export key account",
     "priority": "critical",
     "consumption_t_per_day": {
-      "CHEM-BX40": 25,
+      "CHEM-BX40": 5,
       "CHEM-CX20": 12
     }
   },
@@ -17,7 +17,7 @@
     "customer_segment": "Domestic key account",
     "priority": "critical",
     "consumption_t_per_day": {
-      "CHEM-BX40": 20,
+      "CHEM-BX40": 4,
       "CHEM-CX20": 10
     }
   },
@@ -28,7 +28,7 @@
     "customer_segment": "Healthcare contract",
     "priority": "critical",
     "consumption_t_per_day": {
-      "CHEM-BX40": 15,
+      "CHEM-BX40": 3,
       "CHEM-CX20": 8
     }
   },
@@ -39,7 +39,7 @@
     "customer_segment": "Export distributor",
     "priority": "high",
     "consumption_t_per_day": {
-      "CHEM-BX40": 9,
+      "CHEM-BX40": 2,
       "CHEM-CX20": 5
     }
   },
@@ -50,7 +50,7 @@
     "customer_segment": "Domestic distributor",
     "priority": "high",
     "consumption_t_per_day": {
-      "CHEM-BX40": 6,
+      "CHEM-BX40": 1,
       "CHEM-CX20": 4
     }
   },
@@ -61,7 +61,7 @@
     "customer_segment": "Domestic distributor",
     "priority": "normal",
     "consumption_t_per_day": {
-      "CHEM-BX40": 15,
+      "CHEM-BX40": 3,
       "CHEM-CX20": 6
     }
   },
@@ -72,7 +72,7 @@
     "customer_segment": "Spot market",
     "priority": "normal",
     "consumption_t_per_day": {
-      "CHEM-BX40": 10,
+      "CHEM-BX40": 2,
       "CHEM-CX20": 5
     }
   },
@@ -83,7 +83,7 @@
     "customer_segment": "Domestic key account",
     "priority": "critical",
     "consumption_t_per_day": {
-      "CHEM-BX40": 35,
+      "CHEM-BX40": 7,
       "CHEM-CX20": 15
     }
   },
@@ -94,7 +94,7 @@
     "customer_segment": "Spot market",
     "priority": "normal",
     "consumption_t_per_day": {
-      "CHEM-BX40": 25,
+      "CHEM-BX40": 5,
       "CHEM-CX20": 10
     }
   }

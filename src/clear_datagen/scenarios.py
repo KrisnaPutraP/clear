@@ -2,8 +2,14 @@
 (docs/PLAN.md §1b, §4, §5c).
 
 All company, plant, material, supplier, vessel, and forwarder names are
-fictional. S1 keeps the ratio locked in PLAN §1a: 190 t on hand against
-100 t/day is 1.9 days of coverage, while the exception takes about 3 days.
+fictional. S1 keeps the ratio locked in PLAN §1a: 38 t on hand against
+20 t/day is 1.9 days of coverage, while the exception takes about 3 days.
+
+Scale: plant 1100 is a mid-size integrated mill of roughly 1,000 to 1,500
+air-dry tonnes of pulp per day. Bleaching uses about 13 to 20 kg of sodium
+chlorate per tonne of hardwood pulp (chlorine dioxide made on site), which
+gives the 20 t/day of CHEM-BX40; caustic soda use is of the same order.
+These are assumptions for plausibility, not data from a real mill.
 """
 
 from clear_tools import s4
@@ -28,40 +34,40 @@ SUPPLIERS = {
 # Inbound purchase orders: one per scenario shipment.
 PURCHASE_ORDERS = [
     {"number": "4500001021", "date": "2026-09-07", "supplier": "17300101",
-     "material": "CHEM-BX40", "plant": "1100", "quantity": 600},
+     "material": "CHEM-BX40", "plant": "1100", "quantity": 120},
     {"number": "4500001022", "date": "2026-09-28", "supplier": "17300102",
      "material": "CHEM-CX20", "plant": "1100", "quantity": 350},
 ]
 
 # (material, plant): (unrestricted stock t, safety stock t)
 STOCK = {
-    ("CHEM-BX40", "1100"): (190, 150),
-    ("CHEM-BX40", "1200"): (300, 200),
+    ("CHEM-BX40", "1100"): (38, 30),
+    ("CHEM-BX40", "1200"): (60, 40),
     ("CHEM-CX20", "1100"): (300, 100),
     ("CHEM-CX20", "1200"): (140, 80),
 }
 
-# Daily chemical use per order. At plant 1100, CHEM-BX40 sums to 100 t/day for
-# all orders, 75 t/day for critical + high, and 60 t/day for critical only.
+# Daily chemical use per order. At plant 1100, CHEM-BX40 sums to 20 t/day for
+# all orders, 15 t/day for critical + high, and 12 t/day for critical only.
 DEMAND_ORDERS = [
     ("PRD-1101", "1100", "Liquid packaging board", "Export key account", "critical",
-     {"CHEM-BX40": 25, "CHEM-CX20": 12}),
+     {"CHEM-BX40": 5, "CHEM-CX20": 12}),
     ("PRD-1102", "1100", "Food-grade folding box board", "Domestic key account", "critical",
-     {"CHEM-BX40": 20, "CHEM-CX20": 10}),
+     {"CHEM-BX40": 4, "CHEM-CX20": 10}),
     ("PRD-1103", "1100", "Medical-grade tissue", "Healthcare contract", "critical",
-     {"CHEM-BX40": 15, "CHEM-CX20": 8}),
+     {"CHEM-BX40": 3, "CHEM-CX20": 8}),
     ("PRD-1104", "1100", "Copy paper A4 80 gsm", "Export distributor", "high",
-     {"CHEM-BX40": 9, "CHEM-CX20": 5}),
+     {"CHEM-BX40": 2, "CHEM-CX20": 5}),
     ("PRD-1105", "1100", "Coated art paper 120 gsm", "Domestic distributor", "high",
-     {"CHEM-BX40": 6, "CHEM-CX20": 4}),
+     {"CHEM-BX40": 1, "CHEM-CX20": 4}),
     ("PRD-1106", "1100", "Uncoated woodfree 70 gsm", "Domestic distributor", "normal",
-     {"CHEM-BX40": 15, "CHEM-CX20": 6}),
+     {"CHEM-BX40": 3, "CHEM-CX20": 6}),
     ("PRD-1107", "1100", "Newsprint 45 gsm", "Spot market", "normal",
-     {"CHEM-BX40": 10, "CHEM-CX20": 5}),
+     {"CHEM-BX40": 2, "CHEM-CX20": 5}),
     ("PRD-1201", "1200", "Corrugating medium", "Domestic key account", "critical",
-     {"CHEM-BX40": 35, "CHEM-CX20": 15}),
+     {"CHEM-BX40": 7, "CHEM-CX20": 15}),
     ("PRD-1202", "1200", "Kraft liner", "Spot market", "normal",
-     {"CHEM-BX40": 25, "CHEM-CX20": 10}),
+     {"CHEM-BX40": 5, "CHEM-CX20": 10}),
 ]
 
 PARAMETERS = {

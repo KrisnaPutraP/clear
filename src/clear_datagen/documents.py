@@ -2,8 +2,8 @@
 
 Invoice, packing list, bill of lading, and certificate of analysis per
 shipment. Every problem shipment carries exactly one clear discrepancy: in
-S1 the packing list (and the cargo actually loaded) shows 560 t while the
-invoice and the purchase order say 600 t. S2's documents agree.
+S1 the packing list (and the cargo actually loaded) shows 112 t while the
+invoice and the purchase order say 120 t. S2's documents agree.
 """
 
 from clear_datagen.scenarios import BUYER, MATERIALS, PLANTS, PURCHASE_ORDERS, SHIPMENTS, SUPPLIERS
@@ -11,8 +11,8 @@ from clear_datagen.scenarios import BUYER, MATERIALS, PLANTS, PURCHASE_ORDERS, S
 # Values that differ per shipment. shipped_t is what the packing list states.
 DOCUMENT_DATA = {
     "SHP-1001": {
-        "ref": "VC-26-0917", "date": "2026-09-30", "unit_price": 540.00, "shipped_t": 560,
-        "package_type": "IBC totes", "package_net_kg": 1_000, "package_tare_kg": 60,
+        "ref": "VC-26-0917", "date": "2026-09-30", "unit_price": 540.00, "shipped_t": 112,
+        "package_type": "FIBC bulk bags", "package_net_kg": 1_000, "package_tare_kg": 3,
         "batch": "BX40-2609-A",
         "analysis": [("Assay (as NaClO3)", ">= 99.0 %", "99.6 %"), ("Moisture", "<= 0.10 %", "0.07 %"),
                      ("Insolubles", "<= 0.01 %", "0.004 %")],

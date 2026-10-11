@@ -48,23 +48,29 @@ Plant 1200 (East Java) can send stock transport orders with a lead time of
 
 | | S1, hero (SHP-1001) | S2, contrast (SHP-1002) |
 |---|---|---|
-| Material | CHEM-BX40, bleaching agent | CHEM-CX20, caustic agent |
-| Purchase order | 4500001021, 600 t | 4500001022, 350 t |
-| Plant 1100 stock / safety stock | 190 t / 150 t | 300 t / 100 t |
-| Plant 1200 stock / safety stock | 300 t / 200 t | 140 t / 80 t |
-| Plant 1100 use: all / critical + high / critical | 100 / 75 / 60 t per day | 50 / 39 / 30 t per day |
+| Material | CHEM-BX40, bleaching agent (sodium chlorate) | CHEM-CX20, caustic agent (caustic soda, 48 %) |
+| Purchase order | 4500001021, 120 t | 4500001022, 350 t |
+| Plant 1100 stock / safety stock | 38 t / 30 t | 300 t / 100 t |
+| Plant 1200 stock / safety stock | 60 t / 40 t | 140 t / 80 t |
+| Plant 1100 use: all / critical + high / critical | 20 / 15 / 12 t per day | 50 / 39 / 30 t per day |
 | Prepared events | Customs document hold, then an ETA slip with high berth congestion | Yard congestion |
 
 S1 keeps the ratio of the original proposal: 1.9 days of coverage against a
 resolution time of about 3 days.
 
+The tonnages assume plant 1100 is a mid-size integrated mill making roughly
+1,000 to 1,500 air-dry tonnes of pulp per day. Bleaching hardwood pulp with
+chlorine dioxide made on site takes about 13 to 20 kg of sodium chlorate per
+tonne of pulp, hence 20 t/day of CHEM-BX40; caustic soda use is of the same
+order. Both are plausibility assumptions, not data from a real mill.
+
 ### Documents (`src/clear_datagen/documents.py`)
 
 Each shipment has an invoice, a packing list, a bill of lading, and a
 certificate of analysis rendered from fixed templates. S1 carries exactly
-one discrepancy: the packing list states 560 t (560 IBC totes, also on the
-bill of lading), while the invoice and purchase order say 600 t. S2's
-documents agree.
+one discrepancy: the packing list states 112 t (112 one-tonne FIBC bulk bags,
+also on the bill of lading), while the invoice and purchase order say 120 t.
+S2's documents agree.
 
 ### Exception history (`src/clear_datagen/history.py`)
 

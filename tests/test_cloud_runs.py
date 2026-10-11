@@ -30,7 +30,7 @@ def test_s1_runs_on_the_deployment_like_it_runs_locally(deployment):
     assert [e["tool"] for e in log if e.get("flag") == "rejected"] == ["validate_action"]
     assert [e["tool"] for e in log if e.get("flag") == "discrepancy"] == ["reconcile_documents"]
     [action] = case["plan"]["actions"]
-    assert action["validation"]["quantity"] == 100
+    assert action["validation"]["quantity"] == 20
 
     clear.submit_decision(case_id, action["validation_id"], "Demo Planner", "approved", wait=True)
     with clear.snapshot():

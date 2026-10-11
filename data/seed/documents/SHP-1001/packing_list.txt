@@ -8,7 +8,7 @@ Consignee: PT Arunika Pulp & Paper, Indonesia
 Buyer PO No.: 4500001021
 Buyer Material No.: CHEM-BX40
 Description of Goods: Bleaching agent BX-40
-Packages: 560 IBC totes, 1,000 kg net each
-Quantity: 560 MT
-Total Net Weight: 560,000 kg
-Total Gross Weight: 593,600 kg
+Packages: 112 FIBC bulk bags, 1,000 kg net each
+Quantity: 112 MT
+Total Net Weight: 112,000 kg
+Total Gross Weight: 112,336 kg

@@ -9,7 +9,7 @@ Vessel / Voyage: MV Northern Lumen / NL-2641
 Port of Loading: Hamburg
 Port of Discharge: Tanjung Priok
 
-Description of Goods: 560 IBC totes said to contain Bleaching agent BX-40
-Gross Weight: 593,600 kg
+Description of Goods: 112 FIBC bulk bags said to contain Bleaching agent BX-40
+Gross Weight: 112,336 kg
 Reference: Buyer PO No. 4500001021
 Freight: Prepaid

@@ -9,9 +9,9 @@ Buyer: PT Arunika Pulp & Paper, Arunika West Mill, Indonesia
 Buyer PO No.: 4500001021
 Buyer Material No.: CHEM-BX40
 Description of Goods: Bleaching agent BX-40
-Quantity: 600 MT
+Quantity: 120 MT
 Unit Price: USD 540.00 per MT
-Total Amount: USD 324,000.00
+Total Amount: USD 64,800.00
 Incoterms: CIF Tanjung Priok
 
 Vessel / Voyage: MV Northern Lumen / NL-2641

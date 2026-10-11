@@ -5,7 +5,7 @@
     "PurchaseOrderItemText": "Bleaching agent BX-40",
     "Material": "CHEM-BX40",
     "Plant": "1100",
-    "OrderQuantity": 600,
+    "OrderQuantity": 120,
     "PurchaseOrderQuantityUnit": "TO"
   },
   {

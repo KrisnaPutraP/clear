@@ -35,7 +35,7 @@
     "shipment_id": "SHP-1001",
     "status": "awaiting_approval",
     "status_reason": null,
-    "updated_at": "2026-10-10T16:16:57+00:00",
+    "updated_at": "2026-10-11T08:03:53+00:00",
     "running": false,
     "shipment": {
       "shipment_id": "SHP-1001",
@@ -91,15 +91,15 @@
       "documents": [
         {
           "document_type": "commercial_invoice",
-          "text": "COMMERCIAL INVOICE\n\nInvoice No.: INV-VC-26-0917\nInvoice Date: 2026-09-30\n\nSeller: Veltrona Chemicals GmbH, Hamburg, Germany\nBuyer: PT Arunika Pulp & Paper, Arunika West Mill, Indonesia\n\nBuyer PO No.: 4500001021\nBuyer Material No.: CHEM-BX40\nDescription of Goods: Bleaching agent BX-40\nQuantity: 600 MT\nUnit Price: USD 540.00 per MT\nTotal Amount: USD 324,000.00\nIncoterms: CIF Tanjung Priok\n\nVessel / Voyage: MV Northern Lumen / NL-2641\nPort of Loading: Hamburg\nPort of Discharge: Tanjung Priok\n\nWe certify that this invoice is true and correct.\n"
+          "text": "COMMERCIAL INVOICE\n\nInvoice No.: INV-VC-26-0917\nInvoice Date: 2026-09-30\n\nSeller: Veltrona Chemicals GmbH, Hamburg, Germany\nBuyer: PT Arunika Pulp & Paper, Arunika West Mill, Indonesia\n\nBuyer PO No.: 4500001021\nBuyer Material No.: CHEM-BX40\nDescription of Goods: Bleaching agent BX-40\nQuantity: 120 MT\nUnit Price: USD 540.00 per MT\nTotal Amount: USD 64,800.00\nIncoterms: CIF Tanjung Priok\n\nVessel / Voyage: MV Northern Lumen / NL-2641\nPort of Loading: Hamburg\nPort of Discharge: Tanjung Priok\n\nWe certify that this invoice is true and correct.\n"
         },
         {
           "document_type": "packing_list",
-          "text": "PACKING LIST\n\nPacking List No.: PL-VC-26-0917\nDate: 2026-09-30\nShipper: Veltrona Chemicals GmbH, Hamburg, Germany\nConsignee: PT Arunika Pulp & Paper, Indonesia\n\nBuyer PO No.: 4500001021\nBuyer Material No.: CHEM-BX40\nDescription of Goods: Bleaching agent BX-40\nPackages: 560 IBC totes, 1,000 kg net each\nQuantity: 560 MT\nTotal Net Weight: 560,000 kg\nTotal Gross Weight: 593,600 kg\n"
+          "text": "PACKING LIST\n\nPacking List No.: PL-VC-26-0917\nDate: 2026-09-30\nShipper: Veltrona Chemicals GmbH, Hamburg, Germany\nConsignee: PT Arunika Pulp & Paper, Indonesia\n\nBuyer PO No.: 4500001021\nBuyer Material No.: CHEM-BX40\nDescription of Goods: Bleaching agent BX-40\nPackages: 112 FIBC bulk bags, 1,000 kg net each\nQuantity: 112 MT\nTotal Net Weight: 112,000 kg\nTotal Gross Weight: 112,336 kg\n"
         },
         {
           "document_type": "bill_of_lading",
-          "text": "BILL OF LADING (NON-NEGOTIABLE COPY)\n\nB/L No.: BL-VC-26-0917\nShipper: Veltrona Chemicals GmbH, Hamburg, Germany\nConsignee: PT Arunika Pulp & Paper, Indonesia\nNotify Party: Same as consignee\n\nVessel / Voyage: MV Northern Lumen / NL-2641\nPort of Loading: Hamburg\nPort of Discharge: Tanjung Priok\n\nDescription of Goods: 560 IBC totes said to contain Bleaching agent BX-40\nGross Weight: 593,600 kg\nReference: Buyer PO No. 4500001021\nFreight: Prepaid\n"
+          "text": "BILL OF LADING (NON-NEGOTIABLE COPY)\n\nB/L No.: BL-VC-26-0917\nShipper: Veltrona Chemicals GmbH, Hamburg, Germany\nConsignee: PT Arunika Pulp & Paper, Indonesia\nNotify Party: Same as consignee\n\nVessel / Voyage: MV Northern Lumen / NL-2641\nPort of Loading: Hamburg\nPort of Discharge: Tanjung Priok\n\nDescription of Goods: 112 FIBC bulk bags said to contain Bleaching agent BX-40\nGross Weight: 112,336 kg\nReference: Buyer PO No. 4500001021\nFreight: Prepaid\n"
         },
         {
           "document_type": "certificate_of_analysis",
@@ -114,10 +114,10 @@
       "discrepancies": [
         {
           "field": "quantity",
-          "purchase_order_value": 600.0,
+          "purchase_order_value": 120.0,
           "document_values": {
-            "commercial_invoice": 600.0,
-            "packing_list": 560.0
+            "commercial_invoice": 120.0,
+            "packing_list": 112.0
           },
           "mismatched_documents": [
             "packing_list"
@@ -143,8 +143,8 @@
         {
           "document_type": "commercial_invoice",
           "field": "quantity",
-          "value": 600.0,
-          "quote": "Quantity: 600 MT"
+          "value": 120.0,
+          "quote": "Quantity: 120 MT"
         },
         {
           "document_type": "packing_list",
@@ -161,8 +161,8 @@
         {
           "document_type": "packing_list",
           "field": "quantity",
-          "value": 560.0,
-          "quote": "Quantity: 560 MT"
+          "value": 112.0,
+          "quote": "Quantity: 112 MT"
         },
         {
           "document_type": "bill_of_lading",
@@ -181,90 +181,90 @@
         "source": "S/4HANA (mock) API_PURCHASEORDER_PROCESS_SRV/A_PurchaseOrderItem",
         "purchase_order": "4500001021",
         "material": "CHEM-BX40",
-        "quantity": 600.0
+        "quantity": 120.0
       },
-      "created_at": "2026-10-10T16:16:56+00:00"
+      "created_at": "2026-10-11T08:03:52+00:00"
     },
     "inventory": {
       "material": "CHEM-BX40",
       "plants": [
         {
           "plant": "1100",
-          "unrestricted_t": 190,
+          "unrestricted_t": 38,
           "in_transit_t": 0,
-          "safety_stock_t": 150,
+          "safety_stock_t": 30,
           "consumption_t_per_day": {
-            "all": 100,
-            "critical_high": 75,
-            "critical": 60
+            "all": 20,
+            "critical_high": 15,
+            "critical": 12
           },
           "orders": [
             {
               "order_id": "PRD-1101",
               "product": "Liquid packaging board",
               "priority": "critical",
-              "consumption_t_per_day": 25
+              "consumption_t_per_day": 5
             },
             {
               "order_id": "PRD-1102",
               "product": "Food-grade folding box board",
               "priority": "critical",
-              "consumption_t_per_day": 20
+              "consumption_t_per_day": 4
             },
             {
               "order_id": "PRD-1103",
               "product": "Medical-grade tissue",
               "priority": "critical",
-              "consumption_t_per_day": 15
+              "consumption_t_per_day": 3
             },
             {
               "order_id": "PRD-1104",
               "product": "Copy paper A4 80 gsm",
               "priority": "high",
-              "consumption_t_per_day": 9
+              "consumption_t_per_day": 2
             },
             {
               "order_id": "PRD-1105",
               "product": "Coated art paper 120 gsm",
               "priority": "high",
-              "consumption_t_per_day": 6
+              "consumption_t_per_day": 1
             },
             {
               "order_id": "PRD-1106",
               "product": "Uncoated woodfree 70 gsm",
               "priority": "normal",
-              "consumption_t_per_day": 15
+              "consumption_t_per_day": 3
             },
             {
               "order_id": "PRD-1107",
               "product": "Newsprint 45 gsm",
               "priority": "normal",
-              "consumption_t_per_day": 10
+              "consumption_t_per_day": 2
             }
           ]
         },
         {
           "plant": "1200",
-          "unrestricted_t": 300,
+          "unrestricted_t": 60,
           "in_transit_t": 0,
-          "safety_stock_t": 200,
+          "safety_stock_t": 40,
           "consumption_t_per_day": {
-            "all": 60,
-            "critical_high": 35,
-            "critical": 35
+            "all": 12,
+            "critical_high": 7,
+            "critical": 7
           },
           "orders": [
             {
               "order_id": "PRD-1201",
               "product": "Corrugating medium",
               "priority": "critical",
-              "consumption_t_per_day": 35
+              "consumption_t_per_day": 7
             },
             {
               "order_id": "PRD-1202",
               "product": "Kraft liner",
               "priority": "normal",
-              "consumption_t_per_day": 25
+              "consumption_t_per_day": 5
             }
           ]
         }
@@ -308,7 +308,7 @@
         "coverage_days": 1.9,
         "required_coverage_days": 3.5,
         "covered": false,
-        "shortage_t": 160.0,
+        "shortage_t": 32.0,
         "transfer": null,
         "deferred_orders": [],
         "sources": {
@@ -320,7 +320,7 @@
       },
       "options": [
         {
-          "name": "Transfer 100 t from 1200",
+          "name": "Transfer 20 t from 1200",
           "assessment_id": "ASM-0002",
           "validation_id": null,
           "note": "The feasible transfer alone still leaves a shortage.",
@@ -330,13 +330,13 @@
             "coverage_days": 2.9,
             "required_coverage_days": 3.5,
             "covered": false,
-            "shortage_t": 60.0,
+            "shortage_t": 12.0,
             "transfer": {
               "status": "proposed",
-              "quantity_t": 100.0,
+              "quantity_t": 20.0,
               "source_plant": "1200",
               "lead_time_days": 1.0,
-              "cost_usd": 4500.0
+              "cost_usd": 900.0
             },
             "deferred_orders": [],
             "sources": {
@@ -349,7 +349,7 @@
           "validation": null
         },
         {
-          "name": "Transfer 100 t from 1200 + critical and high orders",
+          "name": "Transfer 20 t from 1200 + critical and high orders",
           "assessment_id": "ASM-0003",
           "validation_id": "VAL-0002",
           "note": "Covers the requirement; normal-priority orders wait.",
@@ -362,23 +362,23 @@
             "shortage_t": 0.0,
             "transfer": {
               "status": "proposed",
-              "quantity_t": 100.0,
+              "quantity_t": 20.0,
               "source_plant": "1200",
               "lead_time_days": 1.0,
-              "cost_usd": 4500.0
+              "cost_usd": 900.0
             },
             "deferred_orders": [
               {
                 "order_id": "PRD-1106",
                 "product": "Uncoated woodfree 70 gsm",
                 "priority": "normal",
-                "consumption_t_per_day": 15
+                "consumption_t_per_day": 3
               },
               {
                 "order_id": "PRD-1107",
                 "product": "Newsprint 45 gsm",
                 "priority": "normal",
-                "consumption_t_per_day": 10
+                "consumption_t_per_day": 2
               }
             ],
             "sources": {
@@ -391,16 +391,16 @@
           "validation": {
             "validation_id": "VAL-0002",
             "valid": true,
-            "quantity": 100.0,
+            "quantity": 20.0,
             "source_plant": "1200",
             "destination_plant": "1100",
             "violations": [],
-            "max_feasible_quantity": 100
+            "max_feasible_quantity": 20
           }
         }
       ],
       "recommendation": "Transfer the feasible quantity from plant 1200 and serve critical and high orders until the shipment clears; the full transfer was rejected by the safety-stock rule.",
-      "recommended_option": "Transfer 100 t from 1200 + critical and high orders",
+      "recommended_option": "Transfer 20 t from 1200 + critical and high orders",
       "actions": [
         {
           "validation_id": "VAL-0002",
@@ -409,11 +409,11 @@
           "validation": {
             "validation_id": "VAL-0002",
             "valid": true,
-            "quantity": 100.0,
+            "quantity": 20.0,
             "source_plant": "1200",
             "destination_plant": "1100",
             "violations": [],
-            "max_feasible_quantity": 100
+            "max_feasible_quantity": 20
           },
           "approval": null,
           "sto": null
@@ -429,7 +429,7 @@
     "shipment_id": "SHP-1001",
     "status": "monitoring",
     "status_reason": null,
-    "updated_at": "2026-10-10T16:16:57+00:00",
+    "updated_at": "2026-10-11T08:03:53+00:00",
     "running": false,
     "shipment": {
       "shipment_id": "SHP-1001",
@@ -485,15 +485,15 @@
       "documents": [
         {
           "document_type": "commercial_invoice",
-          "text": "COMMERCIAL INVOICE\n\nInvoice No.: INV-VC-26-0917\nInvoice Date: 2026-09-30\n\nSeller: Veltrona Chemicals GmbH, Hamburg, Germany\nBuyer: PT Arunika Pulp & Paper, Arunika West Mill, Indonesia\n\nBuyer PO No.: 4500001021\nBuyer Material No.: CHEM-BX40\nDescription of Goods: Bleaching agent BX-40\nQuantity: 600 MT\nUnit Price: USD 540.00 per MT\nTotal Amount: USD 324,000.00\nIncoterms: CIF Tanjung Priok\n\nVessel / Voyage: MV Northern Lumen / NL-2641\nPort of Loading: Hamburg\nPort of Discharge: Tanjung Priok\n\nWe certify that this invoice is true and correct.\n"
+          "text": "COMMERCIAL INVOICE\n\nInvoice No.: INV-VC-26-0917\nInvoice Date: 2026-09-30\n\nSeller: Veltrona Chemicals GmbH, Hamburg, Germany\nBuyer: PT Arunika Pulp & Paper, Arunika West Mill, Indonesia\n\nBuyer PO No.: 4500001021\nBuyer Material No.: CHEM-BX40\nDescription of Goods: Bleaching agent BX-40\nQuantity: 120 MT\nUnit Price: USD 540.00 per MT\nTotal Amount: USD 64,800.00\nIncoterms: CIF Tanjung Priok\n\nVessel / Voyage: MV Northern Lumen / NL-2641\nPort of Loading: Hamburg\nPort of Discharge: Tanjung Priok\n\nWe certify that this invoice is true and correct.\n"
         },
         {
           "document_type": "packing_list",
-          "text": "PACKING LIST\n\nPacking List No.: PL-VC-26-0917\nDate: 2026-09-30\nShipper: Veltrona Chemicals GmbH, Hamburg, Germany\nConsignee: PT Arunika Pulp & Paper, Indonesia\n\nBuyer PO No.: 4500001021\nBuyer Material No.: CHEM-BX40\nDescription of Goods: Bleaching agent BX-40\nPackages: 560 IBC totes, 1,000 kg net each\nQuantity: 560 MT\nTotal Net Weight: 560,000 kg\nTotal Gross Weight: 593,600 kg\n"
+          "text": "PACKING LIST\n\nPacking List No.: PL-VC-26-0917\nDate: 2026-09-30\nShipper: Veltrona Chemicals GmbH, Hamburg, Germany\nConsignee: PT Arunika Pulp & Paper, Indonesia\n\nBuyer PO No.: 4500001021\nBuyer Material No.: CHEM-BX40\nDescription of Goods: Bleaching agent BX-40\nPackages: 112 FIBC bulk bags, 1,000 kg net each\nQuantity: 112 MT\nTotal Net Weight: 112,000 kg\nTotal Gross Weight: 112,336 kg\n"
         },
         {
           "document_type": "bill_of_lading",
-          "text": "BILL OF LADING (NON-NEGOTIABLE COPY)\n\nB/L No.: BL-VC-26-0917\nShipper: Veltrona Chemicals GmbH, Hamburg, Germany\nConsignee: PT Arunika Pulp & Paper, Indonesia\nNotify Party: Same as consignee\n\nVessel / Voyage: MV Northern Lumen / NL-2641\nPort of Loading: Hamburg\nPort of Discharge: Tanjung Priok\n\nDescription of Goods: 560 IBC totes said to contain Bleaching agent BX-40\nGross Weight: 593,600 kg\nReference: Buyer PO No. 4500001021\nFreight: Prepaid\n"
+          "text": "BILL OF LADING (NON-NEGOTIABLE COPY)\n\nB/L No.: BL-VC-26-0917\nShipper: Veltrona Chemicals GmbH, Hamburg, Germany\nConsignee: PT Arunika Pulp & Paper, Indonesia\nNotify Party: Same as consignee\n\nVessel / Voyage: MV Northern Lumen / NL-2641\nPort of Loading: Hamburg\nPort of Discharge: Tanjung Priok\n\nDescription of Goods: 112 FIBC bulk bags said to contain Bleaching agent BX-40\nGross Weight: 112,336 kg\nReference: Buyer PO No. 4500001021\nFreight: Prepaid\n"
         },
         {
           "document_type": "certificate_of_analysis",
@@ -508,10 +508,10 @@
       "discrepancies": [
         {
           "field": "quantity",
-          "purchase_order_value": 600.0,
+          "purchase_order_value": 120.0,
           "document_values": {
-            "commercial_invoice": 600.0,
-            "packing_list": 560.0
+            "commercial_invoice": 120.0,
+            "packing_list": 112.0
           },
           "mismatched_documents": [
             "packing_list"
@@ -537,8 +537,8 @@
         {
           "document_type": "commercial_invoice",
           "field": "quantity",
-          "value": 600.0,
-          "quote": "Quantity: 600 MT"
+          "value": 120.0,
+          "quote": "Quantity: 120 MT"
         },
         {
           "document_type": "packing_list",
@@ -555,8 +555,8 @@
         {
           "document_type": "packing_list",
           "field": "quantity",
-          "value": 560.0,
-          "quote": "Quantity: 560 MT"
+          "value": 112.0,
+          "quote": "Quantity: 112 MT"
         },
         {
           "document_type": "bill_of_lading",
@@ -575,90 +575,90 @@
         "source": "S/4HANA (mock) API_PURCHASEORDER_PROCESS_SRV/A_PurchaseOrderItem",
         "purchase_order": "4500001021",
         "material": "CHEM-BX40",
-        "quantity": 600.0
+        "quantity": 120.0
       },
-      "created_at": "2026-10-10T16:16:56+00:00"
+      "created_at": "2026-10-11T08:03:52+00:00"
     },
     "inventory": {
       "material": "CHEM-BX40",
       "plants": [
         {
           "plant": "1100",
-          "unrestricted_t": 190,
-          "in_transit_t": 100.0,
-          "safety_stock_t": 150,
+          "unrestricted_t": 38,
+          "in_transit_t": 20.0,
+          "safety_stock_t": 30,
           "consumption_t_per_day": {
-            "all": 100,
-            "critical_high": 75,
-            "critical": 60
+            "all": 20,
+            "critical_high": 15,
+            "critical": 12
           },
           "orders": [
             {
               "order_id": "PRD-1101",
               "product": "Liquid packaging board",
               "priority": "critical",
-              "consumption_t_per_day": 25
+              "consumption_t_per_day": 5
             },
             {
               "order_id": "PRD-1102",
               "product": "Food-grade folding box board",
               "priority": "critical",
-              "consumption_t_per_day": 20
+              "consumption_t_per_day": 4
             },
             {
               "order_id": "PRD-1103",
               "product": "Medical-grade tissue",
               "priority": "critical",
-              "consumption_t_per_day": 15
+              "consumption_t_per_day": 3
             },
             {
               "order_id": "PRD-1104",
               "product": "Copy paper A4 80 gsm",
               "priority": "high",
-              "consumption_t_per_day": 9
+              "consumption_t_per_day": 2
             },
             {
               "order_id": "PRD-1105",
               "product": "Coated art paper 120 gsm",
               "priority": "high",
-              "consumption_t_per_day": 6
+              "consumption_t_per_day": 1
             },
             {
               "order_id": "PRD-1106",
               "product": "Uncoated woodfree 70 gsm",
               "priority": "normal",
-              "consumption_t_per_day": 15
+              "consumption_t_per_day": 3
             },
             {
               "order_id": "PRD-1107",
               "product": "Newsprint 45 gsm",
               "priority": "normal",
-              "consumption_t_per_day": 10
+              "consumption_t_per_day": 2
             }
           ]
         },
         {
           "plant": "1200",
-          "unrestricted_t": 200.0,
+          "unrestricted_t": 40.0,
           "in_transit_t": 0,
-          "safety_stock_t": 200,
+          "safety_stock_t": 40,
           "consumption_t_per_day": {
-            "all": 60,
-            "critical_high": 35,
-            "critical": 35
+            "all": 12,
+            "critical_high": 7,
+            "critical": 7
           },
           "orders": [
             {
               "order_id": "PRD-1201",
               "product": "Corrugating medium",
               "priority": "critical",
-              "consumption_t_per_day": 35
+              "consumption_t_per_day": 7
             },
             {
               "order_id": "PRD-1202",
               "product": "Kraft liner",
               "priority": "normal",
-              "consumption_t_per_day": 25
+              "consumption_t_per_day": 5
             }
           ]
         }
@@ -702,7 +702,7 @@
         "coverage_days": 1.9,
         "required_coverage_days": 3.5,
         "covered": false,
-        "shortage_t": 160.0,
+        "shortage_t": 32.0,
         "transfer": null,
         "deferred_orders": [],
         "sources": {
@@ -714,7 +714,7 @@
       },
       "options": [
         {
-          "name": "Transfer 100 t from 1200",
+          "name": "Transfer 20 t from 1200",
           "assessment_id": "ASM-0002",
           "validation_id": null,
           "note": "The feasible transfer alone still leaves a shortage.",
@@ -724,13 +724,13 @@
             "coverage_days": 2.9,
             "required_coverage_days": 3.5,
             "covered": false,
-            "shortage_t": 60.0,
+            "shortage_t": 12.0,
             "transfer": {
               "status": "proposed",
-              "quantity_t": 100.0,
+              "quantity_t": 20.0,
               "source_plant": "1200",
               "lead_time_days": 1.0,
-              "cost_usd": 4500.0
+              "cost_usd": 900.0
             },
             "deferred_orders": [],
             "sources": {
@@ -743,7 +743,7 @@
           "validation": null
         },
         {
-          "name": "Transfer 100 t from 1200 + critical and high orders",
+          "name": "Transfer 20 t from 1200 + critical and high orders",
           "assessment_id": "ASM-0003",
           "validation_id": "VAL-0002",
           "note": "Covers the requirement; normal-priority orders wait.",
@@ -756,23 +756,23 @@
             "shortage_t": 0.0,
             "transfer": {
               "status": "proposed",
-              "quantity_t": 100.0,
+              "quantity_t": 20.0,
               "source_plant": "1200",
               "lead_time_days": 1.0,
-              "cost_usd": 4500.0
+              "cost_usd": 900.0
             },
             "deferred_orders": [
               {
                 "order_id": "PRD-1106",
                 "product": "Uncoated woodfree 70 gsm",
                 "priority": "normal",
-                "consumption_t_per_day": 15
+                "consumption_t_per_day": 3
               },
               {
                 "order_id": "PRD-1107",
                 "product": "Newsprint 45 gsm",
                 "priority": "normal",
-                "consumption_t_per_day": 10
+                "consumption_t_per_day": 2
               }
             ],
             "sources": {
@@ -785,16 +785,16 @@
           "validation": {
             "validation_id": "VAL-0002",
             "valid": true,
-            "quantity": 100.0,
+            "quantity": 20.0,
             "source_plant": "1200",
             "destination_plant": "1100",
             "violations": [],
-            "max_feasible_quantity": 100
+            "max_feasible_quantity": 20
           }
         }
       ],
       "recommendation": "Transfer the feasible quantity from plant 1200 and serve critical and high orders until the shipment clears; the full transfer was rejected by the safety-stock rule.",
-      "recommended_option": "Transfer 100 t from 1200 + critical and high orders",
+      "recommended_option": "Transfer 20 t from 1200 + critical and high orders",
       "actions": [
         {
           "validation_id": "VAL-0002",
@@ -803,11 +803,11 @@
           "validation": {
             "validation_id": "VAL-0002",
             "valid": true,
-            "quantity": 100.0,
+            "quantity": 20.0,
             "source_plant": "1200",
             "destination_plant": "1100",
             "violations": [],
-            "max_feasible_quantity": 100
+            "max_feasible_quantity": 20
           },
           "approval": {
             "approval_id": "APR-0001",
@@ -815,19 +815,19 @@
             "approver": "Rina Hartono · Supply planner",
             "decision": "approved",
             "reason": null,
-            "created_at": "2026-10-10T16:16:57+00:00"
+            "created_at": "2026-10-11T08:03:53+00:00"
           },
           "sto": {
             "purchase_order": "4500001023",
             "purchase_order_type": "UB",
             "material": "CHEM-BX40",
-            "quantity_t": 100.0,
+            "quantity_t": 20.0,
             "source_plant": "1200",
             "destination_plant": "1100",
             "lead_time_days": 1.0,
             "validation_id": "VAL-0002",
             "approval_id": "APR-0001",
-            "created_at": "2026-10-10T16:16:57+00:00"
+            "created_at": "2026-10-11T08:03:53+00:00"
           }
         }
       ],
@@ -836,81 +836,81 @@
         "plants": [
           {
             "plant": "1100",
-            "unrestricted_t": 190,
-            "in_transit_t": 100.0,
-            "safety_stock_t": 150,
+            "unrestricted_t": 38,
+            "in_transit_t": 20.0,
+            "safety_stock_t": 30,
             "consumption_t_per_day": {
-              "all": 100,
-              "critical_high": 75,
-              "critical": 60
+              "all": 20,
+              "critical_high": 15,
+              "critical": 12
             },
             "orders": [
               {
                 "order_id": "PRD-1101",
                 "product": "Liquid packaging board",
                 "priority": "critical",
-                "consumption_t_per_day": 25
+                "consumption_t_per_day": 5
               },
               {
                 "order_id": "PRD-1102",
                 "product": "Food-grade folding box board",
                 "priority": "critical",
-                "consumption_t_per_day": 20
+                "consumption_t_per_day": 4
               },
               {
                 "order_id": "PRD-1103",
                 "product": "Medical-grade tissue",
                 "priority": "critical",
-                "consumption_t_per_day": 15
+                "consumption_t_per_day": 3
               },
               {
                 "order_id": "PRD-1104",
                 "product": "Copy paper A4 80 gsm",
                 "priority": "high",
-                "consumption_t_per_day": 9
+                "consumption_t_per_day": 2
               },
               {
                 "order_id": "PRD-1105",
                 "product": "Coated art paper 120 gsm",
                 "priority": "high",
-                "consumption_t_per_day": 6
+                "consumption_t_per_day": 1
               },
               {
                 "order_id": "PRD-1106",
                 "product": "Uncoated woodfree 70 gsm",
                 "priority": "normal",
-                "consumption_t_per_day": 15
+                "consumption_t_per_day": 3
               },
               {
                 "order_id": "PRD-1107",
                 "product": "Newsprint 45 gsm",
                 "priority": "normal",
-                "consumption_t_per_day": 10
+                "consumption_t_per_day": 2
               }
             ]
           },
           {
             "plant": "1200",
-            "unrestricted_t": 200.0,
+            "unrestricted_t": 40.0,
             "in_transit_t": 0,
-            "safety_stock_t": 200,
+            "safety_stock_t": 40,
             "consumption_t_per_day": {
-              "all": 60,
-              "critical_high": 35,
-              "critical": 35
+              "all": 12,
+              "critical_high": 7,
+              "critical": 7
             },
             "orders": [
               {
                 "order_id": "PRD-1201",
                 "product": "Corrugating medium",
                 "priority": "critical",
-                "consumption_t_per_day": 35
+                "consumption_t_per_day": 7
               },
               {
                 "order_id": "PRD-1202",
                 "product": "Kraft liner",
                 "priority": "normal",
-                "consumption_t_per_day": 25
+                "consumption_t_per_day": 5
               }
             ]
           }
@@ -930,7 +930,7 @@
     "shipment_id": "SHP-1001",
     "status": "needs_human_decision",
     "status_reason": "Decide on emergency sourcing for the deferred high and normal orders.",
-    "updated_at": "2026-10-10T16:16:58+00:00",
+    "updated_at": "2026-10-11T08:03:53+00:00",
     "running": false,
     "shipment": {
       "shipment_id": "SHP-1001",
@@ -992,15 +992,15 @@
       "documents": [
         {
           "document_type": "commercial_invoice",
-          "text": "COMMERCIAL INVOICE\n\nInvoice No.: INV-VC-26-0917\nInvoice Date: 2026-09-30\n\nSeller: Veltrona Chemicals GmbH, Hamburg, Germany\nBuyer: PT Arunika Pulp & Paper, Arunika West Mill, Indonesia\n\nBuyer PO No.: 4500001021\nBuyer Material No.: CHEM-BX40\nDescription of Goods: Bleaching agent BX-40\nQuantity: 600 MT\nUnit Price: USD 540.00 per MT\nTotal Amount: USD 324,000.00\nIncoterms: CIF Tanjung Priok\n\nVessel / Voyage: MV Northern Lumen / NL-2641\nPort of Loading: Hamburg\nPort of Discharge: Tanjung Priok\n\nWe certify that this invoice is true and correct.\n"
+          "text": "COMMERCIAL INVOICE\n\nInvoice No.: INV-VC-26-0917\nInvoice Date: 2026-09-30\n\nSeller: Veltrona Chemicals GmbH, Hamburg, Germany\nBuyer: PT Arunika Pulp & Paper, Arunika West Mill, Indonesia\n\nBuyer PO No.: 4500001021\nBuyer Material No.: CHEM-BX40\nDescription of Goods: Bleaching agent BX-40\nQuantity: 120 MT\nUnit Price: USD 540.00 per MT\nTotal Amount: USD 64,800.00\nIncoterms: CIF Tanjung Priok\n\nVessel / Voyage: MV Northern Lumen / NL-2641\nPort of Loading: Hamburg\nPort of Discharge: Tanjung Priok\n\nWe certify that this invoice is true and correct.\n"
         },
         {
           "document_type": "packing_list",
-          "text": "PACKING LIST\n\nPacking List No.: PL-VC-26-0917\nDate: 2026-09-30\nShipper: Veltrona Chemicals GmbH, Hamburg, Germany\nConsignee: PT Arunika Pulp & Paper, Indonesia\n\nBuyer PO No.: 4500001021\nBuyer Material No.: CHEM-BX40\nDescription of Goods: Bleaching agent BX-40\nPackages: 560 IBC totes, 1,000 kg net each\nQuantity: 560 MT\nTotal Net Weight: 560,000 kg\nTotal Gross Weight: 593,600 kg\n"
+          "text": "PACKING LIST\n\nPacking List No.: PL-VC-26-0917\nDate: 2026-09-30\nShipper: Veltrona Chemicals GmbH, Hamburg, Germany\nConsignee: PT Arunika Pulp & Paper, Indonesia\n\nBuyer PO No.: 4500001021\nBuyer Material No.: CHEM-BX40\nDescription of Goods: Bleaching agent BX-40\nPackages: 112 FIBC bulk bags, 1,000 kg net each\nQuantity: 112 MT\nTotal Net Weight: 112,000 kg\nTotal Gross Weight: 112,336 kg\n"
         },
         {
           "document_type": "bill_of_lading",
-          "text": "BILL OF LADING (NON-NEGOTIABLE COPY)\n\nB/L No.: BL-VC-26-0917\nShipper: Veltrona Chemicals GmbH, Hamburg, Germany\nConsignee: PT Arunika Pulp & Paper, Indonesia\nNotify Party: Same as consignee\n\nVessel / Voyage: MV Northern Lumen / NL-2641\nPort of Loading: Hamburg\nPort of Discharge: Tanjung Priok\n\nDescription of Goods: 560 IBC totes said to contain Bleaching agent BX-40\nGross Weight: 593,600 kg\nReference: Buyer PO No. 4500001021\nFreight: Prepaid\n"
+          "text": "BILL OF LADING (NON-NEGOTIABLE COPY)\n\nB/L No.: BL-VC-26-0917\nShipper: Veltrona Chemicals GmbH, Hamburg, Germany\nConsignee: PT Arunika Pulp & Paper, Indonesia\nNotify Party: Same as consignee\n\nVessel / Voyage: MV Northern Lumen / NL-2641\nPort of Loading: Hamburg\nPort of Discharge: Tanjung Priok\n\nDescription of Goods: 112 FIBC bulk bags said to contain Bleaching agent BX-40\nGross Weight: 112,336 kg\nReference: Buyer PO No. 4500001021\nFreight: Prepaid\n"
         },
         {
           "document_type": "certificate_of_analysis",
@@ -1015,10 +1015,10 @@
       "discrepancies": [
         {
           "field": "quantity",
-          "purchase_order_value": 600.0,
+          "purchase_order_value": 120.0,
           "document_values": {
-            "commercial_invoice": 600.0,
-            "packing_list": 560.0
+            "commercial_invoice": 120.0,
+            "packing_list": 112.0
           },
           "mismatched_documents": [
             "packing_list"
@@ -1044,8 +1044,8 @@
         {
           "document_type": "commercial_invoice",
           "field": "quantity",
-          "value": 600.0,
-          "quote": "Quantity: 600 MT"
+          "value": 120.0,
+          "quote": "Quantity: 120 MT"
         },
         {
           "document_type": "packing_list",
@@ -1062,8 +1062,8 @@
         {
           "document_type": "packing_list",
           "field": "quantity",
-          "value": 560.0,
-          "quote": "Quantity: 560 MT"
+          "value": 112.0,
+          "quote": "Quantity: 112 MT"
         },
         {
           "document_type": "bill_of_lading",
@@ -1082,90 +1082,90 @@
         "source": "S/4HANA (mock) API_PURCHASEORDER_PROCESS_SRV/A_PurchaseOrderItem",
         "purchase_order": "4500001021",
         "material": "CHEM-BX40",
-        "quantity": 600.0
+        "quantity": 120.0
       },
-      "created_at": "2026-10-10T16:16:56+00:00"
+      "created_at": "2026-10-11T08:03:52+00:00"
     },
     "inventory": {
       "material": "CHEM-BX40",
       "plants": [
         {
           "plant": "1100",
-          "unrestricted_t": 190,
-          "in_transit_t": 100.0,
-          "safety_stock_t": 150,
+          "unrestricted_t": 38,
+          "in_transit_t": 20.0,
+          "safety_stock_t": 30,
           "consumption_t_per_day": {
-            "all": 100,
-            "critical_high": 75,
-            "critical": 60
+            "all": 20,
+            "critical_high": 15,
+            "critical": 12
           },
           "orders": [
             {
               "order_id": "PRD-1101",
               "product": "Liquid packaging board",
               "priority": "critical",
-              "consumption_t_per_day": 25
+              "consumption_t_per_day": 5
             },
             {
               "order_id": "PRD-1102",
               "product": "Food-grade folding box board",
               "priority": "critical",
-              "consumption_t_per_day": 20
+              "consumption_t_per_day": 4
             },
             {
               "order_id": "PRD-1103",
               "product": "Medical-grade tissue",
               "priority": "critical",
-              "consumption_t_per_day": 15
+              "consumption_t_per_day": 3
             },
             {
               "order_id": "PRD-1104",
               "product": "Copy paper A4 80 gsm",
               "priority": "high",
-              "consumption_t_per_day": 9
+              "consumption_t_per_day": 2
             },
             {
               "order_id": "PRD-1105",
               "product": "Coated art paper 120 gsm",
               "priority": "high",
-              "consumption_t_per_day": 6
+              "consumption_t_per_day": 1
             },
             {
               "order_id": "PRD-1106",
               "product": "Uncoated woodfree 70 gsm",
               "priority": "normal",
-              "consumption_t_per_day": 15
+              "consumption_t_per_day": 3
             },
             {
               "order_id": "PRD-1107",
               "product": "Newsprint 45 gsm",
               "priority": "normal",
-              "consumption_t_per_day": 10
+              "consumption_t_per_day": 2
             }
           ]
         },
         {
           "plant": "1200",
-          "unrestricted_t": 200.0,
+          "unrestricted_t": 40.0,
           "in_transit_t": 0,
-          "safety_stock_t": 200,
+          "safety_stock_t": 40,
           "consumption_t_per_day": {
-            "all": 60,
-            "critical_high": 35,
-            "critical": 35
+            "all": 12,
+            "critical_high": 7,
+            "critical": 7
           },
           "orders": [
             {
               "order_id": "PRD-1201",
               "product": "Corrugating medium",
               "priority": "critical",
-              "consumption_t_per_day": 35
+              "consumption_t_per_day": 7
             },
             {
               "order_id": "PRD-1202",
               "product": "Kraft liner",
               "priority": "normal",
-              "consumption_t_per_day": 25
+              "consumption_t_per_day": 5
             }
           ]
         }
@@ -1209,7 +1209,7 @@
         "coverage_days": 2.9,
         "required_coverage_days": 4.5,
         "covered": false,
-        "shortage_t": 160.0,
+        "shortage_t": 32.0,
         "transfer": null,
         "deferred_orders": [],
         "sources": {
@@ -1231,20 +1231,20 @@
             "coverage_days": 3.87,
             "required_coverage_days": 4.5,
             "covered": false,
-            "shortage_t": 47.5,
+            "shortage_t": 9.5,
             "transfer": null,
             "deferred_orders": [
               {
                 "order_id": "PRD-1106",
                 "product": "Uncoated woodfree 70 gsm",
                 "priority": "normal",
-                "consumption_t_per_day": 15
+                "consumption_t_per_day": 3
               },
               {
                 "order_id": "PRD-1107",
                 "product": "Newsprint 45 gsm",
                 "priority": "normal",
-                "consumption_t_per_day": 10
+                "consumption_t_per_day": 2
               }
             ],
             "sources": {
@@ -1274,25 +1274,25 @@
                 "order_id": "PRD-1104",
                 "product": "Copy paper A4 80 gsm",
                 "priority": "high",
-                "consumption_t_per_day": 9
+                "consumption_t_per_day": 2
               },
               {
                 "order_id": "PRD-1105",
                 "product": "Coated art paper 120 gsm",
                 "priority": "high",
-                "consumption_t_per_day": 6
+                "consumption_t_per_day": 1
               },
               {
                 "order_id": "PRD-1106",
                 "product": "Uncoated woodfree 70 gsm",
                 "priority": "normal",
-                "consumption_t_per_day": 15
+                "consumption_t_per_day": 3
               },
               {
                 "order_id": "PRD-1107",
                 "product": "Newsprint 45 gsm",
                 "priority": "normal",
-                "consumption_t_per_day": 10
+                "consumption_t_per_day": 2
               }
             ],
             "sources": {
@@ -1315,11 +1315,11 @@
           "validation": {
             "validation_id": "VAL-0002",
             "valid": true,
-            "quantity": 100.0,
+            "quantity": 20.0,
             "source_plant": "1200",
             "destination_plant": "1100",
             "violations": [],
-            "max_feasible_quantity": 100
+            "max_feasible_quantity": 20
           },
           "approval": {
             "approval_id": "APR-0001",
@@ -1327,19 +1327,19 @@
             "approver": "Rina Hartono · Supply planner",
             "decision": "approved",
             "reason": null,
-            "created_at": "2026-10-10T16:16:57+00:00"
+            "created_at": "2026-10-11T08:03:53+00:00"
           },
           "sto": {
             "purchase_order": "4500001023",
             "purchase_order_type": "UB",
             "material": "CHEM-BX40",
-            "quantity_t": 100.0,
+            "quantity_t": 20.0,
             "source_plant": "1200",
             "destination_plant": "1100",
             "lead_time_days": 1.0,
             "validation_id": "VAL-0002",
             "approval_id": "APR-0001",
-            "created_at": "2026-10-10T16:16:57+00:00"
+            "created_at": "2026-10-11T08:03:53+00:00"
           }
         }
       ],
@@ -1348,81 +1348,81 @@
         "plants": [
           {
             "plant": "1100",
-            "unrestricted_t": 190,
-            "in_transit_t": 100.0,
-            "safety_stock_t": 150,
+            "unrestricted_t": 38,
+            "in_transit_t": 20.0,
+            "safety_stock_t": 30,
             "consumption_t_per_day": {
-              "all": 100,
-              "critical_high": 75,
-              "critical": 60
+              "all": 20,
+              "critical_high": 15,
+              "critical": 12
             },
             "orders": [
               {
                 "order_id": "PRD-1101",
                 "product": "Liquid packaging board",
                 "priority": "critical",
-                "consumption_t_per_day": 25
+                "consumption_t_per_day": 5
               },
               {
                 "order_id": "PRD-1102",
                 "product": "Food-grade folding box board",
                 "priority": "critical",
-                "consumption_t_per_day": 20
+                "consumption_t_per_day": 4
               },
               {
                 "order_id": "PRD-1103",
                 "product": "Medical-grade tissue",
                 "priority": "critical",
-                "consumption_t_per_day": 15
+                "consumption_t_per_day": 3
               },
               {
                 "order_id": "PRD-1104",
                 "product": "Copy paper A4 80 gsm",
                 "priority": "high",
-                "consumption_t_per_day": 9
+                "consumption_t_per_day": 2
               },
               {
                 "order_id": "PRD-1105",
                 "product": "Coated art paper 120 gsm",
                 "priority": "high",
-                "consumption_t_per_day": 6
+                "consumption_t_per_day": 1
               },
               {
                 "order_id": "PRD-1106",
                 "product": "Uncoated woodfree 70 gsm",
                 "priority": "normal",
-                "consumption_t_per_day": 15
+                "consumption_t_per_day": 3
               },
               {
                 "order_id": "PRD-1107",
                 "product": "Newsprint 45 gsm",
                 "priority": "normal",
-                "consumption_t_per_day": 10
+                "consumption_t_per_day": 2
               }
             ]
           },
           {
             "plant": "1200",
-            "unrestricted_t": 200.0,
+            "unrestricted_t": 40.0,
             "in_transit_t": 0,
-            "safety_stock_t": 200,
+            "safety_stock_t": 40,
             "consumption_t_per_day": {
-              "all": 60,
-              "critical_high": 35,
-              "critical": 35
+              "all": 12,
+              "critical_high": 7,
+              "critical": 7
             },
             "orders": [
               {
                 "order_id": "PRD-1201",
                 "product": "Corrugating medium",
                 "priority": "critical",
-                "consumption_t_per_day": 35
+                "consumption_t_per_day": 7
               },
               {
                 "order_id": "PRD-1202",
                 "product": "Kraft liner",
                 "priority": "normal",
-                "consumption_t_per_day": 25
+                "consumption_t_per_day": 5
               }
             ]
           }
@@ -1441,7 +1441,7 @@
     {
       "seq": 1,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:56+00:00",
+      "at": "2026-10-11T08:03:52+00:00",
       "actor": "Event feed",
       "kind": "event",
       "summary": "Pre-arrival customs check flagged SHP-1001: the shipping documents do not agree on quantity.",
@@ -1451,7 +1451,7 @@
     {
       "seq": 2,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:56+00:00",
+      "at": "2026-10-11T08:03:52+00:00",
       "actor": "Orchestrator",
       "kind": "note",
       "summary": "A customs document hold: start with document reconciliation."
@@ -1459,7 +1459,7 @@
     {
       "seq": 3,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:56+00:00",
+      "at": "2026-10-11T08:03:52+00:00",
       "actor": "Orchestrator",
       "kind": "delegation",
       "summary": "Asked Evidence: Shipment SHP-1001 is on a customs document hold. Get the shipment, its purchase order, the material's inventory, and its documents; extract and reconcile the document fields.",
@@ -1468,7 +1468,7 @@
     {
       "seq": 4,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:56+00:00",
+      "at": "2026-10-11T08:03:52+00:00",
       "actor": "Evidence",
       "kind": "tool",
       "summary": "SHP-1001: exception, ETA 2026-10-31T14:00:00+07:00; document_discrepancy (normal congestion)",
@@ -1478,27 +1478,27 @@
     {
       "seq": 5,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:56+00:00",
+      "at": "2026-10-11T08:03:52+00:00",
       "actor": "Evidence",
       "kind": "tool",
-      "summary": "PO 4500001021: 600 TO CHEM-BX40 for plant 1100 from Veltrona Chemicals GmbH",
+      "summary": "PO 4500001021: 120 TO CHEM-BX40 for plant 1100 from Veltrona Chemicals GmbH",
       "tool": "get_purchase_order",
       "source": "S/4HANA (mock)"
     },
     {
       "seq": 6,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:56+00:00",
+      "at": "2026-10-11T08:03:52+00:00",
       "actor": "Evidence",
       "kind": "tool",
-      "summary": "CHEM-BX40: 1100 190 t (safety 150); 1200 300 t (safety 200)",
+      "summary": "CHEM-BX40: 1100 38 t (safety 30); 1200 60 t (safety 40)",
       "tool": "get_inventory",
       "source": "S/4HANA (mock)"
     },
     {
       "seq": 7,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:56+00:00",
+      "at": "2026-10-11T08:03:52+00:00",
       "actor": "Evidence",
       "kind": "tool",
       "summary": "4 of 4 required documents",
@@ -1508,7 +1508,7 @@
     {
       "seq": 8,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:56+00:00",
+      "at": "2026-10-11T08:03:52+00:00",
       "actor": "Evidence",
       "kind": "tool",
       "summary": "REC-0001: quantity differs in packing_list",
@@ -1519,7 +1519,7 @@
     {
       "seq": 9,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:56+00:00",
+      "at": "2026-10-11T08:03:52+00:00",
       "actor": "Evidence",
       "kind": "note",
       "summary": "- The packing list quantity differs from the invoice and the PO (reconcile_documents). - Plant 1200 holds CHEM-BX40 above its safety stock (get_inventory)."
@@ -1527,7 +1527,7 @@
     {
       "seq": 10,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:56+00:00",
+      "at": "2026-10-11T08:03:52+00:00",
       "actor": "Orchestrator",
       "kind": "note",
       "summary": "The quantity discrepancy is confirmed. Quantify the impact."
@@ -1535,7 +1535,7 @@
     {
       "seq": 11,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:57+00:00",
+      "at": "2026-10-11T08:03:52+00:00",
       "actor": "Orchestrator",
       "kind": "delegation",
       "summary": "Asked Impact & Options: Predict the resolution time for SHP-1001 and assess the current plan: all orders, no transfer.",
@@ -1544,7 +1544,7 @@
     {
       "seq": 12,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:57+00:00",
+      "at": "2026-10-11T08:03:52+00:00",
       "actor": "Impact & Options",
       "kind": "tool",
       "summary": "PRED-0001: 3 days (median of 93 similar past cases)",
@@ -1554,17 +1554,17 @@
     {
       "seq": 13,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:57+00:00",
+      "at": "2026-10-11T08:03:52+00:00",
       "actor": "Impact & Options",
       "kind": "tool",
-      "summary": "ASM-0001 all orders: coverage 1.9 of 3.5 days needed, short 160 t",
+      "summary": "ASM-0001 all orders: coverage 1.9 of 3.5 days needed, short 32 t",
       "tool": "calculate_supply_risk",
       "source": "deterministic calculation"
     },
     {
       "seq": 14,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:57+00:00",
+      "at": "2026-10-11T08:03:52+00:00",
       "actor": "Impact & Options",
       "kind": "note",
       "summary": "PRED-0001 gives the resolution time. ASM-0001: the current plan leaves a shortage."
@@ -1572,7 +1572,7 @@
     {
       "seq": 15,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:57+00:00",
+      "at": "2026-10-11T08:03:52+00:00",
       "actor": "Orchestrator",
       "kind": "note",
       "summary": "There is a shortage and plant 1200 holds stock. Validate a transfer of the full shortage."
@@ -1580,19 +1580,19 @@
     {
       "seq": 16,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:57+00:00",
+      "at": "2026-10-11T08:03:52+00:00",
       "actor": "Orchestrator",
       "kind": "delegation",
-      "summary": "Asked Action: Validate an STO of 160 t from plant 1200 for SHP-1001 with prediction PRED-0001.",
+      "summary": "Asked Action: Validate an STO of 32 t from plant 1200 for SHP-1001 with prediction PRED-0001.",
       "tool": "action_agent"
     },
     {
       "seq": 17,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:57+00:00",
+      "at": "2026-10-11T08:03:52+00:00",
       "actor": "Action",
       "kind": "tool",
-      "summary": "VAL-0001 REJECTED: Plant 1200 would fall to 140 t, below its safety stock of 200 t. Max feasible 100 t.",
+      "summary": "VAL-0001 REJECTED: Plant 1200 would fall to 28 t, below its safety stock of 40 t. Max feasible 20 t.",
       "tool": "validate_action",
       "source": "business rules",
       "flag": "rejected"
@@ -1600,7 +1600,7 @@
     {
       "seq": 18,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:57+00:00",
+      "at": "2026-10-11T08:03:52+00:00",
       "actor": "Action",
       "kind": "note",
       "summary": "VAL-0001 rejected: plant 1200 would fall below its safety stock."
@@ -1608,7 +1608,7 @@
     {
       "seq": 19,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:57+00:00",
+      "at": "2026-10-11T08:03:52+00:00",
       "actor": "Orchestrator",
       "kind": "note",
       "summary": "Rejected by the safety-stock rule. Assess the feasible quantity, alone and with priorities."
@@ -1616,36 +1616,36 @@
     {
       "seq": 20,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:57+00:00",
+      "at": "2026-10-11T08:03:52+00:00",
       "actor": "Orchestrator",
       "kind": "delegation",
-      "summary": "Asked Impact & Options: With PRED-0001 for SHP-1001, assess a 100 t transfer from plant 1200 serving all orders, and the same transfer serving critical_high orders.",
+      "summary": "Asked Impact & Options: With PRED-0001 for SHP-1001, assess a 20 t transfer from plant 1200 serving all orders, and the same transfer serving critical_high orders.",
       "tool": "impact_agent"
     },
     {
       "seq": 21,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:57+00:00",
+      "at": "2026-10-11T08:03:52+00:00",
       "actor": "Impact & Options",
       "kind": "tool",
-      "summary": "ASM-0002 +100 t from 1200, all orders: coverage 2.9 of 3.5 days needed, short 60 t",
+      "summary": "ASM-0002 +20 t from 1200, all orders: coverage 2.9 of 3.5 days needed, short 12 t",
       "tool": "calculate_supply_risk",
       "source": "deterministic calculation"
     },
     {
       "seq": 22,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:57+00:00",
+      "at": "2026-10-11T08:03:52+00:00",
       "actor": "Impact & Options",
       "kind": "tool",
-      "summary": "ASM-0003 +100 t from 1200, critical_high orders: coverage 3.87 of 3.5 days needed, covered",
+      "summary": "ASM-0003 +20 t from 1200, critical_high orders: coverage 3.87 of 3.5 days needed, covered",
       "tool": "calculate_supply_risk",
       "source": "deterministic calculation"
     },
     {
       "seq": 23,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:57+00:00",
+      "at": "2026-10-11T08:03:52+00:00",
       "actor": "Impact & Options",
       "kind": "note",
       "summary": "ASM-0002: the transfer alone is short. ASM-0003: with critical and high orders it is covered."
@@ -1653,7 +1653,7 @@
     {
       "seq": 24,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:57+00:00",
+      "at": "2026-10-11T08:03:52+00:00",
       "actor": "Orchestrator",
       "kind": "note",
       "summary": "The feasible transfer plus critical and high orders is covered. Validate it."
@@ -1661,26 +1661,26 @@
     {
       "seq": 25,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:57+00:00",
+      "at": "2026-10-11T08:03:52+00:00",
       "actor": "Orchestrator",
       "kind": "delegation",
-      "summary": "Asked Action: Validate an STO of 100 t from plant 1200 for SHP-1001 with prediction PRED-0001.",
+      "summary": "Asked Action: Validate an STO of 20 t from plant 1200 for SHP-1001 with prediction PRED-0001.",
       "tool": "action_agent"
     },
     {
       "seq": 26,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:57+00:00",
+      "at": "2026-10-11T08:03:52+00:00",
       "actor": "Action",
       "kind": "tool",
-      "summary": "VAL-0002 valid: 100 t from 1200",
+      "summary": "VAL-0002 valid: 20 t from 1200",
       "tool": "validate_action",
       "source": "business rules"
     },
     {
       "seq": 27,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:57+00:00",
+      "at": "2026-10-11T08:03:52+00:00",
       "actor": "Action",
       "kind": "note",
       "summary": "VAL-0002 is valid."
@@ -1688,7 +1688,7 @@
     {
       "seq": 28,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:57+00:00",
+      "at": "2026-10-11T08:03:53+00:00",
       "actor": "Orchestrator",
       "kind": "status",
       "summary": "Status: awaiting_approval"
@@ -1696,7 +1696,7 @@
     {
       "seq": 29,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:57+00:00",
+      "at": "2026-10-11T08:03:53+00:00",
       "actor": "Rina Hartono · Supply planner",
       "kind": "approval",
       "summary": "Approved VAL-0002",
@@ -1705,7 +1705,7 @@
     {
       "seq": 30,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:57+00:00",
+      "at": "2026-10-11T08:03:53+00:00",
       "actor": "Orchestrator",
       "kind": "note",
       "summary": "Approved: create the STO and verify stock."
@@ -1713,7 +1713,7 @@
     {
       "seq": 31,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:57+00:00",
+      "at": "2026-10-11T08:03:53+00:00",
       "actor": "Orchestrator",
       "kind": "delegation",
       "summary": "Asked Action: Create the STO for VAL-0002 with approval APR-0001, then verify stock positions for CHEM-BX40.",
@@ -1722,10 +1722,10 @@
     {
       "seq": 32,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:57+00:00",
+      "at": "2026-10-11T08:03:53+00:00",
       "actor": "Action",
       "kind": "tool",
-      "summary": "STO 4500001023 created: 100 t 1200 -> 1100",
+      "summary": "STO 4500001023 created: 20 t 1200 -> 1100",
       "tool": "create_stock_transport_order",
       "source": "S/4HANA (mock)",
       "flag": "write"
@@ -1733,17 +1733,17 @@
     {
       "seq": 33,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:57+00:00",
+      "at": "2026-10-11T08:03:53+00:00",
       "actor": "Action",
       "kind": "tool",
-      "summary": "CHEM-BX40: 1100 190 t (safety 150, 100 in transit); 1200 200 t (safety 200)",
+      "summary": "CHEM-BX40: 1100 38 t (safety 30, 20 in transit); 1200 40 t (safety 40)",
       "tool": "get_inventory",
       "source": "S/4HANA (mock)"
     },
     {
       "seq": 34,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:57+00:00",
+      "at": "2026-10-11T08:03:53+00:00",
       "actor": "Action",
       "kind": "note",
       "summary": "STO 4500001023 created; plant 1200 is at its safety stock and plant 1100 has the transfer in transit."
@@ -1751,7 +1751,7 @@
     {
       "seq": 35,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:57+00:00",
+      "at": "2026-10-11T08:03:53+00:00",
       "actor": "Orchestrator",
       "kind": "status",
       "summary": "Status: monitoring"
@@ -1759,7 +1759,7 @@
     {
       "seq": 36,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:57+00:00",
+      "at": "2026-10-11T08:03:53+00:00",
       "actor": "Event feed",
       "kind": "event",
       "summary": "Berth congestion at Tanjung Priok: the carrier moved the ETA of MV Northern Lumen back by one day.",
@@ -1769,7 +1769,7 @@
     {
       "seq": 37,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:58+00:00",
+      "at": "2026-10-11T08:03:53+00:00",
       "actor": "Orchestrator",
       "kind": "note",
       "summary": "The ETA slipped with high congestion. Re-predict and re-assess."
@@ -1777,7 +1777,7 @@
     {
       "seq": 38,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:58+00:00",
+      "at": "2026-10-11T08:03:53+00:00",
       "actor": "Orchestrator",
       "kind": "delegation",
       "summary": "Asked Impact & Options: Predict the resolution time for SHP-1001 again, and assess all orders, critical_high orders, and critical orders, counting the transfer in transit.",
@@ -1786,7 +1786,7 @@
     {
       "seq": 39,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:58+00:00",
+      "at": "2026-10-11T08:03:53+00:00",
       "actor": "Impact & Options",
       "kind": "tool",
       "summary": "PRED-0002: 4 days (median of 21 similar past cases)",
@@ -1796,27 +1796,27 @@
     {
       "seq": 40,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:58+00:00",
+      "at": "2026-10-11T08:03:53+00:00",
       "actor": "Impact & Options",
       "kind": "tool",
-      "summary": "ASM-0004 all orders: coverage 2.9 of 4.5 days needed, short 160 t",
+      "summary": "ASM-0004 all orders: coverage 2.9 of 4.5 days needed, short 32 t",
       "tool": "calculate_supply_risk",
       "source": "deterministic calculation"
     },
     {
       "seq": 41,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:58+00:00",
+      "at": "2026-10-11T08:03:53+00:00",
       "actor": "Impact & Options",
       "kind": "tool",
-      "summary": "ASM-0005 critical_high orders: coverage 3.87 of 4.5 days needed, short 47.5 t",
+      "summary": "ASM-0005 critical_high orders: coverage 3.87 of 4.5 days needed, short 9.5 t",
       "tool": "calculate_supply_risk",
       "source": "deterministic calculation"
     },
     {
       "seq": 42,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:58+00:00",
+      "at": "2026-10-11T08:03:53+00:00",
       "actor": "Impact & Options",
       "kind": "tool",
       "summary": "ASM-0006 critical orders: coverage 4.83 of 4.5 days needed, covered",
@@ -1826,7 +1826,7 @@
     {
       "seq": 43,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:58+00:00",
+      "at": "2026-10-11T08:03:53+00:00",
       "actor": "Impact & Options",
       "kind": "note",
       "summary": "PRED-0002 is longer. ASM-0005: critical and high orders are short. ASM-0006: critical only is covered."
@@ -1834,7 +1834,7 @@
     {
       "seq": 44,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:58+00:00",
+      "at": "2026-10-11T08:03:53+00:00",
       "actor": "Orchestrator",
       "kind": "note",
       "summary": "Critical and high orders no longer fit. Check whether more stock can move."
@@ -1842,19 +1842,19 @@
     {
       "seq": 45,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:58+00:00",
+      "at": "2026-10-11T08:03:53+00:00",
       "actor": "Orchestrator",
       "kind": "delegation",
-      "summary": "Asked Action: Validate a further STO of 50 t from plant 1200 for SHP-1001 with prediction PRED-0002.",
+      "summary": "Asked Action: Validate a further STO of 10 t from plant 1200 for SHP-1001 with prediction PRED-0002.",
       "tool": "action_agent"
     },
     {
       "seq": 46,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:58+00:00",
+      "at": "2026-10-11T08:03:53+00:00",
       "actor": "Action",
       "kind": "tool",
-      "summary": "VAL-0003 REJECTED: Plant 1200 would fall to 150 t, below its safety stock of 200 t. Max feasible 0 t.",
+      "summary": "VAL-0003 REJECTED: Plant 1200 would fall to 30 t, below its safety stock of 40 t. Max feasible 0 t.",
       "tool": "validate_action",
       "source": "business rules",
       "flag": "rejected"
@@ -1862,7 +1862,7 @@
     {
       "seq": 47,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:58+00:00",
+      "at": "2026-10-11T08:03:53+00:00",
       "actor": "Action",
       "kind": "note",
       "summary": "VAL-0003 rejected: plant 1200 is at its safety stock; no further transfer is feasible."
@@ -1870,7 +1870,7 @@
     {
       "seq": 48,
       "case_id": "CASE-0001",
-      "at": "2026-10-10T16:16:58+00:00",
+      "at": "2026-10-11T08:03:53+00:00",
       "actor": "Orchestrator",
       "kind": "status",
       "summary": "Status: needs_human_decision (Decide on emergency sourcing for the deferred high and normal orders.)"

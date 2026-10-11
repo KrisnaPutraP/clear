@@ -27,7 +27,7 @@ def test_s1_from_exception_to_approved_sto_to_eta_slip(store):
     assert [e["tool"] for e in log if e.get("flag") == "rejected"] == ["validate_action"]
     assert [e["tool"] for e in log if e.get("flag") == "discrepancy"] == ["reconcile_documents"]
     [action] = case["plan"]["actions"]
-    assert action["validation"]["quantity"] == 100  # Filled in from the validation record, not typed by the model.
+    assert action["validation"]["quantity"] == 20  # Filled in from the validation record, not typed by the model.
     assert case["plan"]["impact"]["prediction"]["source"] == "baseline-median"
 
     clear.submit_decision(case_id, action["validation_id"], "Demo Planner", "approved", wait=True)
@@ -38,7 +38,7 @@ def test_s1_from_exception_to_approved_sto_to_eta_slip(store):
     assert action["sto"]["purchase_order"] == "4500001023"
     plants = {p["plant"]: p for p in case["plan"]["verification"]["plants"]}
     assert plants["1200"]["unrestricted_t"] == plants["1200"]["safety_stock_t"]
-    assert plants["1100"]["in_transit_t"] == 100
+    assert plants["1100"]["in_transit_t"] == 20
 
     assert clear.send_event("S1-ETA-SLIP", wait=True) == case_id  # Same exception, same case.
     case = clear.get_case(case_id)

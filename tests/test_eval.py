@@ -42,7 +42,7 @@ def test_scripted_runs_pass_every_check(tmp_path):
     for result in report["results"]:
         assert all(result["scores"].values()), (result["variant"], result["scores"])
     summary = report["summary"]
-    assert summary["uncovered_gap_t"] == {"before": 160, "after": 0}
+    assert summary["uncovered_gap_t"] == {"before": 32, "after": 0}
     assert summary["human_interventions"] == {"approvals": 1, "escalations": 0}
     assert summary["infeasible_transfers_proposed_and_blocked"] == 1
 

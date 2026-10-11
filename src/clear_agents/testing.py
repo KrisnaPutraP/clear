@@ -124,11 +124,11 @@ def s1_event(store: JsonStore) -> dict[str, list[Turn]]:
     current, alone, prioritized = (records.next_id(store, "assessment", n) for n in (1, 2, 3))
     rejected, valid = (records.next_id(store, "validation", n) for n in (1, 2))
     risk = {"shipment_id": S1, "prediction_id": prediction}
-    transfer = {**risk, "transfer_quantity_t": 100, "source_plant": "1200"}
+    transfer = {**risk, "transfer_quantity_t": 20, "source_plant": "1200"}
     options = [
-        {"name": "Transfer 100 t from 1200", "assessment_id": alone,
+        {"name": "Transfer 20 t from 1200", "assessment_id": alone,
          "note": "The feasible transfer alone still leaves a shortage."},
-        {"name": "Transfer 100 t from 1200 + critical and high orders", "assessment_id": prioritized,
+        {"name": "Transfer 20 t from 1200 + critical and high orders", "assessment_id": prioritized,
          "validation_id": valid, "note": "Covers the requirement; normal-priority orders wait."},
     ]
     plan = _plan(
@@ -156,13 +156,13 @@ def s1_event(store: JsonStore) -> dict[str, list[Turn]]:
                  [("impact_agent", {"input": f"Predict the resolution time for {S1} and assess the current plan: "
                                              "all orders, no transfer."})]),
             Turn("There is a shortage and plant 1200 holds stock. Validate a transfer of the full shortage.",
-                 [("action_agent", {"input": f"Validate an STO of 160 t from plant 1200 for {S1} "
+                 [("action_agent", {"input": f"Validate an STO of 32 t from plant 1200 for {S1} "
                                              f"with prediction {prediction}."})]),
             Turn("Rejected by the safety-stock rule. Assess the feasible quantity, alone and with priorities.",
-                 [("impact_agent", {"input": f"With {prediction} for {S1}, assess a 100 t transfer from plant 1200 "
+                 [("impact_agent", {"input": f"With {prediction} for {S1}, assess a 20 t transfer from plant 1200 "
                                              "serving all orders, and the same transfer serving critical_high orders."})]),
             Turn("The feasible transfer plus critical and high orders is covered. Validate it.",
-                 [("action_agent", {"input": f"Validate an STO of 100 t from plant 1200 for {S1} "
+                 [("action_agent", {"input": f"Validate an STO of 20 t from plant 1200 for {S1} "
                                              f"with prediction {prediction}."})]),
             Turn("", [("RecoveryPlan", plan)]),
         ],
@@ -183,9 +183,9 @@ def s1_event(store: JsonStore) -> dict[str, list[Turn]]:
             Turn(f"{alone}: the transfer alone is short. {prioritized}: with critical and high orders it is covered."),
         ],
         "action": [
-            Turn("", [("validate_action", {**risk, "source_plant": "1200", "quantity_t": 160})]),
+            Turn("", [("validate_action", {**risk, "source_plant": "1200", "quantity_t": 32})]),
             Turn(f"{rejected} rejected: plant 1200 would fall below its safety stock."),
-            Turn("", [("validate_action", {**risk, "source_plant": "1200", "quantity_t": 100})]),
+            Turn("", [("validate_action", {**risk, "source_plant": "1200", "quantity_t": 20})]),
             Turn(f"{valid} is valid."),
         ],
     }
@@ -250,7 +250,7 @@ def s1_eta_slip(store: JsonStore) -> dict[str, list[Turn]]:
                  [("impact_agent", {"input": f"Predict the resolution time for {S1} again, and assess all orders, "
                                              "critical_high orders, and critical orders, counting the transfer in transit."})]),
             Turn("Critical and high orders no longer fit. Check whether more stock can move.",
-                 [("action_agent", {"input": f"Validate a further STO of 50 t from plant 1200 for {S1} "
+                 [("action_agent", {"input": f"Validate a further STO of 10 t from plant 1200 for {S1} "
                                              f"with prediction {prediction}."})]),
             Turn("", [("RecoveryPlan", plan)]),
         ],
@@ -262,7 +262,7 @@ def s1_eta_slip(store: JsonStore) -> dict[str, list[Turn]]:
             Turn(f"{prediction} is longer. {high}: critical and high orders are short. {critical}: critical only is covered."),
         ],
         "action": [
-            Turn("", [("validate_action", {**risk, "source_plant": "1200", "quantity_t": 50})]),
+            Turn("", [("validate_action", {**risk, "source_plant": "1200", "quantity_t": 10})]),
             Turn(f"{blocked} rejected: plant 1200 is at its safety stock; no further transfer is feasible."),
         ],
     }

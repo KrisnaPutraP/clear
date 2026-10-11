@@ -17,7 +17,7 @@ def test_option_rows_lead_with_the_current_plan_and_mark_the_recommendation(s1_c
     rows = view.option_rows(s1_case["plan"])
 
     assert [r["option"] for r in rows][0] == "Current plan"
-    assert [r["label"] for r in rows] == ["✕ short 160 t", "✕ short 60 t", "✓ covered"]
+    assert [r["label"] for r in rows] == ["✕ short 32 t", "✕ short 12 t", "✓ covered"]
     assert [r["recommended"] for r in rows] == [False, False, True]
     assert rows[2]["orders_served"] == "Critical + high"
 
@@ -30,8 +30,8 @@ def test_document_lines_mark_the_disagreeing_quantity(s1_case):
     def marked(document_type):
         return [(line["text"].strip(), line["mark"]) for line in documents[document_type]["lines"] if line["mark"]]
 
-    assert marked("packing_list") == [("Quantity: 560 MT", "mismatch")]
-    assert marked("commercial_invoice") == [("Quantity: 600 MT", "reference")]
+    assert marked("packing_list") == [("Quantity: 112 MT", "mismatch")]
+    assert marked("commercial_invoice") == [("Quantity: 120 MT", "reference")]
     assert marked("bill_of_lading") == []
 
 
