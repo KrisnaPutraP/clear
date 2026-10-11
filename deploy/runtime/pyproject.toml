@@ -1,0 +1,16 @@
+# Dependencies of the AgentCore Runtime bundle. The AgentCore CLI installs
+# them with uv for Linux ARM64 when it packages the runtime. Pinned to the
+# versions the bundle was resolved and tested with; strands-agents matches
+# the local development setup. mcp stays below 2, as in the CLI's own
+# Strands template.
+[project]
+name = "clear-runtime"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "aws-opentelemetry-distro==0.18.0",
+    "bedrock-agentcore==1.24.1",
+    "mcp==1.30.0",
+    "mcp-proxy-for-aws==1.7.0",
+    "strands-agents==1.59.0",
+]

@@ -2,7 +2,9 @@
 
 Run: streamlit run app/streamlit_app.py
 CLEAR_UI_SCRIPTED=1 drives the agents with the scripted model, for UI
-development only; the page then says so in a banner.
+development only; the page then says so in a banner. With
+CLEAR_AGENT_RUNTIME_ARN set, the agents run on AgentCore Runtime and the
+data lives in DynamoDB (docs/deployment.md).
 """
 
 import html
@@ -16,10 +18,14 @@ from clear_agents import runner
 from clear_agents.testing import ScriptedDirector
 from clear_app import settings, view
 from clear_app.contract import Clear
+from clear_aws import settings as aws_settings
+from clear_aws.dynamo_store import DynamoStore, reset_table
+from clear_aws.remote import RuntimeAgents
 from clear_tools.store import JsonStore, reset_runtime
 
 settings.load_env()
 SCRIPTED = os.environ.get("CLEAR_UI_SCRIPTED") == "1"
+CLOUD = not SCRIPTED and bool(os.environ.get(aws_settings.RUNTIME_ARN_SETTING))
 
 EVENT_LABELS = {
     "S1-DOC-HOLD": "S1 · Customs document hold",
@@ -36,6 +42,9 @@ st.set_page_config(page_title="CLEAR", page_icon="🧭", layout="wide")
 
 @st.cache_resource
 def get_clear() -> Clear:
+    if CLOUD:
+        store = DynamoStore.from_env()
+        return Clear(store, agents=RuntimeAgents.from_env(store))
     runtime = settings.runtime_dir()
     if not runtime.exists():
         reset_runtime(settings.SEED_DIR, runtime)
@@ -67,14 +76,19 @@ def sidebar() -> None:
         st.subheader("Engines")
         model = "Scripted model (development)" if SCRIPTED else \
             f"Amazon Bedrock · {os.environ.get('CLEAR_BEDROCK_MODEL_ID') or 'model not set'}"
+        if CLOUD:
+            model = f"AgentCore Runtime · {model}"
         prediction = "SAP-RPT-1.6, baseline fallback" \
-            if os.environ.get("CLEAR_PREDICTION_BACKEND", "").lower() == "auto" else "Baseline median"
+            if CLOUD or os.environ.get("CLEAR_PREDICTION_BACKEND", "").lower() == "auto" else "Baseline median"
         st.caption(f"Agents: {model}")
         st.caption(f"Resolution time: {prediction}")
         st.subheader("Demo data")
         st.caption("All data is synthetic and every name is fictional.")
         if st.button("Reset demo data", key="reset", disabled=clear.running, width="stretch"):
-            reset_runtime(settings.SEED_DIR, settings.runtime_dir())
+            if CLOUD:
+                reset_table(settings.SEED_DIR, clear.store)
+            else:
+                reset_runtime(settings.SEED_DIR, settings.runtime_dir())
             get_clear.clear()
             st.session_state.pop("case_id", None)
             st.rerun()
@@ -82,7 +96,8 @@ def sidebar() -> None:
 
 def event_feed() -> None:
     st.subheader("Logistics event feed (simulated)")
-    events = clear.list_events()
+    with clear.snapshot():
+        events = clear.list_events()
     for column, event in zip(st.columns(len(events)), events):
         label = EVENT_LABELS.get(event["event_id"], event["event_id"])
         if column.button(label, key=f"event-{event['event_id']}", help=event["description"],
@@ -93,7 +108,8 @@ def event_feed() -> None:
 
 
 def case_picker() -> str | None:
-    cases = clear.list_cases()
+    with clear.snapshot():
+        cases = clear.list_cases()
     if not cases:
         st.info("Send an event to open a case.")
         return None
@@ -112,7 +128,9 @@ def case_view(case_id: str) -> None:
         st.rerun()  # Full rerun: re-enable the event feed and stop polling.
     st.session_state.was_running = running
 
-    case = clear.get_case(case_id)
+    with clear.snapshot():  # Reads only: a decision below writes outside the snapshot.
+        case = clear.get_case(case_id)
+        log = clear.get_case_log(case_id)
     label, color = view.STATUS.get(case["status"], (case["status"], "gray"))
     st.markdown(f"**{case_id}** · shipment {case['shipment_id']} · :{color}-badge[{label}]"
                 + (" · agents working…" if running else ""))
@@ -121,7 +139,7 @@ def case_view(case_id: str) -> None:
 
     left, right = st.columns([2, 3], gap="large")
     with left:
-        timeline(case_id)
+        timeline(log)
     with right:
         tabs = ["Plan", "Approval", "Documents", "Stock"]
         default = "Approval" if case["status"] == "awaiting_approval" else "Plan"
@@ -136,10 +154,10 @@ def case_view(case_id: str) -> None:
             stock_panel(case)
 
 
-def timeline(case_id: str) -> None:
+def timeline(log: list[dict]) -> None:
     st.subheader("Agent timeline")
     with st.container(height=640):
-        for row in view.timeline(clear.get_case_log(case_id)):
+        for row in view.timeline(log):
             text = f"`{row['time']}` **{row['actor']}** · {row['summary']}"
             if row["source"]:
                 text += f"  \n:gray[source: {row['source']}]"

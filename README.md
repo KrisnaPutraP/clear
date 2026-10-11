@@ -28,3 +28,9 @@ credentials. Without them, `CLEAR_UI_SCRIPTED=1` lets you click through the
 UI with a scripted model, for development only. Resolution time comes from
 SAP-RPT-1.6 when the SAP AI Core settings are filled in, with an automatic
 fallback to a baseline median.
+
+## Run on AWS
+
+The same code deploys to Amazon Bedrock AgentCore: the agents on AgentCore
+Runtime, the tools in a Lambda function behind AgentCore Gateway, the data in
+DynamoDB. Steps, resources, and cleanup: `docs/deployment.md`.

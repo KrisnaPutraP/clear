@@ -24,3 +24,6 @@ Thumbs.db
 
 # Evaluation reports
 /data/eval/
+
+# AgentCore CLI project, assembled by scripts/build_deploy.py
+/deploy/cookusanhackathon/

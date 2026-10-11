@@ -1,0 +1,7 @@
+# Dependencies of the tools' Lambda bundle: none. clear_tools uses only the
+# standard library, and the Lambda Python runtime provides boto3.
+[project]
+name = "clear-tools-lambda"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = []

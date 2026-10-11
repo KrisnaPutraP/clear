@@ -1,18 +1,30 @@
-"""Strands tools for the CLEAR agents (docs/PLAN.md §2a, §5a).
+"""Strands tools for the CLEAR agents (docs/PLAN.md §2a, §5a, §5b).
 
-Each tool wraps a clear_tools function bound to one data store, so the LLM
-passes only IDs and decision variables. Tools are grouped by agent, and only
-the Action agent receives the write tool. Errors raised by clear_tools reach
-the LLM as error results, so a governance refusal shows up in the trace.
+Each tool forwards to a clear_tools function by name, so the LLM passes only
+IDs and decision variables. Where the function runs is the Invoke the tools
+are built with: in this process during local development, or the Lambda
+function behind AgentCore Gateway once deployed (clear_aws.gateway). Names,
+descriptions, and input schemas stay the same either way. Tools are grouped
+by agent, and only the Action agent receives the write tool. Errors raised by
+clear_tools reach the LLM as error results, so a governance refusal shows up
+in the trace.
 """
 
+from collections.abc import Callable
 from typing import Literal
 
 from pydantic import BaseModel, Field
 from strands import tool
 
-from clear_tools import predict, read, reconcile, sto, supply_risk, validate
+from clear_tools import catalog
 from clear_tools.store import JsonStore
+
+Invoke = Callable[[str, dict], dict]  # Tool name and arguments -> result; raises when the tool fails.
+
+
+def local(store: JsonStore) -> Invoke:
+    """Run tools in this process against the data store."""
+    return lambda name, arguments: catalog.call(store, name, arguments)
 
 
 class Extraction(BaseModel):
@@ -55,7 +67,7 @@ RECONCILE_SCHEMA = {"json": {
 }}
 
 
-def evidence_tools(store: JsonStore) -> list:
+def evidence_tools(invoke: Invoke) -> list:
     """Read tools plus document reconciliation (Evidence agent)."""
 
     @tool
@@ -65,7 +77,7 @@ def evidence_tools(store: JsonStore) -> list:
         Args:
             shipment_id: Shipment ID, e.g. SHP-1001.
         """
-        return read.get_shipment(store, shipment_id)
+        return invoke("get_shipment", {"shipment_id": shipment_id})
 
     @tool
     def get_purchase_order(purchase_order: str) -> dict:
@@ -74,7 +86,7 @@ def evidence_tools(store: JsonStore) -> list:
         Args:
             purchase_order: Purchase order number, e.g. 4500001021.
         """
-        return read.get_purchase_order(store, purchase_order)
+        return invoke("get_purchase_order", {"purchase_order": purchase_order})
 
     @tool
     def get_documents(shipment_id: str) -> dict:
@@ -83,7 +95,7 @@ def evidence_tools(store: JsonStore) -> list:
         Args:
             shipment_id: Shipment ID.
         """
-        return read.get_documents(store, shipment_id)
+        return invoke("get_documents", {"shipment_id": shipment_id})
 
     @tool(inputSchema=RECONCILE_SCHEMA)
     def reconcile_documents(shipment_id: str, extractions: list[dict]) -> dict:
@@ -91,12 +103,12 @@ def evidence_tools(store: JsonStore) -> list:
         order. Returns discrepancies, missing documents, and any extraction whose quote or value
         could not be found in the document. Do not compare values yourself.
         """
-        return reconcile.reconcile_documents(store, shipment_id, extractions)
+        return invoke("reconcile_documents", {"shipment_id": shipment_id, "extractions": extractions})
 
-    return [get_shipment, get_purchase_order, get_documents, _inventory_tool(store), reconcile_documents]
+    return [get_shipment, get_purchase_order, get_documents, _inventory_tool(invoke), reconcile_documents]
 
 
-def impact_tools(store: JsonStore) -> list:
+def impact_tools(invoke: Invoke) -> list:
     """Prediction and supply-risk assessment (Impact & Options agent)."""
 
     @tool
@@ -107,7 +119,7 @@ def impact_tools(store: JsonStore) -> list:
         Args:
             shipment_id: Shipment ID.
         """
-        return predict.predict_resolution_time(store, shipment_id)
+        return invoke("predict_resolution_time", {"shipment_id": shipment_id})
 
     @tool
     def calculate_supply_risk(
@@ -127,14 +139,15 @@ def impact_tools(store: JsonStore) -> list:
             transfer_quantity_t: Tonnes to transfer from another plant, 0 for none.
             source_plant: Plant the transfer comes from, required when transferring.
         """
-        return supply_risk.calculate_supply_risk(
-            store, shipment_id, prediction_id, priority_level, transfer_quantity_t, source_plant
-        )
+        return invoke("calculate_supply_risk", {
+            "shipment_id": shipment_id, "prediction_id": prediction_id, "priority_level": priority_level,
+            "transfer_quantity_t": transfer_quantity_t, "source_plant": source_plant,
+        })
 
     return [predict_resolution_time, calculate_supply_risk]
 
 
-def action_tools(store: JsonStore) -> list:
+def action_tools(invoke: Invoke) -> list:
     """Validation, the STO write, and stock verification (Action agent)."""
 
     @tool
@@ -148,7 +161,8 @@ def action_tools(store: JsonStore) -> list:
             source_plant: Plant the stock would come from.
             quantity_t: Tonnes to transfer.
         """
-        return validate.validate_action(store, shipment_id, prediction_id, source_plant, quantity_t)
+        return invoke("validate_action", {"shipment_id": shipment_id, "prediction_id": prediction_id,
+                                          "source_plant": source_plant, "quantity_t": quantity_t})
 
     @tool
     def create_stock_transport_order(validation_id: str, approval_id: str) -> dict:
@@ -159,12 +173,12 @@ def action_tools(store: JsonStore) -> list:
             validation_id: ID returned by validate_action.
             approval_id: ID of the human approval for that validation.
         """
-        return sto.create_stock_transport_order(store, validation_id, approval_id)
+        return invoke("create_stock_transport_order", {"validation_id": validation_id, "approval_id": approval_id})
 
-    return [validate_action, create_stock_transport_order, _inventory_tool(store)]
+    return [validate_action, create_stock_transport_order, _inventory_tool(invoke)]
 
 
-def _inventory_tool(store: JsonStore):
+def _inventory_tool(invoke: Invoke):
     @tool
     def get_inventory(material: str) -> dict:
         """Stock, stock in transit, and safety stock per plant, with daily consumption at each
@@ -173,6 +187,6 @@ def _inventory_tool(store: JsonStore):
         Args:
             material: Material number, e.g. CHEM-BX40.
         """
-        return read.get_inventory(store, material)
+        return invoke("get_inventory", {"material": material})
 
     return get_inventory

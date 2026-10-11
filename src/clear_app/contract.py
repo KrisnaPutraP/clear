@@ -4,12 +4,18 @@ send_event, get_case, get_case_log, and submit_decision, plus list_events and
 list_cases to fill the event feed and a case picker. Streamlit imports this
 module; a custom front end can get the same operations over HTTP later
 (docs/ui-contract.md). Agent runs happen in a background thread, so a UI can
-poll get_case_log for a live timeline. One run at a time: the JSON store has
+poll get_case_log for a live timeline. One run at a time: the data store has
 a single writer.
+
+Agents run in this process by default (LocalAgents). Deployed, they run on
+AgentCore Runtime instead (clear_aws.remote.RuntimeAgents) and the store is
+DynamoDB; the operations stay the same.
 """
 
+import contextlib
 import threading
 from collections.abc import Callable
+from typing import Protocol
 
 from clear_agents import caselog, runner
 from clear_agents.plan import RecoveryPlan, render
@@ -18,10 +24,32 @@ from clear_tools.events import CATALOG, prepared_event
 from clear_tools.store import JsonStore
 
 
+class Agents(Protocol):
+    """Where agent runs happen. Both methods block until the run ends and return the case."""
+
+    def work_event(self, case_id: str, event: dict) -> dict: ...
+
+    def work_approval(self, case_id: str, approval: dict) -> dict: ...
+
+
+class LocalAgents:
+    """Agents in this process, with tools bound to the store."""
+
+    def __init__(self, store: JsonStore, model_for: runner.ModelFactory):
+        self.store, self.model_for = store, model_for
+
+    def work_event(self, case_id: str, event: dict) -> dict:
+        return runner.work_event(self.store, case_id, event, self.model_for)
+
+    def work_approval(self, case_id: str, approval: dict) -> dict:
+        return runner.work_approval(self.store, case_id, approval, self.model_for)
+
+
 class Clear:
-    def __init__(self, store: JsonStore, model_for: runner.ModelFactory = runner.bedrock_model):
+    def __init__(self, store: JsonStore, model_for: runner.ModelFactory = runner.bedrock_model,
+                 agents: Agents | None = None):
         self.store = store
-        self.model_for = model_for
+        self.agents = agents or LocalAgents(store, model_for)
         self._busy = threading.Lock()
         self._thread: threading.Thread | None = None
 
@@ -34,7 +62,7 @@ class Clear:
         """Record a logistics event and start the agents on its case. Returns the case_id."""
         event = prepared_event(self.store, event_id)
         case_id = self._prepare(lambda: runner.open_case_for_event(self.store, event))
-        self._start(lambda: runner.work_event(self.store, case_id, event, self.model_for), wait)
+        self._start(lambda: self.agents.work_event(case_id, event), wait)
         return case_id
 
     @property
@@ -77,10 +105,15 @@ class Clear:
         """Approve or reject a validated STO. An approval starts the run that executes it."""
         approval = self._prepare(lambda: runner.decide(self.store, case_id, validation_id, approver, decision, reason))
         if decision == "approved":
-            self._start(lambda: runner.work_approval(self.store, case_id, approval, self.model_for), wait)
+            self._start(lambda: self.agents.work_approval(case_id, approval), wait)
         else:
             self._busy.release()
         return approval
+
+    def snapshot(self):
+        """Context in which reads see one state of the store: a single round trip on DynamoDB."""
+        snapshot = getattr(self.store, "snapshot", None)
+        return snapshot() if snapshot else contextlib.nullcontext()
 
     def wait(self, timeout: float | None = None) -> None:
         """Block until the current run finishes."""
