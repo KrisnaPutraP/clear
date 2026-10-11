@@ -48,8 +48,10 @@ start with `cookusanhackathon`.
 - Quotas above zero for that model and for AgentCore Runtime. A new account
   can start with both at 0 (ours did, on the AWS Free plan): model calls then
   fail with "Operation not allowed", and the deploy stops at the runtime with
-  "maxAgents limit exceeded" and rolls back. AWS Support raises them. To
-  check the runtime quota (the AWS default is 1000):
+  "maxAgents limit exceeded" and rolls back. Only AWS Support restores them:
+  Service Quotas accepts only values above the AWS default, and access to
+  Anthropic models is a separate account-level check. To check the runtime
+  quota (the AWS default is 1000):
 
   ```
   aws service-quotas list-service-quotas --service-code bedrock-agentcore --query "Quotas[?QuotaName=='Total Agents per Account'].Value"
