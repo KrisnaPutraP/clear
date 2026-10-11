@@ -122,3 +122,11 @@ def test_lambda_bundle_imports_only_what_the_lambda_runtime_provides(tmp_path):
     public = {name for name in report["loaded"] if not name.startswith("_")}  # Interpreter internals start with _.
     third_party = public - set(sys.stdlib_module_names) - {"handler", "clear_aws", "clear_tools"}
     assert third_party <= LAMBDA_PROVIDED, sorted(third_party - LAMBDA_PROVIDED)
+
+
+def test_deployment_target_is_filled_once():
+    filled = agentcore.deployment_targets([], "123456789012")
+
+    assert filled == [{"name": "default", "description": "CLEAR hackathon deployment", "account": "123456789012",
+                       "region": "us-west-2"}]
+    assert agentcore.deployment_targets(filled, "999999999999") == filled

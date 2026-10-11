@@ -111,6 +111,14 @@ def gateway(policy_mode: str | None = None) -> dict:
     return spec
 
 
+def deployment_targets(existing: list[dict], account: str) -> list[dict]:
+    """aws-targets.json with a "default" target in the deployment region; the CLI names the stack after it."""
+    if any(target.get("name") == "default" for target in existing):
+        return existing
+    return existing + [{"name": "default", "description": "CLEAR hackathon deployment", "account": account,
+                        "region": settings.REGION}]
+
+
 def runtime_policy() -> dict:
     """What the runtime needs beyond the CLI's grants: the case log and records, and the Action agent's role."""
     return _policy(
