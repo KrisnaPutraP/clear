@@ -198,6 +198,11 @@ In `LOG_ONLY` mode the gateway evaluates and records every decision without
 applying it; check in CloudWatch that S1's calls would all be allowed. Then
 switch to `--policy enforce`, deploy again, and repeat the S1 run.
 
+After every change to the policies, run `python scripts/check_policies.py`.
+It calls the gateway as each role and as an administrator without one, and
+fails when an outcome breaks a rule; AgentCore does not check the STO forbid
+at deploy time, so this is the check that does. None of its calls can write.
+
 ## Checked on the deployment
 
 Deployed on 12 October 2026 without the runtime (gateway, Lambda function,

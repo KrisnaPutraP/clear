@@ -24,6 +24,7 @@ from strands.tools.executors import SequentialToolExecutor
 
 from clear_agents import aicore, caselog, prompts, tools
 from clear_agents.plan import RecoveryPlan, check
+from clear_tools import records
 from clear_tools.approvals import record_approval
 from clear_tools.events import record_event
 from clear_tools.store import JsonStore
@@ -138,8 +139,11 @@ def decide(store: JsonStore, case_id: str, validation_id: str, approver: str, de
 def work_approval(store: JsonStore, case_id: str, approval: dict, model_for: ModelFactory = live_model,
                   invoke_for: InvokeFactory | None = None) -> dict:
     case = caselog.get_case(store, case_id)
+    validation = records.get(store, "validation", approval["validation_id"])
     prompt = (f"Case {case_id} for shipment {case['shipment_id']}: {approval['approver']} approved "
-              f"{approval['validation_id']} (approval_id {approval['approval_id']}).\n"
+              f"{approval['validation_id']} (approval_id {approval['approval_id']}), a transfer of material "
+              f"{validation['material']} from plant {validation['source_plant']} to plant "
+              f"{validation['destination_plant']}.\n"
               "Ask action_agent to create the stock transport order with these two IDs and to verify stock "
               "positions. Then return the plan before the approval with two changes only: that action "
               "marked executed with its STO number, and next_check updated. The approval executes the plan "
