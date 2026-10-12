@@ -46,9 +46,13 @@ class RecoveryPlan(BaseModel):
     current_plan_assessment_id: str = Field(
         description="ID from calculate_supply_risk for the current plan: all orders, no transfer."
     )
-    options: list[Option] = Field(default_factory=list)
+    options: list[Option] = Field(default_factory=list, description="Options impact_agent assessed, beyond the current plan.")
     recommendation: str = Field(description="Chosen course of action and why, in at most two sentences.")
-    recommended_option: str | None = Field(default=None, description="Name of the chosen option, if any.")
+    recommended_option: str | None = Field(
+        default=None,
+        description="Name of the chosen option, one of options; None when the current plan is kept or no option "
+                    "covers the requirement.",
+    )
     actions: list[Action] = Field(default_factory=list, description="STOs, only for validated transfers.")
     escalation: str | None = Field(
         default=None,

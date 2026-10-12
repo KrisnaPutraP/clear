@@ -94,7 +94,8 @@ def build_agents(store: JsonStore, case_id: str, model_for: ModelFactory,
                    "Resolution-time prediction and scoring of recovery options.")
     action = agent("action", "action_agent", "Action", prompts.ACTION,
                    tools.action_tools(invoke_for("action")),
-                   "Validates stock transport orders, creates an approved STO, and verifies stock positions.")
+                   "Looks up which plants hold a material, validates stock transport orders, creates an approved STO, "
+                   "and verifies stock positions.")
     orchestrator = agent("orchestrator", "orchestrator", "Orchestrator", prompts.ORCHESTRATOR,
                          [evidence.as_tool(), impact.as_tool(), action.as_tool()])
     return Agents(orchestrator, evidence, impact, action)

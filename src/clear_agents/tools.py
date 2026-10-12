@@ -59,7 +59,8 @@ RECONCILE_SCHEMA = {"json": {
         "shipment_id": {"type": "string", "description": "Shipment ID, e.g. SHP-1001."},
         "extractions": {
             "type": "array",
-            "description": "purchase_order, material, and quantity read from each document, with quotes.",
+            "description": "The fields each document states (purchase_order, material, quantity), each with its "
+                           "quote; leave out a field a document does not state.",
             "items": _inline(Extraction.model_json_schema()),
         },
     },
