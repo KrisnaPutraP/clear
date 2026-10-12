@@ -198,26 +198,40 @@ In `LOG_ONLY` mode the gateway evaluates and records every decision without
 applying it; check in CloudWatch that S1's calls would all be allowed. Then
 switch to `--policy enforce`, deploy again, and repeat the S1 run.
 
-## To confirm on the first deploy
+## Checked on the deployment
 
-These follow from the documentation but have not been run yet. The first
-deploy created the gateway and the Lambda function, then stopped at the
-runtime quota (see Prerequisites); the log group it left carried the project
-tags.
+Deployed on 12 October 2026 without the runtime (gateway, Lambda function,
+DynamoDB table, Cedar policies in ENFORCE mode), with the agents on a laptop:
 
+- S1 ran end to end through the gateway, approval and STO included, with the
+  policies enforced; no call it needed was denied.
 - The gateway hands the Lambda function's JSON result to the agent as the
-  tool result's text. AWS documents that the function must return valid
-  JSON, not the exact wrapping; `run_scenario.py S2 --cloud` shows it.
+  tool result's text, and a tool's error comes back as the exception the
+  tool raised (for example `LookupError: Unknown validation_id`).
 - `ssm:GetParameter` is enough for the Lambda function to read the
-  SecureString encrypted with the AWS managed key.
-- The project tags reach the runtime, gateway, Lambda function, and roles
-  (Resource Groups & Tag Editor in the console).
-- The Lambda timeout of 60 seconds covers a cold start plus SAP-RPT-1.6,
-  which the tool itself limits to 15 seconds before falling back.
-- The Cedar policies pass AgentCore's own validation. AgentCore generates the
-  schema from the gateway's tools; locally the policies passed Cedar's
-  validator and eight allow/deny cases against an approximation of that
-  schema, which the real one may differ from.
+  SecureString, and the 60-second timeout covers a cold start plus
+  SAP-RPT-1.6: S1's prediction came from SAP-RPT-1.6 through the function.
+- The project tags reach the gateway, the Lambda function and its log group,
+  the table, the parameter, and both roles.
+- What the policies allow and deny, called directly:
+
+  | Caller | Tool | Result |
+  |---|---|---|
+  | Agents role | `get_shipment` | Allowed |
+  | Agents role | `validate_action` | Denied by default |
+  | Action role | `create_stock_transport_order`, approval `X-1` | Denied by `sto_needs_action_agent_and_approval` |
+  | Action role | `create_stock_transport_order`, approval `APR-9999` | Allowed; the tool refuses the unknown validation |
+  | Action role | `predict_resolution_time` | Denied by default |
+  | Administrator, no role | `get_shipment` | Denied by default |
+
+- AgentCore checks each new policy against the policies that already exist,
+  and CloudFormation creates the three in no fixed order. Checked before the
+  Action agent's permit existed, the forbid denies every STO request, and the
+  deploy failed as "Overly Restrictive". The forbid therefore sets
+  `validationMode: IGNORE_ALL_FINDINGS` (`src/clear_aws/policy.py`); the
+  table above shows it still allows the approved STO.
+
+Not checked: the runtime itself, which needs the AgentCore Runtime quota.
 
 ## Clean up
 
