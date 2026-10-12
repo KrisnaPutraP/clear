@@ -20,12 +20,14 @@ from clear_app import settings, view
 from clear_app.contract import Clear
 from clear_aws import settings as aws_settings
 from clear_aws.dynamo_store import DynamoStore, reset_table
-from clear_aws.remote import RuntimeAgents
+from clear_aws.remote import GatewayAgents, RuntimeAgents
 from clear_tools.store import JsonStore, reset_runtime
 
 settings.load_env()
 SCRIPTED = os.environ.get("CLEAR_UI_SCRIPTED") == "1"
 CLOUD = not SCRIPTED and bool(os.environ.get(aws_settings.RUNTIME_ARN_SETTING))
+# Agents here, tools behind AgentCore Gateway, data in DynamoDB: the deployment without AgentCore Runtime.
+GATEWAY = not SCRIPTED and not CLOUD and bool(os.environ.get(aws_settings.GATEWAY_URL_SETTING))
 
 EVENT_LABELS = {
     "S1-DOC-HOLD": "S1 · Customs document hold",
@@ -45,6 +47,9 @@ def get_clear() -> Clear:
     if CLOUD:
         store = DynamoStore.from_env()
         return Clear(store, agents=RuntimeAgents.from_env(store))
+    if GATEWAY:
+        store = DynamoStore.from_env()
+        return Clear(store, agents=GatewayAgents(store))
     runtime = settings.runtime_dir()
     if not runtime.exists():
         reset_runtime(settings.SEED_DIR, runtime)
@@ -77,14 +82,17 @@ def sidebar() -> None:
         model = "Scripted model (development)" if SCRIPTED else runner.live_model_name()
         if CLOUD:
             model = f"AgentCore Runtime · {model}"
+        elif GATEWAY:
+            model = f"{model} · tools via AgentCore Gateway"
         prediction = "SAP-RPT-1.6, baseline fallback" \
-            if CLOUD or os.environ.get("CLEAR_PREDICTION_BACKEND", "").lower() == "auto" else "Baseline median"
+            if CLOUD or GATEWAY or os.environ.get("CLEAR_PREDICTION_BACKEND", "").lower() == "auto" \
+            else "Baseline median"
         st.caption(f"Agents: {model}")
         st.caption(f"Resolution time: {prediction}")
         st.subheader("Demo data")
         st.caption("All data is synthetic and every name is fictional.")
         if st.button("Reset demo data", key="reset", disabled=clear.running, width="stretch"):
-            if CLOUD:
+            if CLOUD or GATEWAY:
                 reset_table(settings.SEED_DIR, clear.store)
             else:
                 reset_runtime(settings.SEED_DIR, settings.runtime_dir())

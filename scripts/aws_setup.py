@@ -34,9 +34,13 @@ def main() -> None:
     steps = provision.setup_steps(session.client, identity["Account"], sap_key, app_settings.SEED_DIR)
     provision.run(steps, args.apply)
 
-    arn = provision.deployed(app_settings.REPO_ROOT / "deploy" / settings.PROJECT).get("runtime_arn")
-    if arn:
-        print(f"\nFor the UI, add to .env:\n{settings.RUNTIME_ARN_SETTING}={arn}")
+    state = provision.deployed(app_settings.REPO_ROOT / "deploy" / settings.PROJECT)
+    if state.get("runtime_arn"):
+        print(f"\nFor the UI, add to .env:\n{settings.RUNTIME_ARN_SETTING}={state['runtime_arn']}")
+    elif state.get("gateway_url"):
+        print("\nTo run the agents here with their tools behind the gateway, add to .env:\n"
+              f"{settings.GATEWAY_URL_SETTING}={state['gateway_url']}\n"
+              f"{settings.ACTION_ROLE_SETTING}={settings.ACTION_ROLE}")
 
 
 if __name__ == "__main__":

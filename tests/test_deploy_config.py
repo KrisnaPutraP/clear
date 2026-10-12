@@ -130,3 +130,10 @@ def test_deployment_target_is_filled_once():
     assert filled == [{"name": "default", "description": "CLEAR hackathon deployment", "account": "123456789012",
                        "region": "us-west-2"}]
     assert agentcore.deployment_targets(filled, "999999999999") == filled
+
+
+def test_project_without_the_runtime_keeps_the_gateway():
+    without = agentcore.project("model-x", with_runtime=False)
+
+    assert without["runtimes"] == []
+    assert without["agentCoreGateways"] == agentcore.project("model-x")["agentCoreGateways"]

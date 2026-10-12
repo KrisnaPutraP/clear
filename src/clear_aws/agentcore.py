@@ -42,8 +42,9 @@ BUNDLES = {
 }
 
 
-def project(model_id: str, policy: dict | None = None) -> dict:
-    """agentcore.json for agents on the Bedrock model model_id.
+def project(model_id: str, policy: dict | None = None, with_runtime: bool = True) -> dict:
+    """agentcore.json for agents on the Bedrock model model_id. Without the runtime (with_runtime
+    False) for an account without AgentCore Runtime quota: the agents then run where the UI runs.
 
     policy, if given, holds gateway_arn and runtime_role_arn of the deployed project and the mode,
     LOG_ONLY or ENFORCE, in which the gateway applies the Cedar policies.
@@ -54,7 +55,7 @@ def project(model_id: str, policy: dict | None = None) -> dict:
         "version": 1,
         "managedBy": "CDK",
         "tags": dict(settings.TAGS),
-        "runtimes": [runtime(model_id)],
+        "runtimes": [runtime(model_id)] if with_runtime else [],
         "agentCoreGateways": [gateway(policy["mode"] if policy else None)],
     }
     if policy:
@@ -148,7 +149,8 @@ def tool_definitions() -> list[dict]:
              "inputSchema": _input_schema(spec["inputSchema"]["json"])} for name, spec in specs.items()]
 
 
-def build(project_dir: Path, model_id: str, repo_root: Path, policy: dict | None = None) -> None:
+def build(project_dir: Path, model_id: str, repo_root: Path, policy: dict | None = None,
+          with_runtime: bool = True) -> None:
     """Write agentcore.json and both code locations into the CLI project directory."""
     for location, (template, packages) in BUNDLES.items():
         target = project_dir / location
@@ -164,7 +166,7 @@ def build(project_dir: Path, model_id: str, repo_root: Path, policy: dict | None
                 for module in modules:
                     shutil.copy2(source / module, target / package / module)
     _write_json(project_dir / RUNTIME_DIR / RUNTIME_POLICY, runtime_policy())
-    _write_json(project_dir / "agentcore" / "agentcore.json", project(model_id, policy))
+    _write_json(project_dir / "agentcore" / "agentcore.json", project(model_id, policy, with_runtime))
 
 
 def _input_schema(schema: dict) -> dict:

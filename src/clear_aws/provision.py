@@ -73,7 +73,8 @@ def run(steps: list[Step], apply: bool) -> None:
 
 
 def deployed(project_dir: Path) -> dict[str, str]:
-    """ARNs of the deployed runtime, its role, and the gateway, from the AgentCore CLI's state file.
+    """ARNs of the deployed runtime, its role, and the gateway, and the gateway's URL, from the
+    AgentCore CLI's state file.
 
     Empty before the first deploy; a key is missing while its resource is not deployed.
     """
@@ -90,6 +91,8 @@ def deployed(project_dir: Path) -> dict[str, str]:
         gateway = gateways.get(settings.GATEWAY)
         if gateway:
             found["gateway_arn"] = gateway["gatewayArn"]
+            if gateway.get("gatewayUrl"):
+                found["gateway_url"] = gateway["gatewayUrl"]
     return found
 
 

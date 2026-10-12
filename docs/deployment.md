@@ -117,6 +117,28 @@ already exists. Delete it before deploying again:
 aws logs delete-log-group --log-group-name /aws/lambda/cookusanhackathon-clear-tools
 ```
 
+## Without AgentCore Runtime
+
+An account without AgentCore Runtime quota (see Prerequisites) can still run
+the tools on AWS. The agents run on the laptop, in the same code the runtime
+would run (`clear_aws.runtime`), and every tool call goes through AgentCore
+Gateway to the Lambda function and the DynamoDB table. The Action agent's
+calls are signed with the Action agent's role, which the laptop's identity
+assumes; the other agents' calls are signed with the laptop's identity.
+
+```
+python scripts/build_deploy.py --no-runtime   # gateway and Lambda function only
+cd deploy/cookusanhackathon
+agentcore validate
+agentcore deploy
+cd ../..
+python scripts/aws_setup.py                   # prints the gateway lines for .env
+python scripts/run_scenario.py S1 --approve --gateway
+```
+
+With `AGENTCORE_GATEWAY_TOOLS_URL` in `.env` and no `CLEAR_AGENT_RUNTIME_ARN`,
+the UI runs in this mode; the sidebar says "tools via AgentCore Gateway".
+
 ## Check and run
 
 1. `python scripts/run_scenario.py S2 --cloud` resets the table and works the

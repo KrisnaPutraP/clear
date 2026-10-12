@@ -224,9 +224,11 @@ def test_deployed_arns_come_from_the_cli_state(tmp_path):
     runtime = f"arn:aws:bedrock-agentcore:us-west-2:{ACCOUNT}:runtime/{settings.PROJECT}_clear-AbCdEf1234"
     role = f"arn:aws:iam::{ACCOUNT}:role/AgentCore-{settings.PROJECT}-RuntimeRole-XYZ"
     gateway = f"arn:aws:bedrock-agentcore:us-west-2:{ACCOUNT}:gateway/{settings.PROJECT}-tools-abc123"
+    url = "https://abc123.gateway.bedrock-agentcore.us-west-2.amazonaws.com/mcp"
     state.write_text(json.dumps({"targets": {"default": {"resources": {
         "runtimes": {settings.RUNTIME: {"runtimeId": "x", "runtimeArn": runtime, "roleArn": role}},
-        "mcp": {"gateways": {settings.GATEWAY: {"gatewayId": "abc123", "gatewayArn": gateway}}},
+        "mcp": {"gateways": {settings.GATEWAY: {"gatewayId": "abc123", "gatewayArn": gateway, "gatewayUrl": url}}},
     }}}}), encoding="utf-8")
 
-    assert provision.deployed(tmp_path) == {"runtime_arn": runtime, "runtime_role_arn": role, "gateway_arn": gateway}
+    assert provision.deployed(tmp_path) == {"runtime_arn": runtime, "runtime_role_arn": role, "gateway_arn": gateway,
+                                          "gateway_url": url}

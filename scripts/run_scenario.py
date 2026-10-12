@@ -11,6 +11,7 @@ Usage:
     python scripts/run_scenario.py S1 --approve --eta-slip   # then fires the ETA slip
     python scripts/run_scenario.py S2
     python scripts/run_scenario.py S1 --approve --cloud      # on AgentCore
+    python scripts/run_scenario.py S1 --approve --gateway    # agents here, tools behind the gateway
 """
 
 import argparse
@@ -29,16 +30,18 @@ def main() -> None:
     parser.add_argument("--approve", action="store_true", help="approve the validated STO as 'Demo Planner'")
     parser.add_argument("--eta-slip", action="store_true", help="S1 only: fire the ETA slip after the approval")
     parser.add_argument("--cloud", action="store_true", help="run on AgentCore Runtime with the DynamoDB table")
+    parser.add_argument("--gateway", action="store_true",
+                        help="run the agents here, their tools behind AgentCore Gateway, on the DynamoDB table")
     args = parser.parse_args()
 
     settings.load_env()
-    if args.cloud:
+    if args.cloud or args.gateway:
         from clear_aws.dynamo_store import DynamoStore, reset_table
-        from clear_aws.remote import RuntimeAgents
+        from clear_aws.remote import GatewayAgents, RuntimeAgents
 
         store = DynamoStore.from_env()
         reset_table(settings.SEED_DIR, store)
-        clear = Clear(store, agents=RuntimeAgents.from_env(store))
+        clear = Clear(store, agents=RuntimeAgents.from_env(store) if args.cloud else GatewayAgents(store))
     else:
         store = JsonStore(settings.runtime_dir())
         reset_runtime(settings.SEED_DIR, store.root)

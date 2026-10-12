@@ -33,6 +33,8 @@ MODES = {"log-only": "LOG_ONLY", "enforce": "ENFORCE"}
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--policy", choices=sorted(MODES), help="attach the Cedar policies to the gateway")
+    parser.add_argument("--no-runtime", action="store_true",
+                        help="gateway and Lambda only; the agents run where the UI runs (no Runtime quota)")
     args = parser.parse_args()
 
     app_settings.load_env()
@@ -50,7 +52,7 @@ def main() -> None:
                      "run agentcore deploy once without --policy first.")
         policy = {**state, "mode": MODES[args.policy]}
 
-    agentcore.build(PROJECT_DIR, model_id, app_settings.REPO_ROOT, policy)
+    agentcore.build(PROJECT_DIR, model_id, app_settings.REPO_ROOT, policy, with_runtime=not args.no_runtime)
     targets_path = PROJECT_DIR / "agentcore" / "aws-targets.json"
     existing = json.loads(targets_path.read_text(encoding="utf-8")) if targets_path.exists() else []
     if not any(target.get("name") == "default" for target in existing):

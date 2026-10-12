@@ -8,8 +8,10 @@ import pytest
 
 from aws_fakes import RUNTIME_ARN, FakeDeployment
 from clear_agents import caselog, runner
-from clear_aws import runtime
-from clear_aws.remote import CLIENT_CONFIG, RuntimeAgents
+from clear_agents.testing import ScriptedDirector
+from clear_app.contract import Clear
+from clear_aws import runtime, settings
+from clear_aws.remote import CLIENT_CONFIG, GatewayAgents, RuntimeAgents
 from clear_tools.events import prepared_event
 
 WRITE_TOOLS = {"validate_action", "create_stock_transport_order"}
@@ -112,3 +114,32 @@ def test_unreachable_gateway_fails_the_run_not_the_runtime(deployment):
 def test_the_runtime_rejects_payloads_it_cannot_work(deployment, payload, error):
     with pytest.raises(error):
         runtime.handle(payload, store=deployment.runtime_store, gateway=deployment.gateway())
+
+
+def test_s1_runs_here_with_its_tools_behind_the_gateway(deployment):
+    store = deployment.ui_store
+    clear = Clear(store, agents=GatewayAgents(store, model_for=ScriptedDirector(store), gateway=deployment.gateway))
+    case_id = clear.send_event("S1-DOC-HOLD", wait=True)
+    [action] = clear.get_case(case_id)["plan"]["actions"]
+    clear.submit_decision(case_id, action["validation_id"], "Demo Planner", "approved", wait=True)
+    with clear.snapshot():
+        case = clear.get_case(case_id)
+
+    assert case["status"] == "monitoring"
+    assert case["plan"]["actions"][0]["sto"]["purchase_order"] == "4500001023"
+    by_role = {"agents": set(), "action": set()}
+    for client in deployment.gateway_clients:
+        by_role["action" if client.credentials else "agents"].update(client.calls)
+    assert WRITE_TOOLS <= by_role["action"]
+    assert not WRITE_TOOLS & by_role["agents"]
+
+
+def test_gateway_mode_without_a_gateway_url_fails_the_run_readably(deployment, monkeypatch):
+    monkeypatch.delenv(settings.GATEWAY_URL_SETTING, raising=False)
+    store = deployment.ui_store
+    clear = Clear(store, agents=GatewayAgents(store, model_for=ScriptedDirector(store)))
+
+    case = clear.get_case(clear.send_event("S2-CONGESTION", wait=True))
+
+    assert case["status"] == "needs_human_decision"
+    assert settings.GATEWAY_URL_SETTING in case["status_reason"]
