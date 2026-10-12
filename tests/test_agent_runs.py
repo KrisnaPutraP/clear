@@ -118,3 +118,12 @@ def test_plan_keeping_a_covered_current_plan_needs_no_escalation(store):
                         current_plan_assessment_id=current["assessment_id"], recommendation="x", next_check="x")
 
     assert check_escalation(store, plan) == []
+
+
+def test_no_escalation_written_as_text_is_no_escalation():
+    base = dict(case_id="CASE-0001", exception="x", evidence=[], prediction_id="PRED-0001",
+                current_plan_assessment_id="ASM-0001", recommendation="x", next_check="x")
+    for text in ("None", "None - the transfer covers it", "None \u2014 no emergency sourcing is needed", "N/A", "null", ""):
+        assert RecoveryPlan(**base, escalation=text).escalation is None, text
+    for text in ("No transfer is available; decide on emergency sourcing.", "Emergency sourcing for deferred orders"):
+        assert RecoveryPlan(**base, escalation=text).escalation == text

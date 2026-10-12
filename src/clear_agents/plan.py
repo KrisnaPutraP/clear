@@ -9,12 +9,16 @@ without a transfer and without telling a human (§6d). render() fills in the
 numbers from the stored records for the approval card and the UI.
 """
 
+import re
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from clear_tools import read, records, sto
 from clear_tools.store import JsonStore
+
+
+_NO_ESCALATION = re.compile(r"\s*(?:none|null|n/?a)?\s*(?:$|[-–—:.,;(])", re.IGNORECASE)
 
 
 class Evidence(BaseModel):
@@ -57,11 +61,17 @@ class RecoveryPlan(BaseModel):
     escalation: str | None = Field(
         default=None,
         description="A decision only a human can make: emergency sourcing when the validator allows no transfer "
-                    "at all and orders are deferred, or when no option covers the requirement; otherwise None. "
-                    "Orders deferred behind a feasible transfer need no escalation. Contingencies and customs "
-                    "follow-up go in next_check.",
+                    "at all and orders are deferred, or when no option covers the requirement. Otherwise leave it "
+                    "empty (null): do not write None or an explanation here. Orders deferred behind a feasible "
+                    "transfer need no escalation. Contingencies and customs follow-up go in next_check.",
     )
     next_check: str = Field(description="What to monitor next.")
+
+    @field_validator("escalation")
+    @classmethod
+    def _no_escalation_as_text(cls, value: str | None) -> str | None:
+        """A model sometimes writes "None - no escalation needed" instead of null; that is no escalation."""
+        return None if value is None or _NO_ESCALATION.match(value) else value
 
 
 def check(store: JsonStore, plan: RecoveryPlan, shipment_id: str) -> list[str]:
