@@ -1,9 +1,9 @@
-"""A scripted stand-in for the Bedrock model, for tests and UI development only.
+"""A scripted stand-in for the live model, for tests and UI development only.
 
-ScriptedModel replays fixed turns (text and tool calls) in the Bedrock
-stream format, so the real Strands agents, tools, hooks, and case log run
-end to end without AWS. It decides nothing and must never stand in for the
-model in the demo.
+ScriptedModel replays fixed turns (text and tool calls) in the stream format
+of Strands' Bedrock model, so the real Strands agents, tools, hooks, and case
+log run end to end without any model or AWS. It decides nothing and must
+never stand in for the model in the demo.
 
 The S1 and S2 scripts reproduce the expected agent steps. They read the
 store when a run starts, so record IDs line up whatever ran before.

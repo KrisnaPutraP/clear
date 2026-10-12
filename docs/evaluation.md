@@ -86,8 +86,13 @@ Git):
 - Time to a recovery plan: median 80 s, from 21 s to 107 s per variant.
 
 Earlier runs the same day showed the failures this run no longer has; the
-prompts and the plan check changed in between. LLM runs vary, so a new run
-can differ.
+prompts and the plan check changed in between. The prompts changed again
+after this run: the Action agent now validates every plant that holds the
+material, even one at its safety stock, and the orchestrator counts a
+transfer as infeasible only on a validation that says so. Variants C1 to
+C4, the ones this affects most, were run again and pass every check; all 20
+are due again before the feature freeze. LLM runs vary, so a new run can
+differ.
 
 ## Manual baseline (scenario S1)
 

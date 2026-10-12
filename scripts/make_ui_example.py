@@ -2,8 +2,8 @@
 
 Runs S1 with the scripted model on a temporary copy of the seed: the
 exception, the planner's approval, then the ETA slip. The shapes are exactly
-what the contract returns; the agent wording is illustrative. Regenerate
-after a real Bedrock run for realistic text.
+what the contract returns; the agent wording is illustrative. For realistic
+text, take it from a live run instead.
 
 Usage: python scripts/make_ui_example.py
 """

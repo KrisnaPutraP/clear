@@ -243,3 +243,22 @@ def test_deployed_arns_come_from_the_cli_state(tmp_path):
 
     assert provision.deployed(tmp_path) == {"runtime_arn": runtime, "runtime_role_arn": role, "gateway_arn": gateway,
                                           "gateway_url": url}
+
+
+def test_the_gateway_url_is_found_by_the_projects_gateway_name(aws):
+    name = f"{settings.PROJECT}-{settings.GATEWAY}"
+    url = f"https://{name}-abc123.gateway.bedrock-agentcore.us-west-2.amazonaws.com/mcp"
+
+    def gateway(gateway_name: str) -> dict:
+        return {"gatewayId": f"{gateway_name}-abc123", "name": gateway_name, "status": "READY", "createdAt": NOW,
+                "updatedAt": NOW, "authorizerType": "AWS_IAM"}
+
+    aws.expect("bedrock-agentcore-control", "list_gateways", {},
+               {"items": [gateway("someone-elses"), gateway(name)]})
+    aws.expect("bedrock-agentcore-control", "get_gateway", {"gatewayIdentifier": f"{name}-abc123"},
+               {**gateway(name), "gatewayArn": f"arn:aws:bedrock-agentcore:us-west-2:{ACCOUNT}:gateway/{name}-abc123",
+                "gatewayUrl": url})
+    assert provision.gateway_url(aws("bedrock-agentcore-control")) == url
+
+    aws.expect("bedrock-agentcore-control", "list_gateways", {}, {"items": []})
+    assert provision.gateway_url(aws("bedrock-agentcore-control")) is None

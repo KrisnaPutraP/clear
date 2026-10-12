@@ -99,6 +99,17 @@ def deployed(project_dir: Path) -> dict[str, str]:
     return found
 
 
+def gateway_url(agentcore) -> str | None:
+    """URL of the project's deployed gateway, looked up in AgentCore by its name, for a clone that has none
+    of the AgentCore CLI's local state. None when the gateway is not deployed."""
+    name = f"{settings.PROJECT}-{settings.GATEWAY}"
+    for page in agentcore.get_paginator("list_gateways").paginate():
+        for gateway in page["items"]:
+            if gateway["name"] == name:
+                return agentcore.get_gateway(gatewayIdentifier=gateway["gatewayId"])["gatewayUrl"]
+    return None
+
+
 def _table_step(dynamodb) -> Step:
     if _exists(lambda: dynamodb.describe_table(TableName=settings.TABLE), "ResourceNotFoundException"):
         return Step(f"DynamoDB table {settings.TABLE} exists")

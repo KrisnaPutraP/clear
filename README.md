@@ -4,37 +4,98 @@ Agentic AI Hackathon 2026 · Track A: Intelligent Supply Chain · Team Cookusan
 
 > ERP runs the process. Humans chase the exceptions. CLEAR resolves them.
 
-CLEAR turns a cross-border shipment exception into an evidence-backed,
-validated recovery plan. A human approves every write action. How it works:
-[docs/architecture.md](docs/architecture.md).
+When an imported shipment is held at the port, a planner today pieces the
+case together by hand from the ERP, the shipping documents, stock reports,
+and approvals before anything moves. CLEAR turns such an exception
+into an evidence-backed, validated recovery plan, and a human approves every
+write before it reaches the ERP.
 
-**Status:** work in progress. Locked decisions: `docs/PLAN.md`.
+## How it works
 
-## Run locally
+- A logistics event (simulated) starts a case.
+- An orchestrator and three specialist agents, built with Strands, work it:
+  the **Evidence** agent reconciles the shipping documents, the **Impact &
+  Options** agent predicts how long the exception lasts and scores recovery
+  options, and the **Action** agent validates and, once approved, creates the
+  stock transport order (STO).
+- The agents reason with **Claude Sonnet 4.6 in SAP AI Core**; resolution
+  times come from **SAP-RPT-1.6**, also in SAP AI Core.
+- Every tool call goes through **AgentCore Gateway**, where **Cedar
+  policies** let each agent's IAM role call only its own tools and forbid the
+  STO without the Action agent and an approval. The tools run in **AWS
+  Lambda** on **DynamoDB**.
+- **The LLM proposes, code computes and validates, a human approves:** every
+  number comes from data, deterministic tools, or SAP-RPT-1.6, and shows its
+  source.
 
-Requires Python 3.12.
+Diagrams and details: [docs/architecture.md](docs/architecture.md).
+
+## Status
+
+Working end to end (12 October 2026): both demo scenarios run live with the
+agents on Claude in SAP AI Core and the tools on AWS behind AgentCore Gateway
+with the Cedar policies enforced. The agents run on the presenter's laptop,
+since the team's AWS account has no AgentCore Runtime quota. Twenty
+evaluation variants check the agents' decisions against an oracle
+([docs/evaluation.md](docs/evaluation.md)). Next: the pitch deck and the demo
+video. Details and open items: [docs/contributing.md](docs/contributing.md).
+
+## Quick start
+
+Requires Python 3.12. No credentials needed for this part:
 
 ```
 python -m venv .venv
 .venv\Scripts\activate          # macOS/Linux: source .venv/bin/activate
 pip install -e ".[dev]"
-copy .env.example .env          # macOS/Linux: cp; then fill in what you have
+copy .env.example .env          # macOS/Linux: cp
 python scripts/reset_data.py
 pytest
-streamlit run app/streamlit_app.py
 ```
 
-The agents run on Claude Sonnet 4.6 in SAP AI Core (`CLEAR_LLM_BACKEND=aicore`
-with the team's AI Core service key and `SAP_LLM_DEPLOYMENT_ID`) or on Amazon
-Bedrock (`CLEAR_LLM_BACKEND=bedrock` with `CLEAR_BEDROCK_MODEL_ID` and AWS
-credentials). Both use the Bedrock Converse API, so the agent code is the same.
-Without either, `CLEAR_UI_SCRIPTED=1` lets you click through the UI with a
-scripted model, for development only. Resolution time comes from
-SAP-RPT-1.6 when the SAP AI Core settings are filled in, with an automatic
-fallback to a baseline median.
+To run the agents live (SAP AI Core) and the tools on AWS, follow
+[docs/setup.md](docs/setup.md).
 
-## Run on AWS
+## Commands
 
-The same code deploys to Amazon Bedrock AgentCore: the agents on AgentCore
-Runtime, the tools in a Lambda function behind AgentCore Gateway, the data in
-DynamoDB. Steps, resources, and cleanup: `docs/deployment.md`.
+| Command | What it does |
+|---|---|
+| `pytest` | All tests; the live ones run only with `CLEAR_LIVE_TESTS=1` |
+| `streamlit run app/streamlit_app.py` | The demo UI; `CLEAR_UI_SCRIPTED=1` in `.env` for a scripted model |
+| `python scripts/run_scenario.py S2` | The short scenario, live, printing the case timeline |
+| `python scripts/run_scenario.py S1 --approve --eta-slip` | The hero scenario: exception, approval, ETA slip |
+| `... --gateway` | The same with the tools on AWS behind AgentCore Gateway |
+| `python scripts/run_eval.py` | The 20-variant evaluation (`--variants A1,C2` for a subset) |
+| `python scripts/reset_data.py` | Fresh demo data (`--aws` for the DynamoDB table) |
+| `python scripts/check_policies.py` | What the gateway's Cedar policies allow and deny |
+| `python scripts/gateway_env.py` | The `.env` lines for the deployed gateway |
+
+## Repository
+
+| Path | Contents |
+|---|---|
+| `app/` | Streamlit demo UI |
+| `src/clear_tools/` | The nine deterministic tools and the mock S/4HANA; standard library only |
+| `src/clear_agents/` | Strands agents, prompts, the recovery plan schema and checks, the SAP AI Core model |
+| `src/clear_app/` | The contract between the UI and the agents, settings |
+| `src/clear_aws/` | AWS: DynamoDB store, Lambda handler, gateway client, Cedar policies, deployment config, setup |
+| `src/clear_eval/` | Evaluation: variants, oracle, scoring |
+| `src/clear_datagen/` | Generators of the synthetic seed data |
+| `data/seed/` | The committed demo data ([data/README.md](data/README.md)) |
+| `deploy/` | Templates of the code bundles for AgentCore Runtime and Lambda |
+| `scripts/` | Command-line entry points (table above) |
+| `tests/` | Unit, scenario-invariant, and deployment tests, with stand-ins for AWS |
+| `docs/` | Architecture, setup, deployment, evaluation, UI contract, contributing |
+
+## Documentation
+
+- [docs/architecture.md](docs/architecture.md): how CLEAR works, with diagrams
+- [docs/setup.md](docs/setup.md): from a fresh clone to the full demo
+- [docs/deployment.md](docs/deployment.md): what runs on AWS and how to deploy it
+- [docs/evaluation.md](docs/evaluation.md): the reliability batch and its results
+- [docs/ui-contract.md](docs/ui-contract.md): the interface between the UI and the agents
+- [docs/contributing.md](docs/contributing.md): rules, workflow, status, open items
+- [data/README.md](data/README.md): the synthetic data and its generator rules
+
+All data in this repository is synthetic, and every company and person name
+in it is fictional.
