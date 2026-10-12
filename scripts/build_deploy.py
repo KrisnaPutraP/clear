@@ -27,7 +27,7 @@ import boto3
 
 from clear_app import settings as app_settings
 from clear_aws import agentcore, provision, settings
-from clear_aws.policy import account
+from clear_aws import policy as cedar
 
 PROJECT_DIR = app_settings.REPO_ROOT / "deploy" / settings.PROJECT
 MODES = {"log-only": "LOG_ONLY", "enforce": "ENFORCE"}
@@ -53,7 +53,7 @@ def main() -> None:
         if "gateway_arn" not in state:
             sys.exit("The policies name the deployed gateway: run agentcore deploy once without --policy first.")
         if args.no_runtime:
-            agents_role_arn = f"arn:aws:iam::{account(state['gateway_arn'])}:role/{settings.AGENTS_ROLE}"
+            agents_role_arn = f"arn:aws:iam::{cedar.account(state['gateway_arn'])}:role/{settings.AGENTS_ROLE}"
         elif "runtime_role_arn" in state:
             agents_role_arn = state["runtime_role_arn"]
         else:
