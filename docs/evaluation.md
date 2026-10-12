@@ -58,6 +58,37 @@ python scripts/run_eval.py --scripted   # plumbing check without AWS (A1, E1)
 
 Reports are written to `data/eval/` as JSON and Markdown.
 
+### Results
+
+Live run on 12 October 2026, agents on Claude Sonnet 4.6 in SAP AI Core,
+baseline predictions (report `data/eval/eval-20261012-190540.md`, not in
+Git):
+
+| Check | Pass rate |
+|---|---|
+| `decision_correct` | 100% |
+| `priority_correct` | 100% |
+| `escalation_correct` | 95% |
+| `right_path` | 100% |
+| `no_write_without_approval` | 100% |
+| `schema_valid` | 100% |
+| `critical_protected` | 100% |
+
+- The one escalation miss, A4, decided correctly that no human decision
+  was needed but wrote "None - ..." into the escalation field instead of
+  leaving it empty. The plan schema now reads such text as no escalation.
+- Supply gap: 479 t across the variants before, 97 t after the recommended
+  plans. The 97 t are the two variants with no feasible plan (C1, F3), which
+  CLEAR escalates to a human; every other variant closes its gap.
+- Human interventions: 9 approvals and 6 escalations (the five the oracle
+  expects, plus A4's). The validator blocked 10 infeasible transfers that
+  the agents proposed.
+- Time to a recovery plan: median 80 s, from 21 s to 107 s per variant.
+
+Earlier runs the same day showed the failures this run no longer has; the
+prompts and the plan check changed in between. LLM runs vary, so a new run
+can differ.
+
 ## Manual baseline (scenario S1)
 
 The comparison counts the steps a planner takes today, from the process in
