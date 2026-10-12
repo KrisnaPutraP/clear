@@ -45,7 +45,12 @@ def engine(gateway_arn: str, agents_role_arn: str) -> dict:
              "statement": _permit(action_role, ACTION_TOOLS, gateway_arn)},
             {"name": "sto_needs_action_agent_and_approval",
              "description": "No STO unless the Action agent calls with an approval ID",
-             "statement": _forbid_write_without_approval(action_role, gateway_arn)},
+             "statement": _forbid_write_without_approval(action_role, gateway_arn),
+             # AgentCore judges each policy against the ones that exist when it is created, and the three
+             # are created in no fixed order. Judged before the Action agent's permit exists, this forbid
+             # denies every STO request ("Overly Restrictive"). The Cedar tests and the denied calls checked
+             # after a deploy show it allows the approved STO (docs/deployment.md).
+             "validationMode": "IGNORE_ALL_FINDINGS"},
         ],
     }
 
