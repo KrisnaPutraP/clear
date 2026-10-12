@@ -75,13 +75,15 @@ def _permit(principal_id: str, tools: tuple[str, ...], gateway_arn: str) -> str:
 
 
 def _forbid_write_without_approval(action_role: str, gateway_arn: str) -> str:
+    # Scoped to IAM principals: AgentCore rejects a policy that denies every request of some principal type as
+    # "Overly Restrictive", and for any other type, such as an OAuth user, the exception below could never hold.
+    # Those principals have no permit, so the default deny still stops them.
     return (f"forbid(\n"
-            f"  principal,\n"
+            f"  principal is AgentCore::IamEntity,\n"
             f"  action == {action(WRITE_TOOL)},\n"
             f'  resource == AgentCore::Gateway::"{gateway_arn}"\n'
             f")\n"
             f"unless {{\n"
-            f"  principal is AgentCore::IamEntity &&\n"
             f'  principal.id == "{action_role}" &&\n'
             f'  context.input.approval_id like "{APPROVAL_PATTERN}"\n'
             f"}};")
