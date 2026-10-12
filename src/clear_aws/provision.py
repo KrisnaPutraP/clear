@@ -36,7 +36,9 @@ def setup_steps(client: Clients, account: str, sap_key: dict[str, str], seed_dir
     files = sum(1 for path in seed_dir.rglob("*") if path.is_file())
     return [
         _table_step(client("dynamodb")),
-        _role_step(client("iam"), account),
+        _role_step(client("iam"), account, settings.ACTION_ROLE, "the Action agent's gateway calls"),
+        _role_step(client("iam"), account, settings.AGENTS_ROLE,
+                   "the Evidence and Impact agents' gateway calls outside the runtime"),
         _parameter_step(client("ssm"), sap_key),
         Step(f"Load the {files} files of data/seed/ into {settings.TABLE}", lambda: reset_table(seed_dir, store)),
     ]
@@ -47,8 +49,9 @@ def cleanup_steps(client: Clients, include_bootstrap: bool = False) -> list[Step
     steps = [_delete_stack(cloudformation, name) for name in _project_stacks(cloudformation)]
     if _exists(lambda: dynamodb.describe_table(TableName=settings.TABLE), "ResourceNotFoundException"):
         steps.append(Step(f"Delete DynamoDB table {settings.TABLE}", lambda: _delete_table(dynamodb)))
-    if _exists(lambda: iam.get_role(RoleName=settings.ACTION_ROLE), "NoSuchEntity"):
-        steps.append(Step(f"Delete IAM role {settings.ACTION_ROLE}", lambda: _delete_role(iam)))
+    for role in (settings.ACTION_ROLE, settings.AGENTS_ROLE):
+        if _exists(lambda role=role: iam.get_role(RoleName=role), "NoSuchEntity"):
+            steps.append(Step(f"Delete IAM role {role}", lambda role=role: _delete_role(iam, role)))
     if _exists(lambda: ssm.get_parameter(Name=settings.SAP_PARAMETER), "ParameterNotFound"):
         steps.append(Step(f"Delete SSM parameter {settings.SAP_PARAMETER}",
                           lambda: ssm.delete_parameter(Name=settings.SAP_PARAMETER)))
@@ -113,23 +116,24 @@ def _table_step(dynamodb) -> Step:
     return Step(f"Create DynamoDB table {settings.TABLE} (on-demand billing)", create)
 
 
-def _role_step(iam, account: str) -> Step:
-    # Trusting the account delegates to IAM policies: only the runtime's role is granted sts:AssumeRole on it.
+def _role_step(iam, account: str, name: str, calls: str) -> Step:
+    # Trusting the account delegates to IAM policies: only identities granted sts:AssumeRole on the role can use
+    # it, such as the runtime's role or a developer running the agents locally.
     trust = {"Version": "2012-10-17", "Statement": [{
         "Effect": "Allow", "Principal": {"AWS": f"arn:aws:iam::{account}:root"}, "Action": "sts:AssumeRole"}]}
     policy = {"Version": "2012-10-17", "Statement": [{
         "Effect": "Allow", "Action": "bedrock-agentcore:InvokeGateway",
         "Resource": f"arn:aws:bedrock-agentcore:{settings.REGION}:{account}:gateway/*"}]}
-    exists = _exists(lambda: iam.get_role(RoleName=settings.ACTION_ROLE), "NoSuchEntity")
+    exists = _exists(lambda: iam.get_role(RoleName=name), "NoSuchEntity")
 
     def apply() -> None:
         if not exists:
-            iam.create_role(RoleName=settings.ACTION_ROLE, AssumeRolePolicyDocument=json.dumps(trust),
-                            Description="CLEAR Action agent: signs its calls to AgentCore Gateway", Tags=TAG_LIST)
-        iam.put_role_policy(RoleName=settings.ACTION_ROLE, PolicyName=ROLE_POLICY, PolicyDocument=json.dumps(policy))
+            iam.create_role(RoleName=name, AssumeRolePolicyDocument=json.dumps(trust),
+                            Description=f"CLEAR: signs {calls}", Tags=TAG_LIST)
+        iam.put_role_policy(RoleName=name, PolicyName=ROLE_POLICY, PolicyDocument=json.dumps(policy))
 
     verb = "Refresh the gateway permission of" if exists else "Create"
-    return Step(f"{verb} IAM role {settings.ACTION_ROLE} for the Action agent's gateway calls", apply)
+    return Step(f"{verb} IAM role {name} for {calls}", apply)
 
 
 def _parameter_step(ssm, sap_key: dict[str, str]) -> Step:
@@ -173,12 +177,12 @@ def _delete_table(dynamodb) -> None:
     dynamodb.get_waiter("table_not_exists").wait(TableName=settings.TABLE)
 
 
-def _delete_role(iam) -> None:
-    for name in iam.list_role_policies(RoleName=settings.ACTION_ROLE)["PolicyNames"]:
-        iam.delete_role_policy(RoleName=settings.ACTION_ROLE, PolicyName=name)
-    for policy in iam.list_attached_role_policies(RoleName=settings.ACTION_ROLE)["AttachedPolicies"]:
-        iam.detach_role_policy(RoleName=settings.ACTION_ROLE, PolicyArn=policy["PolicyArn"])
-    iam.delete_role(RoleName=settings.ACTION_ROLE)
+def _delete_role(iam, role: str) -> None:
+    for name in iam.list_role_policies(RoleName=role)["PolicyNames"]:
+        iam.delete_role_policy(RoleName=role, PolicyName=name)
+    for policy in iam.list_attached_role_policies(RoleName=role)["AttachedPolicies"]:
+        iam.detach_role_policy(RoleName=role, PolicyArn=policy["PolicyArn"])
+    iam.delete_role(RoleName=role)
 
 
 def _log_group_steps(logs) -> list[Step]:

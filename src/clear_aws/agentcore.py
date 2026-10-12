@@ -46,7 +46,8 @@ def project(model_id: str, policy: dict | None = None, with_runtime: bool = True
     """agentcore.json for agents on the Bedrock model model_id. Without the runtime (with_runtime
     False) for an account without AgentCore Runtime quota: the agents then run where the UI runs.
 
-    policy, if given, holds gateway_arn and runtime_role_arn of the deployed project and the mode,
+    policy, if given, holds the deployed gateway_arn, the agents_role_arn the Evidence and Impact agents
+    sign with (the runtime's role, or the agents role without the runtime), and the mode,
     LOG_ONLY or ENFORCE, in which the gateway applies the Cedar policies.
     """
     spec = {
@@ -59,7 +60,7 @@ def project(model_id: str, policy: dict | None = None, with_runtime: bool = True
         "agentCoreGateways": [gateway(policy["mode"] if policy else None)],
     }
     if policy:
-        spec["policyEngines"] = [cedar.engine(policy["gateway_arn"], policy["runtime_role_arn"])]
+        spec["policyEngines"] = [cedar.engine(policy["gateway_arn"], policy["agents_role_arn"])]
     return spec
 
 

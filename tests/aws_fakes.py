@@ -149,7 +149,7 @@ class FakeDeployment:
                                                                 for _ in range(3))
         reset_table(SEED_DIR, self.ui_store)
         monkeypatch.setattr(lambda_tools, "_store", self.lambda_store)
-        monkeypatch.setattr(gateway, "action_credentials", lambda role: f"credentials of {role}")
+        monkeypatch.setattr(gateway, "role_credentials", lambda role, session: f"credentials of {role}")
         self.gateway_clients: list[FakeGatewayClient] = []
         self.runtime_client = FakeRuntimeClient(self)
 

@@ -4,8 +4,9 @@ Company rules enforced outside the agents, so no prompt can talk an agent
 past them. The gateway denies every tool call that no policy permits, and a
 forbid always wins over a permit:
 
-- The runtime's own role, which the Evidence and Impact agents sign with,
-  may call the read and assessment tools.
+- The role the Evidence and Impact agents sign with (the runtime's own role,
+  or the agents role when they run outside the runtime) may call the read
+  and assessment tools.
 - The Action agent's role may call validate_action, the STO write, and
   get_inventory to verify stock.
 - create_stock_transport_order is forbidden unless the caller is the Action
@@ -13,9 +14,9 @@ forbid always wins over a permit:
   whatever other policies are added later.
 
 clear_tools.sto still checks the approval record itself; the policy is the
-outer layer. Naming specific tools requires the gateway's ARN, and the
-AgentCore CLI creates the runtime's role, so the policies are built from the
-CLI's state after a first deploy without them (docs/deployment.md).
+outer layer. Naming specific tools requires the gateway's ARN, so the
+policies are built from the CLI's state after a first deploy without them
+(docs/deployment.md).
 """
 
 from clear_aws import settings
@@ -28,8 +29,8 @@ WRITE_TOOL = "create_stock_transport_order"
 APPROVAL_PATTERN = "APR-*"  # IDs from clear_tools.records.
 
 
-def engine(gateway_arn: str, runtime_role_arn: str) -> dict:
-    """The policy engine entry of agentcore.json, for the deployed gateway and runtime role."""
+def engine(gateway_arn: str, agents_role_arn: str) -> dict:
+    """The policy engine entry of agentcore.json, for the deployed gateway and the agents' role."""
     action_role = f"arn:aws:sts::{account(gateway_arn)}:assumed-role/{settings.ACTION_ROLE}"
     return {
         "name": ENGINE,
@@ -38,7 +39,7 @@ def engine(gateway_arn: str, runtime_role_arn: str) -> dict:
         "policies": [
             {"name": "agents_read_and_assess",
              "description": "Evidence and Impact agents: read and assessment tools",
-             "statement": _permit(assumed_role(runtime_role_arn), AGENT_TOOLS, gateway_arn)},
+             "statement": _permit(assumed_role(agents_role_arn), AGENT_TOOLS, gateway_arn)},
             {"name": "action_agent_tools",
              "description": "Action agent: validation, the STO write, and stock verification",
              "statement": _permit(action_role, ACTION_TOOLS, gateway_arn)},

@@ -9,7 +9,9 @@ local run.
 
 The Action agent, the only one with the write tool, signs its calls with its
 own IAM role, so the gateway's Cedar policy can tell its calls apart from
-the other agents' (docs/PLAN.md §6a).
+the other agents' (docs/PLAN.md §6a). The other agents sign with the
+runtime's role, or, when they run outside the runtime, with the agents role,
+so no developer's own identity needs access to the tools.
 """
 
 import builtins
@@ -33,14 +35,17 @@ class GatewayError(RuntimeError):
 
 
 class Gateway:
-    """MCP sessions with the gateway: one signed with the runtime's role, one with the Action agent's.
+    """MCP sessions with the gateway: one for the Evidence and Impact agents, signed with the runtime's
+    role or the agents role, and one signed with the Action agent's role.
 
     Used as a context manager around one run; it gives role -> Invoke, as clear_agents.runner expects.
     """
 
-    def __init__(self, url: str, action_role: str | None = None, connect: Callable | None = None):
+    def __init__(self, url: str, action_role: str | None = None, connect: Callable | None = None,
+                 agents_role: str | None = None):
         self.url = url
         self.action_role = action_role
+        self.agents_role = agents_role
         self._connect = connect or self._mcp_client  # Credentials, None for the runtime's own -> MCP client.
         self._clients: dict[str, object] = {}
 
@@ -49,12 +54,14 @@ class Gateway:
         url = os.environ.get(settings.GATEWAY_URL_SETTING)
         if not url:
             raise LookupError(f"{settings.GATEWAY_URL_SETTING} is not set; the AgentCore CLI sets it on the runtime")
-        return cls(url, os.environ.get(settings.ACTION_ROLE_SETTING) or None)
+        return cls(url, os.environ.get(settings.ACTION_ROLE_SETTING) or None,
+                   agents_role=os.environ.get(settings.AGENTS_ROLE_SETTING) or None)
 
     def __enter__(self) -> Callable[[str], Invoke]:
         try:
-            self._clients["agents"] = self._start(None)
-            self._clients["action"] = (self._start(action_credentials(self.action_role))
+            self._clients["agents"] = self._start(role_credentials(self.agents_role, "clear-agents")
+                                                  if self.agents_role else None)
+            self._clients["action"] = (self._start(role_credentials(self.action_role, "clear-action-agent"))
                                        if self.action_role else self._clients["agents"])
         except BaseException:
             self.__exit__(None, None, None)
@@ -81,11 +88,11 @@ class Gateway:
             timeout=TIMEOUT))
 
 
-def action_credentials(role: str) -> Credentials:
-    """Temporary credentials of the Action agent's IAM role, given its name or ARN."""
+def role_credentials(role: str, session: str) -> Credentials:
+    """Temporary credentials of an IAM role, given its name or ARN."""
     sts = boto3.client("sts", region_name=settings.region())
     arn = role if role.startswith("arn:") else f"arn:aws:iam::{sts.get_caller_identity()['Account']}:role/{role}"
-    issued = sts.assume_role(RoleArn=arn, RoleSessionName="clear-action-agent")["Credentials"]
+    issued = sts.assume_role(RoleArn=arn, RoleSessionName=session)["Credentials"]
     return Credentials(issued["AccessKeyId"], issued["SecretAccessKey"], issued["SessionToken"])
 
 

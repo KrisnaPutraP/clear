@@ -17,8 +17,14 @@ SAP_VALUE = json.dumps({name: SAP_KEY[name] for name in settings.SAP_SETTINGS})
 TAGS = [{"Key": "Project", "Value": "ID-Hackathon-2026"}, {"Key": "Team", "Value": "Cookusan"},
         {"Key": "DeleteAfter", "Value": "2026-10-31"}]
 NOW = datetime(2026, 10, 11, tzinfo=timezone.utc)
-ROLE = {"Path": "/", "RoleName": settings.ACTION_ROLE, "RoleId": "AROAEXAMPLE0000000000", "CreateDate": NOW,
-        "Arn": f"arn:aws:iam::{ACCOUNT}:role/{settings.ACTION_ROLE}"}
+ROLES = (settings.ACTION_ROLE, settings.AGENTS_ROLE)
+
+
+def role(name: str) -> dict:
+    return {"Path": "/", "RoleName": name, "RoleId": "AROAEXAMPLE0000000000", "CreateDate": NOW,
+            "Arn": f"arn:aws:iam::{ACCOUNT}:role/{name}"}
+
+
 PROJECT_STACK = f"{settings.STACK_PREFIX}default"
 
 
@@ -65,16 +71,17 @@ def stack(name: str, status: str = "CREATE_COMPLETE", outputs: list | None = Non
     return {"StackName": name, "CreationTime": NOW, "StackStatus": status, "Outputs": outputs or []}
 
 
-def expect_lookups(aws, table=False, role=False, parameter: bool | None = False) -> None:
+def expect_lookups(aws, table=False, roles=False, parameter: bool | None = False) -> None:
     """Stub the read-only lookups; parameter=None when the SSM parameter is not looked up."""
     if table:
         aws.expect("dynamodb", "describe_table", {"TableName": settings.TABLE}, {"Table": {"TableStatus": "ACTIVE"}})
     else:
         aws.refuse("dynamodb", "describe_table", {"TableName": settings.TABLE}, "ResourceNotFoundException")
-    if role:
-        aws.expect("iam", "get_role", {"RoleName": settings.ACTION_ROLE}, {"Role": ROLE})
-    else:
-        aws.refuse("iam", "get_role", {"RoleName": settings.ACTION_ROLE}, "NoSuchEntity")
+    for name in ROLES:
+        if roles:
+            aws.expect("iam", "get_role", {"RoleName": name}, {"Role": role(name)})
+        else:
+            aws.refuse("iam", "get_role", {"RoleName": name}, "NoSuchEntity")
     if parameter:
         aws.expect("ssm", "get_parameter", {"Name": settings.SAP_PARAMETER},
                    {"Parameter": {"Name": settings.SAP_PARAMETER, "Type": "SecureString"}})
@@ -88,38 +95,41 @@ def test_setup_creates_what_is_missing_with_the_tags(aws):
     files = sum(1 for path in SEED_DIR.rglob("*") if path.is_file())
 
     assert all(step.apply for step in steps)
-    assert f"Load the {files} files" in steps[3].description
+    assert f"Load the {files} files" in steps[4].description
 
     aws.expect("dynamodb", "create_table", {
         "TableName": settings.TABLE, "AttributeDefinitions": [{"AttributeName": "name", "AttributeType": "S"}],
         "KeySchema": [{"AttributeName": "name", "KeyType": "HASH"}], "BillingMode": "PAY_PER_REQUEST", "Tags": TAGS})
     aws.expect("dynamodb", "describe_table", {"TableName": settings.TABLE}, {"Table": {"TableStatus": "ACTIVE"}})
-    aws.expect("iam", "create_role", {"RoleName": settings.ACTION_ROLE, "AssumeRolePolicyDocument": ANY,
-                                      "Description": ANY, "Tags": TAGS}, {"Role": ROLE})
-    aws.expect("iam", "put_role_policy", {"RoleName": settings.ACTION_ROLE, "PolicyName": "invoke-gateway",
-                                          "PolicyDocument": ANY})
+    for name in ROLES:
+        aws.expect("iam", "create_role", {"RoleName": name, "AssumeRolePolicyDocument": ANY,
+                                          "Description": ANY, "Tags": TAGS}, {"Role": role(name)})
+        aws.expect("iam", "put_role_policy", {"RoleName": name, "PolicyName": "invoke-gateway",
+                                              "PolicyDocument": ANY})
     aws.expect("ssm", "put_parameter", {"Name": settings.SAP_PARAMETER, "Value": SAP_VALUE, "Type": "SecureString",
                                         "Description": ANY, "Tags": TAGS}, {"Version": 1})
-    for step in steps[:3]:  # Loading the seed is reset_table, tested with the DynamoDB store.
+    for step in steps[:4]:  # Loading the seed is reset_table, tested with the DynamoDB store.
         step.apply()
 
 
 def test_setup_with_everything_in_place_refreshes_the_role_and_the_key(aws):
-    expect_lookups(aws, table=True, role=True, parameter=True)
-    table, role, parameter, _ = provision.setup_steps(aws, ACCOUNT, SAP_KEY, SEED_DIR)
+    expect_lookups(aws, table=True, roles=True, parameter=True)
+    table, action_role, agents_role, parameter, _ = provision.setup_steps(aws, ACCOUNT, SAP_KEY, SEED_DIR)
 
     assert table.apply is None
-    aws.expect("iam", "put_role_policy", {"RoleName": settings.ACTION_ROLE, "PolicyName": "invoke-gateway",
-                                          "PolicyDocument": ANY})
+    for name in ROLES:
+        aws.expect("iam", "put_role_policy", {"RoleName": name, "PolicyName": "invoke-gateway",
+                                              "PolicyDocument": ANY})
     aws.expect("ssm", "put_parameter", {"Name": settings.SAP_PARAMETER, "Value": SAP_VALUE, "Type": "SecureString",
                                         "Overwrite": True}, {"Version": 2})
-    role.apply()
+    action_role.apply()
+    agents_role.apply()
     parameter.apply()
 
 
 def test_setup_without_the_sap_key_leaves_predictions_on_the_baseline(aws):
-    expect_lookups(aws, table=True, role=True, parameter=None)
-    parameter = provision.setup_steps(aws, ACCOUNT, {}, SEED_DIR)[2]
+    expect_lookups(aws, table=True, roles=True, parameter=None)
+    parameter = provision.setup_steps(aws, ACCOUNT, {}, SEED_DIR)[3]
 
     assert parameter.apply is None
     assert "baseline" in parameter.description
@@ -127,15 +137,15 @@ def test_setup_without_the_sap_key_leaves_predictions_on_the_baseline(aws):
 
 def test_the_action_role_trusts_its_own_account_and_may_only_invoke_gateways(aws):
     expect_lookups(aws)
-    role = provision.setup_steps(aws, ACCOUNT, SAP_KEY, SEED_DIR)[1]
+    action_role = provision.setup_steps(aws, ACCOUNT, SAP_KEY, SEED_DIR)[1]
     sent = {}
     aws("iam").meta.events.register("before-parameter-build.iam.*",
                                     lambda params, model, **kwargs: sent.setdefault(model.name, dict(params)))
     aws.expect("iam", "create_role", {"RoleName": settings.ACTION_ROLE, "AssumeRolePolicyDocument": ANY,
-                                      "Description": ANY, "Tags": TAGS}, {"Role": ROLE})
+                                      "Description": ANY, "Tags": TAGS}, {"Role": role(settings.ACTION_ROLE)})
     aws.expect("iam", "put_role_policy", {"RoleName": settings.ACTION_ROLE, "PolicyName": "invoke-gateway",
                                           "PolicyDocument": ANY})
-    role.apply()
+    action_role.apply()
 
     trust = json.loads(sent["CreateRole"]["AssumeRolePolicyDocument"])
     assert trust["Statement"] == [{"Effect": "Allow", "Principal": {"AWS": f"arn:aws:iam::{ACCOUNT}:root"},
@@ -147,7 +157,7 @@ def test_the_action_role_trusts_its_own_account_and_may_only_invoke_gateways(aws
 
 def test_cleanup_deletes_every_project_resource_in_order(aws):
     aws.expect("cloudformation", "describe_stacks", {}, {"Stacks": [stack(PROJECT_STACK), stack("SomeoneElse")]})
-    expect_lookups(aws, table=True, role=True, parameter=True)
+    expect_lookups(aws, table=True, roles=True, parameter=True)
     lambda_logs = f"/aws/lambda/{settings.PROJECT}-{settings.TARGET}"
     aws.expect("logs", "describe_log_groups", {"logGroupNamePrefix": provision.LOG_GROUP_PREFIXES[0]},
                {"logGroups": [{"logGroupName": lambda_logs}]})
@@ -155,17 +165,18 @@ def test_cleanup_deletes_every_project_resource_in_order(aws):
                {"logGroups": []})
     steps = provision.cleanup_steps(aws)
 
-    assert [s.description.split(" ")[1] for s in steps] == ["CloudFormation", "DynamoDB", "IAM", "SSM", "log"]
+    assert [s.description.split(" ")[1] for s in steps] == ["CloudFormation", "DynamoDB", "IAM", "IAM", "SSM", "log"]
 
     aws.expect("cloudformation", "delete_stack", {"StackName": PROJECT_STACK})
     aws.expect("cloudformation", "describe_stacks", {"StackName": PROJECT_STACK},
                {"Stacks": [stack(PROJECT_STACK, "DELETE_COMPLETE")]})
     aws.expect("dynamodb", "delete_table", {"TableName": settings.TABLE})
     aws.refuse("dynamodb", "describe_table", {"TableName": settings.TABLE}, "ResourceNotFoundException")
-    aws.expect("iam", "list_role_policies", {"RoleName": settings.ACTION_ROLE}, {"PolicyNames": ["invoke-gateway"]})
-    aws.expect("iam", "delete_role_policy", {"RoleName": settings.ACTION_ROLE, "PolicyName": "invoke-gateway"})
-    aws.expect("iam", "list_attached_role_policies", {"RoleName": settings.ACTION_ROLE}, {"AttachedPolicies": []})
-    aws.expect("iam", "delete_role", {"RoleName": settings.ACTION_ROLE})
+    for name in ROLES:
+        aws.expect("iam", "list_role_policies", {"RoleName": name}, {"PolicyNames": ["invoke-gateway"]})
+        aws.expect("iam", "delete_role_policy", {"RoleName": name, "PolicyName": "invoke-gateway"})
+        aws.expect("iam", "list_attached_role_policies", {"RoleName": name}, {"AttachedPolicies": []})
+        aws.expect("iam", "delete_role", {"RoleName": name})
     aws.expect("ssm", "delete_parameter", {"Name": settings.SAP_PARAMETER})
     aws.expect("logs", "delete_log_group", {"logGroupName": lambda_logs})
     for step in steps:

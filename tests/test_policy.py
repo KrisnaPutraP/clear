@@ -54,7 +54,7 @@ def test_names_fit_the_cli_rules():
 
 def test_policies_attach_only_when_asked():
     plain = agentcore.project("model-x")
-    attached = agentcore.project("model-x", {"gateway_arn": GATEWAY, "runtime_role_arn": RUNTIME_ROLE,
+    attached = agentcore.project("model-x", {"gateway_arn": GATEWAY, "agents_role_arn": RUNTIME_ROLE,
                                              "mode": "LOG_ONLY"})
 
     assert "policyEngines" not in plain
@@ -62,3 +62,10 @@ def test_policies_attach_only_when_asked():
     assert attached["agentCoreGateways"][0]["policyEngineConfiguration"] == {
         "policyEngineName": policy.ENGINE, "mode": "LOG_ONLY"}
     assert [e["name"] for e in attached["policyEngines"]] == [policy.ENGINE]
+
+
+def test_outside_the_runtime_the_agents_role_reads_and_assesses():
+    agents_role = f"arn:aws:iam::{ACCOUNT}:role/{settings.AGENTS_ROLE}"
+    [read, *_] = policy.engine(GATEWAY, agents_role)["policies"]
+
+    assert f'"arn:aws:sts::{ACCOUNT}:assumed-role/{settings.AGENTS_ROLE}"' in read["statement"]

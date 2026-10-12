@@ -122,9 +122,12 @@ aws logs delete-log-group --log-group-name /aws/lambda/cookusanhackathon-clear-t
 An account without AgentCore Runtime quota (see Prerequisites) can still run
 the tools on AWS. The agents run on the laptop, in the same code the runtime
 would run (`clear_aws.runtime`), and every tool call goes through AgentCore
-Gateway to the Lambda function and the DynamoDB table. The Action agent's
-calls are signed with the Action agent's role, which the laptop's identity
-assumes; the other agents' calls are signed with the laptop's identity.
+Gateway to the Lambda function and the DynamoDB table. The laptop's identity
+assumes two roles to sign the calls: the Action agent's role for the Action
+agent, and `cookusan-hackathon-agents` for the Evidence and Impact agents.
+The gateway's Cedar policies tell the agents apart by these roles, and the
+developer's own identity needs no access to the tools. `aws_setup.py --apply`
+creates both roles.
 
 ```
 python scripts/build_deploy.py --no-runtime   # gateway and Lambda function only
@@ -138,6 +141,8 @@ python scripts/run_scenario.py S1 --approve --gateway
 
 With `AGENTCORE_GATEWAY_TOOLS_URL` in `.env` and no `CLEAR_AGENT_RUNTIME_ARN`,
 the UI runs in this mode; the sidebar says "tools via AgentCore Gateway".
+Attach the Cedar policies as described below, with `--no-runtime` added to
+each `build_deploy.py --policy` command.
 
 ## Check and run
 
@@ -169,7 +174,7 @@ policy permits, and a `forbid` always wins over a `permit`:
 
 | Policy | Rule |
 |---|---|
-| `agents_read_and_assess` | The runtime's own role (Evidence and Impact agents) may call the read and assessment tools |
+| `agents_read_and_assess` | The role the Evidence and Impact agents sign with (the runtime's own role, or `cookusan-hackathon-agents` without the runtime) may call the read and assessment tools |
 | `action_agent_tools` | The Action agent's role may call `validate_action`, `create_stock_transport_order`, and `get_inventory` |
 | `sto_needs_action_agent_and_approval` | `create_stock_transport_order` is forbidden unless the caller is the Action agent's role and the call carries an approval ID (`APR-…`) |
 

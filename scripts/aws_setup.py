@@ -40,7 +40,8 @@ def main() -> None:
     elif state.get("gateway_url"):
         print("\nTo run the agents here with their tools behind the gateway, add to .env:\n"
               f"{settings.GATEWAY_URL_SETTING}={state['gateway_url']}\n"
-              f"{settings.ACTION_ROLE_SETTING}={settings.ACTION_ROLE}")
+              f"{settings.ACTION_ROLE_SETTING}={settings.ACTION_ROLE}\n"
+              f"{settings.AGENTS_ROLE_SETTING}={settings.AGENTS_ROLE}")
 
 
 if __name__ == "__main__":

@@ -15,7 +15,7 @@ class Recorder:
 
     def __init__(self, monkeypatch):
         self.clients: list[FakeGatewayClient] = []
-        monkeypatch.setattr(gateway, "action_credentials", lambda role: f"credentials of {role}")
+        monkeypatch.setattr(gateway, "role_credentials", lambda role, session: f"credentials of {role}")
 
     def __call__(self, credentials):
         client = FakeGatewayClient(credentials)
@@ -34,6 +34,16 @@ def test_the_action_agent_calls_with_its_own_role(monkeypatch):
     assert all(client.started and client.stopped for client in connect.clients)
 
 
+def test_outside_the_runtime_the_other_agents_call_with_the_agents_role(monkeypatch):
+    connect = Recorder(monkeypatch)
+    with Gateway("https://gateway.example", settings.ACTION_ROLE, connect, agents_role=settings.AGENTS_ROLE):
+        pass
+    agents, action = connect.clients
+
+    assert agents.credentials == f"credentials of {settings.AGENTS_ROLE}"
+    assert action.credentials == f"credentials of {settings.ACTION_ROLE}"
+
+
 def test_without_an_action_role_all_agents_share_one_session(monkeypatch):
     connect = Recorder(monkeypatch)
     with Gateway("https://gateway.example", None, connect):
@@ -46,10 +56,10 @@ def test_without_an_action_role_all_agents_share_one_session(monkeypatch):
 def test_a_failed_connection_closes_what_was_opened(monkeypatch):
     connect = Recorder(monkeypatch)
 
-    def fail(role):
+    def fail(role, session):
         raise PermissionError("not authorized to perform sts:AssumeRole")
 
-    monkeypatch.setattr(gateway, "action_credentials", fail)
+    monkeypatch.setattr(gateway, "role_credentials", fail)
 
     with pytest.raises(PermissionError):
         with Gateway("https://gateway.example", settings.ACTION_ROLE, connect):
@@ -103,4 +113,7 @@ def test_the_runtime_needs_the_gateway_url_the_cli_sets(monkeypatch):
 
     monkeypatch.setenv(settings.GATEWAY_URL_SETTING, "https://gateway.example")
     monkeypatch.setenv(settings.ACTION_ROLE_SETTING, settings.ACTION_ROLE)
-    assert (Gateway.from_env().url, Gateway.from_env().action_role) == ("https://gateway.example", settings.ACTION_ROLE)
+    monkeypatch.setenv(settings.AGENTS_ROLE_SETTING, settings.AGENTS_ROLE)
+    found = Gateway.from_env()
+    assert (found.url, found.action_role, found.agents_role) == ("https://gateway.example", settings.ACTION_ROLE,
+                                                                 settings.AGENTS_ROLE)

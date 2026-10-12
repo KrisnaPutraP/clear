@@ -7,13 +7,15 @@ target with your account (read with STS) and us-west-2. Nothing is created
 in AWS until you run `agentcore deploy` in that directory.
 
 With --policy, agentcore.json also attaches the Cedar policies to the gateway
-(docs/PLAN.md §6a). They name the deployed gateway and the runtime's role, so
-deploy once without --policy first.
+(docs/PLAN.md §6a). They name the deployed gateway and the role the agents
+sign with (the runtime's, or with --no-runtime the agents role), so deploy
+once without --policy first.
 
 Usage:
     python scripts/build_deploy.py
     python scripts/build_deploy.py --policy log-only    # decisions logged, not applied
     python scripts/build_deploy.py --policy enforce
+    python scripts/build_deploy.py --no-runtime --policy log-only   # agents outside the runtime
 """
 
 import argparse
@@ -25,6 +27,7 @@ import boto3
 
 from clear_app import settings as app_settings
 from clear_aws import agentcore, provision, settings
+from clear_aws.policy import account
 
 PROJECT_DIR = app_settings.REPO_ROOT / "deploy" / settings.PROJECT
 MODES = {"log-only": "LOG_ONLY", "enforce": "ENFORCE"}
@@ -47,10 +50,17 @@ def main() -> None:
     policy = None
     if args.policy:
         state = provision.deployed(PROJECT_DIR)
-        if not {"gateway_arn", "runtime_role_arn"} <= state.keys():
-            sys.exit("The policies name the deployed gateway and the runtime's role: "
-                     "run agentcore deploy once without --policy first.")
-        policy = {**state, "mode": MODES[args.policy]}
+        if "gateway_arn" not in state:
+            sys.exit("The policies name the deployed gateway: run agentcore deploy once without --policy first.")
+        if args.no_runtime:
+            agents_role_arn = f"arn:aws:iam::{account(state['gateway_arn'])}:role/{settings.AGENTS_ROLE}"
+        elif "runtime_role_arn" in state:
+            agents_role_arn = state["runtime_role_arn"]
+        else:
+            sys.exit("The policies name the runtime's role: deploy the runtime once without --policy first, "
+                     "or add --no-runtime.")
+        policy = {"gateway_arn": state["gateway_arn"], "agents_role_arn": agents_role_arn,
+                  "mode": MODES[args.policy]}
 
     agentcore.build(PROJECT_DIR, model_id, app_settings.REPO_ROOT, policy, with_runtime=not args.no_runtime)
     targets_path = PROJECT_DIR / "agentcore" / "aws-targets.json"
