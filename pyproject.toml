@@ -17,6 +17,8 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8"]
+# Agents on this machine with their tools behind AgentCore Gateway (docs/deployment.md); pinned as in deploy/runtime.
+aws = ["mcp-proxy-for-aws==1.7.0"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

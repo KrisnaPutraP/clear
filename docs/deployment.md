@@ -130,6 +130,7 @@ developer's own identity needs no access to the tools. `aws_setup.py --apply`
 creates both roles.
 
 ```
+pip install -e ".[aws]"                       # the gateway client the agents need here
 python scripts/build_deploy.py --no-runtime   # gateway and Lambda function only
 cd deploy/cookusanhackathon
 agentcore validate
