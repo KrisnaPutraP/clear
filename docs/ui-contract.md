@@ -1,9 +1,11 @@
 # CLEAR UI contract
 
 A front end for CLEAR needs four operations plus two lists (prepared events
-and cases). Today they are methods of `clear_app.contract.Clear` (Python,
-used by the Streamlit app in `app/streamlit_app.py`). A custom front end gets
-the same calls over HTTP; the routes below are the proposed mapping.
+and cases). They are methods of `clear_app.contract.Clear` (Python,
+used by the Streamlit app in `app/streamlit_app.py`) and HTTP routes in
+`clear_app.api`. The Next.js workspace in `frontend/` uses these routes
+through its `/api/clear/*` proxy. See [web-development.md](web-development.md)
+for startup, configuration, and the single-worker constraint.
 
 [`examples/case_s1.json`](examples/case_s1.json) holds the exact output of
 every call during scenario S1: the exception, the planner's approval, and the
@@ -12,7 +14,7 @@ wording in it is illustrative; the shapes are exact.
 
 ## Calls
 
-| Call | Python | Proposed HTTP | Returns |
+| Call | Python | HTTP | Returns |
 |---|---|---|---|
 | List prepared events | `list_events()` | `GET /events` | `[{event_id, scenario, type, shipment_id, description}]` |
 | List cases | `list_cases()` | `GET /cases` | `[{case_id, shipment_id, status}]`, newest first |
@@ -24,6 +26,23 @@ wording in it is illustrative; the shapes are exact.
 `decision` is `approved` or `rejected`; a rejection needs a `reason`. Only
 one agent run happens at a time: while `get_case(...)["running"]` is true,
 `send_event` and `submit_decision` fail with "An agent run is in progress".
+
+Event and decision POSTs return HTTP `202` without waiting for the agents.
+The event response is `{"case_id": "CASE-..."}`; the decision response is
+the approval record. A rejection records its decision synchronously and
+starts no agent run. Approval requests must target an action that is
+awaiting approval on the current case plan. A stale or unrelated validation
+is rejected before an approval record is written.
+
+Unknown IDs return `404`, conflicting runs or decisions return `409`, and
+invalid request bodies or negative log cursors return `422`. Decision
+bodies contain `validation_id`, `approver`, `decision`, and optional
+`reason`; a rejection requires a nonblank reason.
+
+`GET /health` additionally reports the configured mode/model/prediction,
+synthetic-data indicator, process status, and global `running` flag. It
+does not test upstream SAP or AWS availability. Interactive API documentation
+is available at `/docs`.
 
 ## Live timeline
 

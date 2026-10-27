@@ -1,5 +1,9 @@
 # Setting up CLEAR
 
+For the Next.js frontend and FastAPI backend, follow
+[web-development.md](web-development.md). This page covers the existing
+Streamlit workflow and the shared live-model/AWS credentials.
+
 From a fresh clone to the full demo. Each level adds one kind of access, and
 each one works without the next:
 

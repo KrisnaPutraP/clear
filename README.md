@@ -56,12 +56,20 @@ pytest
 To run the agents live (SAP AI Core) and the tools on AWS, follow
 [docs/setup.md](docs/setup.md).
 
+For the **Next.js + FastAPI workspace**, install `.[api,dev]`, start
+`python -m uvicorn clear_app.api:create_app --factory --host 127.0.0.1 --port 8000`
+from an activated environment, then run `npm ci` and `npm run dev` in
+`frontend/`. Set `CLEAR_UI_SCRIPTED=1` in the API process for a development
+demo without credentials. Full instructions: [docs/web-development.md](docs/web-development.md).
+
 ## Commands
 
 | Command | What it does |
 |---|---|
 | `pytest` | All tests; the live ones run only with `CLEAR_LIVE_TESTS=1` |
 | `streamlit run app/streamlit_app.py` | The demo UI; `CLEAR_UI_SCRIPTED=1` in `.env` for a scripted model |
+| `python -m uvicorn clear_app.api:create_app --factory --host 127.0.0.1 --port 8000` | FastAPI adapter, one worker per store; API docs at `/docs` |
+| `npm run dev` (in `frontend/`) | Next.js workspace at `http://127.0.0.1:3000` |
 | `python scripts/run_scenario.py S2` | The short scenario, live, printing the case timeline |
 | `python scripts/run_scenario.py S1 --approve --eta-slip` | The hero scenario: exception, approval, ETA slip |
 | `... --gateway` | The same with the tools on AWS behind AgentCore Gateway |
@@ -75,9 +83,10 @@ To run the agents live (SAP AI Core) and the tools on AWS, follow
 | Path | Contents |
 |---|---|
 | `app/` | Streamlit demo UI |
+| `frontend/` | Next.js workspace, typed API client, and browser workflow test |
 | `src/clear_tools/` | The nine deterministic tools and the mock S/4HANA; standard library only |
 | `src/clear_agents/` | Strands agents, prompts, the recovery plan schema and checks, the SAP AI Core model |
-| `src/clear_app/` | The contract between the UI and the agents, settings |
+| `src/clear_app/` | UI contract, FastAPI adapter, backend initialization, and settings |
 | `src/clear_aws/` | AWS: DynamoDB store, Lambda handler, gateway client, Cedar policies, deployment config, setup |
 | `src/clear_eval/` | Evaluation: variants, oracle, scoring |
 | `src/clear_datagen/` | Generators of the synthetic seed data |
@@ -92,6 +101,7 @@ To run the agents live (SAP AI Core) and the tools on AWS, follow
 - [docs/architecture.md](docs/architecture.md): how CLEAR works, with diagrams
 - [docs/proposal-alignment.md](docs/proposal-alignment.md): how the demo implements the proposal, adaptations and their justification, and remaining scope
 - [docs/setup.md](docs/setup.md): from a fresh clone to the full demo
+- [docs/web-development.md](docs/web-development.md): Next.js and FastAPI setup, workflow, configuration, and checks
 - [docs/deployment.md](docs/deployment.md): what runs on AWS and how to deploy it
 - [docs/evaluation.md](docs/evaluation.md): the reliability batch and its results
 - [docs/ui-contract.md](docs/ui-contract.md): the interface between the UI and the agents

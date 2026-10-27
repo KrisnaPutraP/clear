@@ -1,5 +1,11 @@
 # CLEAR architecture
 
+The Next.js workspace in `frontend/` accesses the existing Python UI
+contract through the FastAPI adapter in `src/clear_app/api.py`. Its
+`/api/clear/*` proxy forwards requests to the API service. The agents and
+tools below are shared with the Streamlit workflow. See
+[web-development.md](web-development.md) for the two-service setup.
+
 CLEAR turns a cross-border shipment exception into a validated recovery
 plan. Its design rule: **the LLM proposes, code computes and validates, a
 human approves.**

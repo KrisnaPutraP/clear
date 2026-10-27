@@ -15,6 +15,10 @@ Assessment date: 27 October 2026. The assessment uses repository code and
 documentation, including the live-run status recorded on 12 October 2026.
 It is not a new live deployment check or a new evaluation run.
 
+The UI migration adds a Next.js workspace and a FastAPI adapter around the
+same Python contract. It preserves the workflow described below; see
+[web-development.md](web-development.md) for its implementation and setup.
+
 ## The idea that the demo must preserve
 
 The primary user is an import or supply-chain planner at a manufacturer
