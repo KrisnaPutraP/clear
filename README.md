@@ -90,6 +90,7 @@ To run the agents live (SAP AI Core) and the tools on AWS, follow
 ## Documentation
 
 - [docs/architecture.md](docs/architecture.md): how CLEAR works, with diagrams
+- [docs/proposal-alignment.md](docs/proposal-alignment.md): how the demo implements the proposal, adaptations and their justification, and remaining scope
 - [docs/setup.md](docs/setup.md): from a fresh clone to the full demo
 - [docs/deployment.md](docs/deployment.md): what runs on AWS and how to deploy it
 - [docs/evaluation.md](docs/evaluation.md): the reliability batch and its results
