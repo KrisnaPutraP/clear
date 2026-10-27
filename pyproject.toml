@@ -16,7 +16,9 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8"]
+# Match the deployment bundle: tests explicitly guard that version parity.
+dev = ["pytest>=8", "httpx>=0.27,<1", "strands-agents==1.59.0"]
+api = ["fastapi>=0.115,<1", "uvicorn>=0.30,<1"]
 # Agents on this machine with their tools behind AgentCore Gateway (docs/setup.md): the gateway client,
 # pinned as in deploy/runtime, and the CRT that lets boto3 use `aws login` credentials.
 aws = ["mcp-proxy-for-aws==1.7.0", "botocore[crt]"]

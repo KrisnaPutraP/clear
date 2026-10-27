@@ -103,7 +103,20 @@ class Clear:
     def submit_decision(self, case_id: str, validation_id: str, approver: str, decision: str,
                         reason: str | None = None, wait: bool = False) -> dict:
         """Approve or reject a validated STO. An approval starts the run that executes it."""
-        approval = self._prepare(lambda: runner.decide(self.store, case_id, validation_id, approver, decision, reason))
+        def decide():
+            # Bind a web client's decision to the current case and pending plan.
+            # Do this inside the same lock as the write, so two requests cannot
+            # both approve a stale plan or approve another case's validation.
+            case = caselog.get_case(self.store, case_id)
+            pending = (case.get("plan") or {}).get("actions", [])
+            if case["status"] != "awaiting_approval" or not any(
+                action["validation_id"] == validation_id and action["status"] == "awaiting_approval"
+                for action in pending
+            ):
+                raise PermissionError("This validation is not awaiting approval on the current case plan.")
+            return runner.decide(self.store, case_id, validation_id, approver, decision, reason)
+
+        approval = self._prepare(decide)
         if decision == "approved":
             self._start(lambda: self.agents.work_approval(case_id, approval), wait)
         else:
