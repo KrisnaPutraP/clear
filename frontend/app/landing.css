@@ -265,10 +265,8 @@
   letter-spacing: 0.12em;
 }
 
-/* Above the horizon the title is the night's ink; below it the same letters
-   sink into the sea. The horizon cuts the second line through its upper
-   third: 1.15em down a 1.72em block. The letters are filled with two flat
-   colours split at that line. */
+/* The title stands across the horizon, its second line cut by the seam
+   through its upper third: 1.15em down a 1.72em block. */
 .hero-title {
   position: absolute;
   left: var(--margin);
@@ -280,11 +278,7 @@
   letter-spacing: -0.035em;
   font-stretch: var(--wide);
   text-transform: uppercase;
-  color: transparent;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 172' preserveAspectRatio='none'%3E%3Crect width='1' height='115' fill='%23eef1f6'/%3E%3Crect y='115' width='1' height='57' fill='%238fa9dc'/%3E%3C/svg%3E");
-  background-size: 100% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
+  color: var(--night-ink);
 }
 
 .hero-line {
