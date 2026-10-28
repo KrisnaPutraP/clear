@@ -96,7 +96,7 @@ test("planner can investigate, approve, reassess, and review a covered case", as
           (element: HTMLImageElement) =>
             element.complete &&
             element.naturalWidth > 0 &&
-            element.currentSrc.endsWith(".svg"),
+            element.currentSrc.endsWith(".webp"),
         ),
     )
     .toBeTruthy();
