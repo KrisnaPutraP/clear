@@ -1001,7 +1001,7 @@ function CaseProgress({
   ];
   return (
     <section
-      className={`case-progress case-in ${item.status}`}
+      className={`case-progress case-in ${item.status} ${active ? "running" : ""}`}
       aria-label="Case progress"
     >
       <div className="case-next-step" role="status" aria-atomic="true">
@@ -1072,6 +1072,9 @@ function CaseProgress({
           >
             <span className="step-mark" aria-hidden="true" />
             <button onClick={() => onNavigate(destinations[i])}>{step}</button>
+            {i < steps.length - 1 && (
+              <span className="step-line" aria-hidden="true" />
+            )}
           </li>
         ))}
       </ol>
