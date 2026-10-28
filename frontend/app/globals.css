@@ -892,10 +892,11 @@ main {
 
 /* The harbour scene ----------------------------------------------------------- */
 
+/* Borderless: the scene bleeds to the column's edges, its sky is the page
+   ground, and the shore fades into the ground below. */
 .scene {
-  border-radius: var(--radius);
+  margin-inline: -32px;
   overflow: hidden;
-  background: #10141c;
   color: #f1f2f4;
 }
 
@@ -904,8 +905,8 @@ main {
   width: 100%;
   aspect-ratio: 1200 / 430;
   min-height: 300px;
-  background: #1b2640;
   isolation: isolate;
+  mask-image: linear-gradient(to bottom, #000 88%, transparent);
 }
 
 .harbour {
@@ -918,8 +919,8 @@ main {
 
 .scene-copy {
   position: relative;
-  max-width: 560px;
-  padding: 28px 32px 0;
+  max-width: 600px;
+  padding: 20px 32px 0;
 }
 
 .scene-copy h2 {
@@ -953,7 +954,7 @@ main {
   flex-wrap: wrap;
   gap: 10px 36px;
   margin: 0;
-  padding: 14px 32px 16px;
+  padding: 2px 32px 4px;
 }
 
 .case-voyage div {
@@ -2938,8 +2939,12 @@ footer {
     min-height: 240px;
   }
 
+  .scene {
+    margin-inline: -16px;
+  }
+
   .scene-copy {
-    padding: 20px 18px 0;
+    padding: 16px 16px 0;
   }
 
   .scene-copy h2 {
@@ -2950,7 +2955,7 @@ footer {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px 16px;
-    padding: 12px 18px 14px;
+    padding: 0 16px 4px;
   }
 
   .case-voyage dd {

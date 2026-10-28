@@ -15,7 +15,8 @@ const GROUND = 268;
 const SEA = 236;
 
 const ink = {
-  sky: ["#1b2640", "#223050", "#2b3c61", "#36507a"],
+  // The top band is the page ground, so the sky has no edge.
+  sky: ["#121a2b", "#1b2742", "#253556", "#33496f"],
   glow: "#e9925a",
   distant: "#2a3a5c",
   sea: "#1a3152",
