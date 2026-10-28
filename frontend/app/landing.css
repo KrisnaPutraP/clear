@@ -130,6 +130,12 @@
   font-weight: 800;
   letter-spacing: 0.02em;
   text-decoration: none;
+  transition: letter-spacing 300ms var(--ease-out);
+}
+
+.landing-mark:hover,
+.landing-mark:focus-visible {
+  letter-spacing: 0.06em;
 }
 
 .landing-bar nav {

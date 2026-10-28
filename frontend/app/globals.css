@@ -302,6 +302,66 @@ main {
   filter: brightness(1.6) saturate(0.85);
 }
 
+/* The mark answers the pointer like a compass: on hover the needle swings
+   past north, back, and settles; a press sinks it a little. The name opens
+   its letters as it does. */
+.brand .clear-mark,
+.landing-mark svg {
+  transition: transform 160ms var(--ease-out);
+}
+
+.brand:hover .clear-mark,
+.brand:focus-visible .clear-mark,
+.landing-mark:hover svg,
+.landing-mark:focus-visible svg {
+  animation: compass-seek 1.1s var(--ease-out);
+}
+
+.brand:active .clear-mark,
+.landing-mark:active svg {
+  transform: scale(0.88);
+}
+
+.brand-name {
+  transition: letter-spacing 300ms var(--ease-out);
+}
+
+.brand:hover .brand-name,
+.brand:focus-visible .brand-name {
+  letter-spacing: 0.06em;
+}
+
+.brand:active .brand-name {
+  letter-spacing: 0.01em;
+}
+
+@keyframes compass-seek {
+  0% {
+    rotate: 0deg;
+  }
+  35% {
+    rotate: 210deg;
+  }
+  60% {
+    rotate: 330deg;
+  }
+  80% {
+    rotate: 372deg;
+  }
+  100% {
+    rotate: 360deg;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand:hover .clear-mark,
+  .brand:focus-visible .clear-mark,
+  .landing-mark:hover svg,
+  .landing-mark:focus-visible svg {
+    animation: none;
+  }
+}
+
 .brand-name {
   font-size: 26px;
   font-weight: 800;
