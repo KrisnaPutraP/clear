@@ -43,34 +43,23 @@ test("planner can investigate, approve, reassess, and review a covered case", as
     page.locator(".analysis-icon .clear-mark[data-active='true']"),
   ).toBeVisible();
   const compass = page.locator(".analysis-icon .clear-mark");
-  expect(
-    await compass
-      .locator(".compass-front")
-      .evaluate(
-        (element: HTMLImageElement) =>
-          element.complete &&
-          element.naturalWidth > 0 &&
-          element.currentSrc.endsWith(".svg"),
-      ),
-  ).toBeTruthy();
-  await expect(compass.locator(".compass-rotor")).toHaveCSS(
-    "transform-style",
-    "preserve-3d",
-  );
-  expect(
-    await compass
-      .locator(".compass-rotor")
-      .evaluate((element) => getComputedStyle(element).transform),
-  ).toMatch(/^matrix3d\(/);
-  await expect(page.locator(".clear-orbit")).toHaveCount(0);
-  await page.locator(".compass-rotor").evaluateAll((elements) => {
-    for (const element of elements) {
-      for (const animation of element.getAnimations()) {
-        animation.pause();
-        animation.currentTime = 540;
-      }
-    }
-  });
+  await expect
+    .poll(async () =>
+      compass
+        .locator(".compass-animated")
+        .evaluate(
+          (element: HTMLImageElement) =>
+            element.complete &&
+            element.naturalWidth > 0 &&
+            element.currentSrc.endsWith(".svg"),
+        ),
+    )
+    .toBeTruthy();
+  await expect(compass.locator(".compass-animated")).toBeVisible();
+  const movingFrame = await compass.screenshot();
+  await page.waitForTimeout(250);
+  expect(Buffer.compare(movingFrame, await compass.screenshot())).not.toBe(0);
+  await expect(page.locator(".clear-orbit, .compass-edge")).toHaveCount(0);
   await page.screenshot({
     path: "test-results/workspace-analyzing.png",
     fullPage: true,
@@ -89,16 +78,12 @@ test("planner can investigate, approve, reassess, and review a covered case", as
     fullPage: true,
   });
   await page.setViewportSize({ width: 1440, height: 1000 });
-  await page.locator(".compass-rotor").evaluateAll((elements) => {
-    for (const element of elements) {
-      for (const animation of element.getAnimations()) animation.play();
-    }
-  });
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await expect(compass.locator(".compass-rotor")).toHaveCSS(
-    "animation-name",
-    "none",
-  );
+  await expect(compass.locator(".compass-animated")).toBeHidden();
+  await expect(compass.locator(".compass-still")).toBeVisible();
+  const stillFrame = await compass.screenshot();
+  await page.waitForTimeout(250);
+  expect(Buffer.compare(stillFrame, await compass.screenshot())).toBe(0);
   await page.emulateMedia({ reducedMotion: "no-preference" });
   holdAnalysis = false;
   await expect(page.locator(".case-banner .status")).toHaveText(

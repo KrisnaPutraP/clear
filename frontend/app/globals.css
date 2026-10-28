@@ -2433,41 +2433,20 @@ td,
 }
 .clear-mark {
   display: inline-block;
+  position: relative;
   vertical-align: middle;
   flex-shrink: 0;
-  perspective: 360px;
-  --compass-depth: calc(var(--compass-size) * 0.016);
 }
-.compass-rotor {
+.clear-mark img {
   display: block;
-  position: relative;
-  width: 100%;
-  height: 100%;
-  transform-style: preserve-3d;
-}
-.compass-face {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  backface-visibility: hidden;
   user-select: none;
 }
-.clear-mark[data-active="true"] .compass-rotor {
-  animation: compass-turn 3.6s linear infinite;
-}
-.clear-mark[data-active="true"] .compass-front {
-  transform: translateZ(calc(var(--compass-depth) * 4));
-}
-.compass-back {
-  transform: rotateY(180deg) translateZ(calc(var(--compass-depth) * 4));
-}
-.compass-edge {
-  position: absolute;
-  inset: 4.6875%;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #83ad94, #174f38 50%, #0d3828);
-  transform: translateZ(calc(var(--compass-depth) * var(--slice)));
+.clear-mark[data-active="true"] .compass-still {
+  visibility: hidden;
 }
 .working-dots {
   display: inline-flex;
@@ -2486,14 +2465,6 @@ td,
 }
 .working-dots i:nth-child(3) {
   animation-delay: 300ms;
-}
-@keyframes compass-turn {
-  from {
-    transform: rotateX(-18deg) rotateY(0deg) rotateZ(-12deg);
-  }
-  to {
-    transform: rotateX(-18deg) rotateY(360deg) rotateZ(-12deg);
-  }
 }
 @keyframes skeleton-breathe {
   from {
@@ -2714,9 +2685,11 @@ td,
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .clear-mark[data-active="true"] .compass-rotor {
-    animation: none;
-    transform: rotateX(-18deg) rotateY(-20deg) rotateZ(-12deg);
+  .clear-mark .compass-animated {
+    display: none;
+  }
+  .clear-mark[data-active="true"] .compass-still {
+    visibility: visible;
   }
   .panel-content {
     transform: none;

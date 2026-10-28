@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  useEffect,
-  useRef,
-  useState,
-  type CSSProperties,
-  type ReactNode,
-} from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   Activity,
   ArrowRight,
@@ -135,43 +129,27 @@ function ClearMark({
     <span
       className="clear-mark"
       data-active={active}
-      style={
-        {
-          width: size,
-          height: size,
-          "--compass-size": `${size}px`,
-        } as CSSProperties
-      }
+      style={{ width: size, height: size }}
       aria-hidden="true"
     >
-      <span className="compass-rotor">
-        {active &&
-          [-3, -2, -1, 0, 1, 2, 3].map((slice) => (
-            <span
-              key={slice}
-              className="compass-edge"
-              style={{ "--slice": slice } as CSSProperties}
-            />
-          ))}
+      <img
+        className="compass-still"
+        src={active ? "/clear-compass-still.svg" : "/clear-compass.svg"}
+        width={size}
+        height={size}
+        alt=""
+        draggable={false}
+      />
+      {active && (
         <img
-          className="compass-face compass-front"
-          src="/clear-compass.svg"
-          width="256"
-          height="256"
+          className="compass-animated"
+          src="/clear-compass-loading.svg"
+          width={size}
+          height={size}
           alt=""
           draggable={false}
         />
-        {active && (
-          <img
-            className="compass-face compass-back"
-            src="/clear-compass.svg"
-            width="256"
-            height="256"
-            alt=""
-            draggable={false}
-          />
-        )}
-      </span>
+      )}
     </span>
   );
 }
@@ -987,7 +965,7 @@ function Overview({ item, onReview }: { item: Case; onReview: () => void }) {
       <div className="analysis-state">
         <span className="analysis-icon">
           {item.running ? (
-            <ClearMark active size={60} />
+            <ClearMark active size={84} />
           ) : (
             <TriangleAlert size={30} />
           )}
