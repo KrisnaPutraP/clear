@@ -19,6 +19,7 @@ from clear_tools.store import JsonStore
 
 
 _NO_ESCALATION = re.compile(r"\s*(?:none|null|n/?a)?\s*(?:$|[-–—:.,;(])", re.IGNORECASE)
+_POINT = re.compile(r"(?:^|(?<=\s))\(?(\d{1,2})[.)]\s+")
 
 
 class Evidence(BaseModel):
@@ -65,13 +66,39 @@ class RecoveryPlan(BaseModel):
                     "empty (null): do not write None or an explanation here. Orders deferred behind a feasible "
                     "transfer need no escalation. Contingencies and customs follow-up go in next_check.",
     )
-    next_check: str = Field(description="What to monitor next.")
+    next_check: str = Field(
+        description="What to monitor next. One check is one sentence. Several checks are a numbered list, one per "
+                    "line, written '1. ', '2. ' and so on, at most four, each one sentence of at most 30 words; a "
+                    "check may open with a short label and a colon. No other headings, bullets or markdown.",
+    )
+
+    @field_validator("next_check")
+    @classmethod
+    def _one_point_per_line(cls, value: str) -> str:
+        """Models number follow-ups as "1)", "(1)" or "1." and run them together; store them one per line as "1. "."""
+        return format_points(value)
 
     @field_validator("escalation")
     @classmethod
     def _no_escalation_as_text(cls, value: str | None) -> str | None:
         """A model sometimes writes "None - no escalation needed" instead of null; that is no escalation."""
         return None if value is None or _NO_ESCALATION.match(value) else value
+
+
+def format_points(text: str) -> str:
+    """Text whose numbered points count up from 1, rewritten one point per line as "1. ", "2. "; other text as is.
+
+    Only a run that starts the text and counts up is a list, so a figure such as "4.83" or a sentence that
+    ends in a number stays where it is.
+    """
+    marks = []
+    for match in _POINT.finditer(text):
+        if int(match.group(1)) == len(marks) + 1:
+            marks.append(match)
+    if len(marks) < 2 or text[: marks[0].start()].strip():
+        return text.strip()
+    ends = [mark.start() for mark in marks[1:]] + [len(text)]
+    return "\n".join(f"{i}. {text[mark.end():end].strip()}" for i, (mark, end) in enumerate(zip(marks, ends), 1))
 
 
 def check(store: JsonStore, plan: RecoveryPlan, shipment_id: str) -> list[str]:

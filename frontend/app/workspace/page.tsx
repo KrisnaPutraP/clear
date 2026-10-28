@@ -369,8 +369,8 @@ export default function Workspace() {
     action: Action,
     decision: "approved" | "rejected",
     reason: string,
-  ) {
-    if (!activeCase || mutationLock.current) return;
+  ): Promise<boolean> {
+    if (!activeCase || mutationLock.current) return false;
     mutationLock.current = true;
     setPending(true);
     setActionError("");
@@ -405,16 +405,34 @@ export default function Workspace() {
             : "Your reason has been recorded. This case now needs a planner's decision.",
       });
       setRefreshKey((k) => k + 1);
+      return true;
     } catch (cause) {
       setActionError(
         cause instanceof Error
           ? cause.message
           : "Could not record your decision.",
       );
+      return false;
     } finally {
       mutationLock.current = false;
       setPending(false);
     }
+  }
+
+  // A course that does not use the waiting transfer: the transfer is declined
+  // with the course as its reason, and the course is recorded on the case.
+  async function chooseOtherCourse(
+    action: Action,
+    option: string | null,
+    note: string,
+  ) {
+    const reason = [
+      option ? `Chose ${option}` : "Chose another course",
+      note.trim(),
+    ]
+      .filter(Boolean)
+      .join(": ");
+    if (await decide(action, "rejected", reason)) await resolveCase(option, note);
   }
 
   async function resolveCase(option: string | null, note: string) {
@@ -909,6 +927,7 @@ export default function Workspace() {
                               approver={approver}
                               error={actionError}
                               onDecision={decide}
+                              onOtherCourse={chooseOtherCourse}
                             />
                           ))
                         )}
@@ -1453,15 +1472,15 @@ function Typed({
   );
 }
 
-// An agent often writes its follow-up as one paragraph of numbered points,
-// "1. CUSTOMS HOLD (binding constraint): … 2. …". Split it on the numbers
+// The plan stores a follow-up one point per line as "1. ", "2. "; older plans
+// ran them together, numbered "1." or "1)". Split it on the numbers
 // only when they count up from 1, so a figure such as "4.83" or a sentence
 // ending in a number never breaks it, and lift an upper-case lead-in before
 // a colon out as the point's label.
 type FollowUpPoint = { label: string | null; text: string };
 function followUpPoints(text: string): FollowUpPoint[] | null {
   const marks: { at: number; end: number }[] = [];
-  for (const match of text.matchAll(/(^|\s)(\d{1,2})\.\s+/g)) {
+  for (const match of text.matchAll(/(^|\s)\(?(\d{1,2})[.)]\s+/g)) {
     if (Number(match[2]) !== marks.length + 1) continue;
     const at = match.index + match[1].length;
     marks.push({ at, end: match.index + match[0].length });
@@ -1951,6 +1970,7 @@ function Approval({
   approver,
   error,
   onDecision,
+  onOtherCourse,
 }: {
   action: Action;
   caseItem: Case;
@@ -1961,6 +1981,11 @@ function Approval({
     action: Action,
     decision: "approved" | "rejected",
     reason: string,
+  ) => Promise<boolean>;
+  onOtherCourse: (
+    action: Action,
+    option: string | null,
+    note: string,
   ) => Promise<void>;
 }) {
   const [reason, setReason] = useState("");
@@ -1969,18 +1994,27 @@ function Approval({
     action.status === "awaiting_approval" &&
     caseItem.status === "awaiting_approval" &&
     action.approval?.decision !== "rejected";
-  // The options this transfer serves: the planner picks one as they approve.
-  // They differ only in which orders go first, so the choice travels with the
-  // approval as its note and the transfer itself stays the validated one.
-  const courses = (caseItem.plan?.options || []).filter(
-    (option) => option.validation?.validation_id === action.validation_id,
-  );
+  // One decision, as for an escalation: every option of the plan, and a
+  // course of the planner's own. An option that uses this transfer approves
+  // it, with the option as the approval's note (options sharing a transfer
+  // differ only in which orders go first). Any other course declines the
+  // transfer and records that course on the case.
+  const OWN = "";
+  const courses = caseItem.plan?.options || [];
+  const usesTransfer = (name: string) =>
+    courses.some(
+      (option) =>
+        option.name === name &&
+        option.validation?.validation_id === action.validation_id,
+    );
   const [course, setCourse] = useState(
     courses.find((option) => option.name === caseItem.plan?.recommended_option)
       ?.name ??
-      courses[0]?.name ??
-      "",
+      courses.find((option) => usesTransfer(option.name))?.name ??
+      OWN,
   );
+  const own = course === OWN;
+  const approves = !own && usesTransfer(course) && valid.valid;
   const approvalNote = [course && `Course: ${course}`, reason.trim()]
     .filter(Boolean)
     .join(" · ");
@@ -2046,14 +2080,14 @@ function Approval({
             tone="warning"
             title="Approval creates a stock transport order"
           >
-            Approve to transfer {number(valid.quantity)} t from plant{" "}
-            {valid.source_plant} to plant {valid.destination_plant}. Your
+            A course that uses this transfer approves {number(valid.quantity)}{" "}
+            t from plant {valid.source_plant} to plant{" "}
+            {valid.destination_plant}. Any other course declines it. Your
             decision is recorded as {approver}.
           </Notice>
-          {courses.length > 0 && (
-            <fieldset className="resolve-options" disabled={disabled}>
-              <legend>Course to follow</legend>
-              {courses.map((option) => (
+          <fieldset className="resolve-options" disabled={disabled}>
+            <legend>Course to follow</legend>
+            {courses.map((option) => (
                 <label className="resolve-option" key={option.name}>
                   <input
                     type="radio"
@@ -2074,19 +2108,32 @@ function Approval({
                         ` · defers ${option.assessment.deferred_orders
                           .map((order) => order.order_id)
                           .join(", ")}`}
+                      {!usesTransfer(option.name) &&
+                        " · without this transfer"}
                       {option.name === caseItem.plan?.recommended_option &&
                         " · Recommended"}
                     </small>
                   </span>
                 </label>
               ))}
-            </fieldset>
-          )}
+            <label className="resolve-option">
+              <input
+                type="radio"
+                name={`course-${action.validation_id}`}
+                checked={own}
+                onChange={() => setCourse(OWN)}
+              />
+              <span>
+                <strong>Another course</strong>
+                <small>Describe it in the note, e.g. emergency sourcing</small>
+              </span>
+            </label>
+          </fieldset>
           <label
             className="reason-label"
             htmlFor={`reason-${action.validation_id}`}
           >
-            Decision note <span>Required for rejection</span>
+            Decision note <span>{own ? "Required" : "Optional"}</span>
           </label>
           <textarea
             id={`reason-${action.validation_id}`}
@@ -2115,21 +2162,20 @@ function Approval({
           <div className="approval-buttons">
             <p className="approval-signature">
               Signed as <strong>{approver}</strong>
-              {!reason.trim() && " · a note is needed only to reject"}
+              {approves
+                ? " · creates the stock transport order"
+                : " · declines this transfer; you carry the course out"}
             </p>
             <button
-              className="reject-button"
-              disabled={disabled || !reason.trim()}
-              onClick={() => void onDecision(action, "rejected", reason)}
-            >
-              Reject
-            </button>
-            <button
               className="approve-button"
-              disabled={disabled || !valid.valid}
-              onClick={() => void onDecision(action, "approved", approvalNote)}
+              disabled={disabled || (own && !reason.trim())}
+              onClick={() =>
+                void (approves
+                  ? onDecision(action, "approved", approvalNote)
+                  : onOtherCourse(action, own ? null : course, reason))
+              }
             >
-              Approve transfer
+              {approves ? "Approve transfer" : "Record decision"}
             </button>
           </div>
         </div>

@@ -216,8 +216,11 @@ test("planner can investigate, approve, reassess, and review a covered case", as
     page.getByText("Approval creates a stock transport order", { exact: true }),
   ).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "Reject", exact: true }),
-  ).toBeDisabled();
+    page.getByRole("radio", { name: /Another course/ }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Approve transfer", exact: true }),
+  ).toBeEnabled();
   await expect(page.getByText("Plant 1200", { exact: true })).toBeVisible();
   await page.screenshot({
     path: "test-results/workspace-approval.png",
