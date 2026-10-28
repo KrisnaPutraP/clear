@@ -1998,6 +1998,7 @@ function Approval({
           <strong>Plant {valid.destination_plant}</strong>
         </div>
       </div>
+      <ApprovalPlan action={action} caseItem={caseItem} />
       <p className="approval-rationale">{caseItem.plan?.recommendation}</p>
       <p className="panel-footnote">
         Quantity and route come from the validation record. Stock is rechecked
@@ -2218,6 +2219,50 @@ function ResolutionNote({ resolution }: { resolution: Resolution }) {
           logistics event reopens the assessment.
         </p>
       </div>
+    </div>
+  );
+}
+
+// One transfer can sit under several options: they share the validated
+// transfer and differ only in which orders are served while the shipment is
+// held. Only the transfer is an ERP write, so it is the one thing approved;
+// the order priority is the planner's to apply. This says which option the
+// transfer carries out and which other options lean on it too.
+function ApprovalPlan({ action, caseItem }: { action: Action; caseItem: Case }) {
+  const options = (caseItem.plan?.options || []).filter(
+    (option) => option.validation?.validation_id === action.validation_id,
+  );
+  if (!options.length) return null;
+  const chosen =
+    options.find((option) => option.name === caseItem.plan?.recommended_option) ||
+    options[0];
+  const others = options.filter((option) => option !== chosen);
+  const deferred = chosen.assessment.deferred_orders.map((order) => order.order_id);
+  return (
+    <div className="approval-plan">
+      <p>
+        <strong>Carries out: {chosen.name}</strong>
+        {chosen.name === caseItem.plan?.recommended_option && (
+          <span className="option-mark">Recommended</span>
+        )}
+      </p>
+      <p>
+        {number(chosen.assessment.coverage_days)} of{" "}
+        {number(chosen.assessment.required_coverage_days)} days covered
+        {deferred.length
+          ? `; ${deferred.join(", ")} wait until the shipment clears.`
+          : "; no order waits."}{" "}
+        Only the transfer is written to S/4HANA; which orders go first is yours
+        to apply.
+      </p>
+      {others.length > 0 && (
+        <p className="approval-plan-note">
+          {others.map((option) => option.name).join(" and ")}{" "}
+          {others.length > 1 ? "use" : "uses"} the same transfer and{" "}
+          {others.length > 1 ? "defer" : "defers"} more orders, so there is
+          nothing else to approve.
+        </p>
+      )}
     </div>
   );
 }

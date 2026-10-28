@@ -2338,6 +2338,28 @@ td span:not(.priority) {
   color: var(--ink-2);
 }
 
+.approval-plan {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 76ch;
+  padding: 14px 16px;
+  background: var(--surface-2);
+  border-radius: var(--radius);
+}
+
+.approval-plan p:first-child {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+}
+
+.approval-plan-note {
+  color: var(--ink-3);
+  font-size: 14px;
+}
+
 .decision-desk {
   display: flex;
   flex-direction: column;
