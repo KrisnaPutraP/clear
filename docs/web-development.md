@@ -168,11 +168,17 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-The browser test starts isolated services on ports 8100 and 3100 and uses a
-new runtime under `frontend/.test-runtime/`, without live credentials. It
-exercises event submission, document discrepancies, inventory, approval,
+The browser tests start isolated services on ports 8101 and 3101 and use a
+new runtime under `frontend/.test-runtime/`, without live credentials. Set
+`CLEAR_E2E_API_PORT` and `CLEAR_E2E_WEB_PORT` to override these ports. The
+frontend uses `.next-e2e/` so tests can run alongside the normal dev server.
+`CLEAR_NEXT_DIST_DIR` selects a separate Next.js build directory when needed.
+The workflow test exercises event submission, document discrepancies, inventory, approval,
 STO confirmation, ETA reassessment, and a covered case. It also checks the
-mobile viewport and records screenshots in `frontend/test-results/`.
+mobile viewport, branded loading, reduced-motion behavior, document source
+comparisons, and local approval errors. A second test checks interrupted
+connections, recovery, and keyboard tab navigation. Screenshots are recorded
+in `frontend/test-results/`.
 Those generated directories are ignored by Git.
 
 For a production frontend build, run `npm run build` and `npm start` in

@@ -124,6 +124,8 @@ def test_http_conflicting_events_do_not_start_a_second_writer(store):
 
 
 def test_scripted_bootstrap_ignores_cloud_configuration(tmp_path, monkeypatch):
+    # Keep the developer's local configuration out of this offline bootstrap test.
+    monkeypatch.setattr("clear_app.bootstrap.settings.load_env", lambda: None)
     monkeypatch.setenv("CLEAR_UI_SCRIPTED", "1")
     monkeypatch.setenv("CLEAR_RUNTIME_DIR", str(tmp_path / "demo"))
     monkeypatch.setenv("CLEAR_AGENT_RUNTIME_ARN", "do-not-use")

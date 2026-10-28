@@ -123,11 +123,23 @@ export type Case = CaseSummary & {
     documents: { document_type: string; text: string }[];
   };
   reconciliation: {
-    discrepancies: { field: string; mismatched_documents: string[] }[];
+    purchase_order: {
+      source: string;
+      purchase_order: string;
+      material: string;
+      quantity: number;
+    };
+    discrepancies: {
+      field: string;
+      purchase_order_value: string | number;
+      document_values: Record<string, string | number>;
+      mismatched_documents: string[];
+    }[];
     verified_extractions: {
       field: string;
       document_type: string;
       quote: string;
+      value: string | number;
     }[];
   } | null;
   inventory: { material: string; plants: PlantStock[] };

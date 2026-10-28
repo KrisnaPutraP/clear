@@ -21,6 +21,7 @@ dist/
 # Next.js frontend
 node_modules/
 .next/
+.next-*/
 out/
 *.tsbuildinfo
 /frontend/next-env.d.ts
