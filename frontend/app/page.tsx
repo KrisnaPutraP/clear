@@ -15,6 +15,7 @@ import type {
   Action,
   Assessment,
   Case,
+  Resolution,
   CaseStatus,
   CaseSummary,
   Event,
@@ -378,6 +379,35 @@ export default function Workspace() {
           decision === "approved"
             ? `Recorded as ${approver}. CLEAR is creating the order and checking stock.`
             : "Your reason has been recorded. This case now needs a planner's decision.",
+      });
+      setRefreshKey((k) => k + 1);
+    } catch (cause) {
+      setActionError(
+        cause instanceof Error
+          ? cause.message
+          : "Could not record your decision.",
+      );
+    } finally {
+      mutationLock.current = false;
+      setPending(false);
+    }
+  }
+
+  async function resolveCase(option: string | null, note: string) {
+    if (!activeCase || mutationLock.current) return;
+    mutationLock.current = true;
+    setPending(true);
+    setActionError("");
+    setFeedback(null);
+    try {
+      await api(`/cases/${encodeURIComponent(activeCase.case_id)}/resolution`, {
+        method: "POST",
+        body: JSON.stringify({ approver, option, note: note.trim() || null }),
+      });
+      setTab("Overview");
+      setFeedback({
+        title: "Decision recorded",
+        message: `Recorded as ${approver}. CLEAR keeps monitoring the case; carry out the chosen course in your own systems.`,
       });
       setRefreshKey((k) => k + 1);
     } catch (cause) {
@@ -781,7 +811,8 @@ export default function Workspace() {
                       >
                         {name}
                         {name === "Approval" &&
-                          activeCase.status === "awaiting_approval" && (
+                          (activeCase.status === "awaiting_approval" ||
+                            activeCase.status === "needs_human_decision") && (
                             <span className="tab-count" aria-label="1 pending">
                               1
                             </span>
@@ -812,7 +843,18 @@ export default function Workspace() {
                     {tab === "Monitoring" && <Monitoring item={activeCase} />}
                     {tab === "Approval" && (
                       <div className="approval-list">
-                        {!activeCase.plan?.actions.length ? (
+                        {activeCase.status === "needs_human_decision" && (
+                          <Resolve
+                            caseItem={activeCase}
+                            disabled={disabled}
+                            approver={approver}
+                            error={actionError}
+                            onResolve={resolveCase}
+                          />
+                        )}
+                        {activeCase.status === "needs_human_decision" &&
+                        !activeCase.plan?.actions.length ? null : !activeCase
+                            .plan?.actions.length ? (
                           <div className="panel-empty">
                             <h3>No transfer to approve</h3>
                             <p>
@@ -918,7 +960,7 @@ function CaseProgress({
   const steps = [
     "Investigate",
     "Assess impact",
-    item.status === "needs_human_decision"
+    item.status === "needs_human_decision" || item.resolution
       ? "Planner decision"
       : item.status === "monitoring" && !item.plan?.actions.length
         ? "No action needed"
@@ -928,9 +970,11 @@ function CaseProgress({
   const destinations: Tab[] = [
     "Documents",
     "Overview",
-    item.status === "needs_human_decision" || !item.plan?.actions.length
-      ? "Overview"
-      : "Approval",
+    item.status === "needs_human_decision"
+      ? "Approval"
+      : !item.plan?.actions.length
+        ? "Overview"
+        : "Approval",
     "Monitoring",
   ];
   return (
@@ -973,6 +1017,14 @@ function CaseProgress({
             onClick={() => onNavigate("Approval")}
           >
             Review transfer <ArrowRight size={16} />
+          </button>
+        )}
+        {item.status === "needs_human_decision" && !active && (
+          <button
+            className="primary-button decision"
+            onClick={() => onNavigate("Approval")}
+          >
+            Make the call <ArrowRight size={16} />
           </button>
         )}
         {item.status === "monitoring" && !active && (
@@ -1019,6 +1071,7 @@ function Monitoring({ item }: { item: Case }) {
             : `This case is ${statuses[item.status].toLowerCase()}. Review the current stage before following up.`}
         </Notice>
       )}
+      {item.resolution && <ResolutionNote resolution={item.resolution} />}
       <div className="monitoring-follow-up">
         <h3>Next follow-up</h3>
         <p>
@@ -1192,6 +1245,8 @@ function Overview({ item }: { item: Case }) {
             <>
               Transfer <strong>{number(transfer.quantity)} t</strong>
             </>
+          ) : item.resolution ? (
+            "Planner’s call recorded"
           ) : plan.escalation ? (
             "Escalate to a planner"
           ) : (
@@ -1234,7 +1289,9 @@ function Overview({ item }: { item: Case }) {
           review the prediction source before deciding.
         </Notice>
       )}
-      {plan.escalation && (
+      {item.resolution ? (
+        <ResolutionNote resolution={item.resolution} />
+      ) : plan.escalation && (
         <div className="escalation" role="note">
           <div>
             <strong>A decision needs your attention</strong>
@@ -1259,6 +1316,7 @@ function Overview({ item }: { item: Case }) {
               name={option.name}
               assessment={option.assessment}
               recommended={option.name === plan.recommended_option}
+              chosen={option.name === item.resolution?.option}
               note={option.note}
               valid={option.validation?.valid}
             />
@@ -1300,12 +1358,14 @@ function Option({
   name,
   assessment,
   recommended,
+  chosen = false,
   note,
   valid,
 }: {
   name: string;
   assessment: Assessment;
   recommended: boolean;
+  chosen?: boolean;
   note?: string;
   valid?: boolean;
 }) {
@@ -1327,6 +1387,7 @@ function Option({
       <div className="option-title">
         <strong>{name}</strong>
         {recommended && <span className="option-mark">Recommended</span>}
+        {chosen && <span className="option-mark chosen">Chosen</span>}
         {valid === false && (
           <span className="validation-rejected">
             Rejected by validator
@@ -1829,6 +1890,138 @@ function Approval({
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+// An escalated case asks for a course CLEAR cannot carry out itself, such as
+// deferring orders or emergency sourcing. The planner records the course they
+// chose; CLEAR logs it and keeps monitoring the case.
+function Resolve({
+  caseItem,
+  disabled,
+  approver,
+  error,
+  onResolve,
+}: {
+  caseItem: Case;
+  disabled: boolean;
+  approver: string;
+  error: string;
+  onResolve: (option: string | null, note: string) => Promise<void>;
+}) {
+  const options = caseItem.plan?.options || [];
+  const OWN = "";
+  const [choice, setChoice] = useState<string>(
+    caseItem.plan?.recommended_option ?? options[0]?.name ?? OWN,
+  );
+  const [note, setNote] = useState("");
+  const own = choice === OWN;
+  return (
+    <div className="decision-desk resolve-desk">
+      <div className="resolve-heading">
+        <h3>Record your decision</h3>
+        <p>
+          {caseItem.status_reason ||
+            "CLEAR cannot settle this case on its own."}
+        </p>
+      </div>
+      <fieldset className="resolve-options" disabled={disabled}>
+        <legend>Course to follow</legend>
+        {options.map((option) => (
+          <label className="resolve-option" key={option.name}>
+            <input
+              type="radio"
+              name="resolve-option"
+              checked={choice === option.name}
+              onChange={() => setChoice(option.name)}
+            />
+            <span>
+              <strong>{option.name}</strong>
+              <small>
+                {option.assessment.covered
+                  ? "Covered"
+                  : `${number(option.assessment.shortage_t)} t short`}
+                {option.assessment.deferred_orders.length > 0 &&
+                  ` · defers ${option.assessment.deferred_orders
+                    .map((order) => order.order_id)
+                    .join(", ")}`}
+                {option.name === caseItem.plan?.recommended_option &&
+                  " · Recommended"}
+              </small>
+            </span>
+          </label>
+        ))}
+        <label className="resolve-option">
+          <input
+            type="radio"
+            name="resolve-option"
+            checked={own}
+            onChange={() => setChoice(OWN)}
+          />
+          <span>
+            <strong>Another course</strong>
+            <small>Describe it in the note, e.g. emergency sourcing</small>
+          </span>
+        </label>
+      </fieldset>
+      <label className="reason-label" htmlFor="resolve-note">
+        Decision note <span>{own ? "Required" : "Optional"}</span>
+      </label>
+      <textarea
+        id="resolve-note"
+        maxLength={2000}
+        placeholder="What you will do and why…"
+        value={note}
+        onChange={(e) => setNote(e.target.value)}
+        disabled={disabled}
+      />
+      {error && (
+        <div className="notice notice-error decision-error" role="alert">
+          <span className="notice-mark" aria-hidden="true" />
+          <div className="notice-copy">
+            <strong>Decision not recorded</strong>
+            <div>
+              The request failed. Review the current case before trying again.
+              <details className="error-details">
+                <summary>Request details</summary>
+                {error}
+              </details>
+            </div>
+          </div>
+        </div>
+      )}
+      <div className="approval-buttons">
+        <p className="approval-signature">
+          Signed as <strong>{approver}</strong> · CLEAR records the decision;
+          you carry it out
+        </p>
+        <button
+          className="approve-button"
+          disabled={disabled || (own && !note.trim())}
+          onClick={() => void onResolve(own ? null : choice, note)}
+        >
+          Record decision
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function ResolutionNote({ resolution }: { resolution: Resolution }) {
+  return (
+    <div className="approval-executed resolution-note">
+      <div>
+        <strong>
+          {resolution.approver} chose{" "}
+          {resolution.option || "a course outside the plan’s options"}
+        </strong>
+        {resolution.note && <p>{resolution.note}</p>}
+        <p>
+          Recorded {time(resolution.at)}. CLEAR keeps monitoring; the next
+          logistics event reopens the assessment.
+        </p>
+      </div>
     </div>
   );
 }

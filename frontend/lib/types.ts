@@ -106,9 +106,18 @@ export type PlantStock = {
     consumption_t_per_day: number;
   }[];
 };
+// The course a planner chose for an escalated case; option is null for a
+// course of their own, which the note describes.
+export type Resolution = {
+  approver: string;
+  option: string | null;
+  note: string | null;
+  at: string;
+};
 export type Case = CaseSummary & {
   running: boolean;
   status_reason: string | null;
+  resolution?: Resolution | null;
   updated_at: string;
   shipment: {
     shipment_id: string;

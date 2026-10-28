@@ -63,6 +63,41 @@ def test_http_s1_approval_execution_and_eta_reassessment(service, store):
         assert len(store.read(EXECUTED)) == 1
 
 
+def test_http_planner_resolves_an_escalated_case(service, store):
+    with TestClient(create_app(service)) as client:
+        case_id, case = send(client, service, "S1-DOC-HOLD")
+        resolution = {"approver": "Demo Planner", "option": None, "note": "Source externally"}
+        assert client.post(f"/cases/{case_id}/resolution", json=resolution).status_code == 409
+        payload = {"validation_id": case["plan"]["actions"][0]["validation_id"],
+                   "approver": "Demo Planner", "decision": "approved"}
+        assert client.post(f"/cases/{case_id}/decisions", json=payload).status_code == 202
+        service.wait(30)
+        _, case = send(client, service, "S1-ETA-SLIP")
+        assert case["status"] == "needs_human_decision"
+        assert case["resolution"] is None
+        option = case["plan"]["recommended_option"]
+
+        url = f"/cases/{case_id}/resolution"
+        for body in ({**resolution, "note": "   "}, {**resolution, "approver": " "}, {**resolution, "extra": 1}):
+            assert client.post(url, json=body).status_code == 422
+        assert client.post(url, json={**resolution, "option": "Not an option"}).status_code == 422
+        assert client.get(f"/cases/{case_id}").json()["status"] == "needs_human_decision"
+
+        response = client.post(url, json={"approver": "Demo Planner", "option": option, "note": None})
+        assert response.status_code == 200, response.text
+        assert response.json()["option"] == option
+        resolved = client.get(f"/cases/{case_id}").json()
+        assert resolved["status"] == "monitoring" and not resolved["running"]
+        assert resolved["resolution"]["approver"] == "Demo Planner"
+        entry = client.get(f"/cases/{case_id}/log").json()[-1]
+        assert (entry["actor"], entry["kind"], entry["summary"]) == ("Demo Planner", "decision", f"Chose {option}")
+        assert client.post(url, json=resolution).status_code == 409
+        assert len(store.read(EXECUTED)) == 1
+
+        _, reopened = send(client, service, "S1-ETA-SLIP")
+        assert reopened["resolution"] is None
+
+
 def test_http_s2_keeps_plan_without_writing(service, store):
     with TestClient(create_app(service)) as client:
         _, case = send(client, service, "S2-CONGESTION")

@@ -329,6 +329,23 @@ test("planner can investigate, approve, reassess, and review a covered case", as
   await expect(
     page.getByText("A decision needs your attention", { exact: true }),
   ).toBeVisible();
+  await page.getByRole("button", { name: /Make the call/ }).click();
+  const resolve = page.locator(".resolve-desk");
+  await expect(resolve.getByRole("radio").nth(1)).toBeChecked();
+  await resolve.getByText("Another course", { exact: true }).click();
+  const record = resolve.getByRole("button", { name: "Record decision" });
+  await expect(record).toBeDisabled();
+  await resolve
+    .getByLabel(/Decision note/)
+    .fill("Source 34 t from an external supplier.");
+  await record.click();
+  await expect(page.locator(".case-banner .status")).toHaveText("Monitoring");
+  await expect(page.locator(".resolution-note")).toContainText(
+    "chose a course outside the plan’s options",
+  );
+  await expect(page.locator(".timeline-panel")).toContainText(
+    "Chose a course outside the plan's options: Source 34 t",
+  );
   await page.getByRole("button", { name: /Demo event simulator/ }).click();
   await page.getByRole("button", { name: /Port congestion/ }).click();
   await expect(page.locator(".case-banner .status")).toHaveText("Monitoring");

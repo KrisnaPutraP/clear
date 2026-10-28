@@ -1659,6 +1659,14 @@ main {
   background: var(--flag-blue);
 }
 
+.option-mark.chosen {
+  color: var(--signal-yellow);
+}
+
+.option-mark.chosen::before {
+  background: var(--signal-yellow);
+}
+
 .validation-rejected {
   display: inline-flex;
   align-items: center;
@@ -2201,6 +2209,79 @@ td span:not(.priority) {
   border: 0;
   padding: 0;
   animation: none;
+}
+
+.resolve-heading h3 {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.resolve-heading p {
+  margin-top: 4px;
+  max-width: 76ch;
+  color: var(--ink-2);
+}
+
+.resolve-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.resolve-options legend {
+  margin-bottom: 8px;
+  padding: 0;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.resolve-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--yellow-edge);
+  border-radius: var(--radius);
+  background: var(--surface);
+  cursor: pointer;
+  transition: border-color 160ms, background-color 160ms;
+}
+
+.resolve-option:hover {
+  border-color: var(--signal-yellow);
+}
+
+.resolve-option:has(input:checked) {
+  border-color: var(--signal-yellow);
+  box-shadow: inset 0 0 0 1px var(--signal-yellow);
+}
+
+.resolve-option input {
+  margin-top: 3px;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  accent-color: var(--signal-yellow);
+}
+
+.resolve-option span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.resolve-option small {
+  color: var(--ink-3);
+  font-size: 13px;
+}
+
+.resolve-options:disabled .resolve-option {
+  cursor: default;
+  opacity: 0.6;
 }
 
 .reason-label {

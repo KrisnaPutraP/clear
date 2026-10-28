@@ -29,6 +29,21 @@ class Decision(BaseModel):
         return self
 
 
+class Resolution(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    approver: NonBlank
+    option: NonBlank | None = None
+    note: Annotated[str, StringConstraints(strip_whitespace=True, max_length=2000)] | None = None
+
+    @model_validator(mode="after")
+    def own_course_has_note(self):
+        self.note = self.note or None
+        if self.option is None and not self.note:
+            raise ValueError("A course outside the plan's options needs a note.")
+        return self
+
+
 def create_app(clear: Clear | None = None) -> FastAPI:
     """One service instance owns the background-run lock for every request."""
 
@@ -89,5 +104,9 @@ def create_app(clear: Clear | None = None) -> FastAPI:
     @app.post("/cases/{case_id}/decisions", status_code=202)
     def decide(case_id: str, body: Decision, request: Request):
         return request.app.state.clear.submit_decision(case_id=case_id, **body.model_dump())
+
+    @app.post("/cases/{case_id}/resolution")
+    def resolve(case_id: str, body: Resolution, request: Request):
+        return request.app.state.clear.resolve_case(case_id=case_id, **body.model_dump())
 
     return app
