@@ -1050,10 +1050,6 @@ main {
   animation: aldis 1.2s steps(1) infinite;
 }
 
-.queued {
-  animation: bob 7s ease-in-out infinite;
-}
-
 @keyframes twinkle {
   50% {
     opacity: 0.35;
@@ -2467,6 +2463,50 @@ textarea:focus-visible {
   font-size: 16px;
 }
 
+/* Agent text typing itself in: the rest is laid out but not yet visible,
+   and a thin caret rides the boundary. */
+.typed-rest {
+  color: transparent;
+}
+
+.typed-rest::before {
+  content: "";
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-right: -2px;
+  vertical-align: -0.12em;
+  background: var(--signal-yellow);
+}
+
+/* Switching cases: the old case dims while the new one loads, then each
+   panel of the new case rises in. The harbour scene is not part of this; it
+   stays mounted and moves to the new case's state on its own transitions. */
+.case-grid.switching .case-in {
+  opacity: 0.35;
+  pointer-events: none;
+  transition: opacity 180ms ease-out;
+}
+
+.case-in {
+  animation: case-in 460ms var(--ease-out) both;
+}
+
+.case-rail.case-in {
+  animation-delay: 60ms;
+}
+
+.detail-panel.case-in {
+  animation-delay: 90ms;
+}
+
+@keyframes case-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
 /* Beside the activity rail the progress card can run narrow; the steps fold
    onto two rows rather than truncating their names. */
 @container (max-width: 620px) {
@@ -2571,7 +2611,7 @@ textarea:focus-visible {
   font-size: 14px;
 }
 
-.evidence-list span {
+.evidence-list li > span {
   color: var(--ink-3);
   font-size: 12px;
   overflow-wrap: anywhere;

@@ -304,9 +304,14 @@ export default function Workspace() {
   }, [selectedId, refreshKey]);
 
   const activeCase = detail?.case_id === selectedId ? detail : null;
+  // While another case loads, the previous one stays on screen, dimmed and
+  // inert, so the harbour scene is never torn down: it sails on to the new
+  // case's state, and the panels fade across.
+  const switching = !activeCase && Boolean(selectedId) && Boolean(detail);
+  const shownCase = activeCase || (switching ? detail : null);
   const busy =
     pending || Boolean(health?.running) || Boolean(activeCase?.running);
-  const disabled = busy || !health || Boolean(error);
+  const disabled = busy || !health || Boolean(error) || switching;
   const awaiting = cases.filter((c) => c.status === "awaiting_approval").length;
   const attention = cases.filter(
     (c) =>
@@ -704,13 +709,13 @@ export default function Workspace() {
             </Notice>
           )}
 
-          {!activeCase && eventSimulator}
+          {!shownCase && eventSimulator}
 
           <div id="workspace" tabIndex={-1} className="workspace-anchor">
             <h2 className="sr-only">Case workspace</h2>
           </div>
 
-          {!activeCase ? (
+          {!shownCase ? (
             <section className="empty-workspace scene">
               <div className="scene-stage">
                 <Harbour item={null} running={Boolean(selectedId) || loading} />
@@ -729,49 +734,53 @@ export default function Workspace() {
               </div>
             </section>
           ) : (
-            <div className="case-grid">
+            <div className={`case-grid ${switching ? "switching" : ""}`}>
               <section className="case-banner scene" aria-label="Case">
                 <div className="scene-stage">
-                  <Harbour item={activeCase} running={activeCase.running} />
-                  <div className="scene-copy">
+                  <Harbour item={shownCase} running={shownCase.running} />
+                  <div className="scene-copy case-in" key={shownCase.case_id}>
                     <h2>
-                      <Status status={activeCase.status} />
+                      <Status status={shownCase.status} />
                     </h2>
                   </div>
                 </div>
-                <dl className="case-voyage">
+                <dl className="case-voyage case-in" key={shownCase.case_id}>
                   <div>
                     <dt>Case</dt>
                     <dd>
-                      {activeCase.case_id} · {activeCase.shipment_id}
+                      {shownCase.case_id} · {shownCase.shipment_id}
                     </dd>
                   </div>
                   <div>
                     <dt>Voyage</dt>
                     <dd>
-                      {activeCase.shipment.port_of_loading}
+                      {shownCase.shipment.port_of_loading}
                       <ArrowRight size={14} aria-label="to" />
-                      {activeCase.shipment.port_of_discharge}
+                      {shownCase.shipment.port_of_discharge}
                     </dd>
                   </div>
-                  {activeCase.shipment.vessel && (
+                  {shownCase.shipment.vessel && (
                     <div>
                       <dt>Vessel</dt>
-                      <dd>{activeCase.shipment.vessel}</dd>
+                      <dd>{shownCase.shipment.vessel}</dd>
                     </div>
                   )}
                   <div>
                     <dt>ETA</dt>
-                    <dd>{date(activeCase.shipment.eta)}</dd>
+                    <dd>{date(shownCase.shipment.eta)}</dd>
                   </div>
                 </dl>
               </section>
               <CaseProgress
-                item={activeCase}
+                key={`progress-${shownCase.case_id}`}
+                item={shownCase}
                 entries={logs}
                 onNavigate={openCaseTab}
               />
-                <section className="detail-panel">
+                <section
+                  className="detail-panel case-in"
+                  key={`detail-${shownCase.case_id}`}
+                >
                   <div
                     className="tabs"
                     role="tablist"
@@ -813,15 +822,15 @@ export default function Workspace() {
                       >
                         {name}
                         {name === "Approval" &&
-                          (activeCase.status === "awaiting_approval" ||
-                            activeCase.status === "needs_human_decision") && (
+                          (shownCase.status === "awaiting_approval" ||
+                            shownCase.status === "needs_human_decision") && (
                             <span className="tab-count" aria-label="1 pending">
                               1
                             </span>
                           )}
                         {name === "Documents" &&
                           Boolean(
-                            activeCase.reconciliation?.discrepancies.length,
+                            shownCase.reconciliation?.discrepancies.length,
                           ) && (
                             <span
                               className="tab-alert"
@@ -833,29 +842,29 @@ export default function Workspace() {
                   </div>
                   <div
                     className="panel-content"
-                    key={`${activeCase.case_id}-${tab}`}
+                    key={`${shownCase.case_id}-${tab}`}
                     role="tabpanel"
                     tabIndex={0}
                     id="case-tabpanel"
                     aria-labelledby={`tab-${tab}`}
                   >
-                    {tab === "Overview" && <Overview item={activeCase} />}
-                    {tab === "Documents" && <Documents item={activeCase} />}
-                    {tab === "Inventory" && <Inventory item={activeCase} />}
-                    {tab === "Monitoring" && <Monitoring item={activeCase} />}
+                    {tab === "Overview" && <Overview item={shownCase} />}
+                    {tab === "Documents" && <Documents item={shownCase} />}
+                    {tab === "Inventory" && <Inventory item={shownCase} />}
+                    {tab === "Monitoring" && <Monitoring item={shownCase} />}
                     {tab === "Approval" && (
                       <div className="approval-list">
-                        {activeCase.status === "needs_human_decision" && (
+                        {shownCase.status === "needs_human_decision" && (
                           <Resolve
-                            caseItem={activeCase}
+                            caseItem={shownCase}
                             disabled={disabled}
                             approver={approver}
                             error={actionError}
                             onResolve={resolveCase}
                           />
                         )}
-                        {activeCase.status === "needs_human_decision" &&
-                        !activeCase.plan?.actions.length ? null : !activeCase
+                        {shownCase.status === "needs_human_decision" &&
+                        !shownCase.plan?.actions.length ? null : !shownCase
                             .plan?.actions.length ? (
                           <div className="panel-empty">
                             <h3>No transfer to approve</h3>
@@ -866,11 +875,11 @@ export default function Workspace() {
                             </p>
                           </div>
                         ) : (
-                          activeCase.plan.actions.map((action) => (
+                          shownCase.plan.actions.map((action) => (
                             <Approval
                               key={action.validation_id}
                               action={action}
-                              caseItem={activeCase}
+                              caseItem={shownCase}
                               disabled={disabled}
                               approver={approver}
                               error={actionError}
@@ -882,35 +891,46 @@ export default function Workspace() {
                     )}
                   </div>
                 </section>
-                <div className="case-rail">
+                <div className="case-rail case-in" key={`rail-${shownCase.case_id}`}>
                   <Timeline
-                    key={activeCase.case_id}
                     entries={logs}
-                    running={activeCase.running}
+                    running={shownCase.running}
                   />
-                  {activeCase.plan && (
+                  {shownCase.plan && (
                     <section
                       className="case-evidence"
                       aria-labelledby="evidence-heading"
                     >
                       <div className="rail-heading">
                         <h3 id="evidence-heading">Evidence</h3>
-                        <span>{activeCase.plan.evidence.length} findings</span>
+                        <span>{shownCase.plan.evidence.length} findings</span>
                       </div>
                       <ul className="evidence-list">
-                        {activeCase.plan.evidence.map((evidence, i) => (
+                        {shownCase.plan.evidence.map((evidence, i) => (
                           <li key={i}>
-                            <p>{evidence.fact}</p>
+                            <p>
+                              <Typed
+                                text={evidence.fact}
+                                version={runVersion(shownCase)}
+                                delay={120 + i * 90}
+                              />
+                            </p>
                             <span>{evidence.source}</span>
                           </li>
                         ))}
                       </ul>
                     </section>
                   )}
-                  {activeCase.plan && (
+                  {shownCase.plan && (
                     <section className="next-check">
                       <h3>What happens next</h3>
-                      <p>{activeCase.plan.next_check}</p>
+                      <p>
+                        <Typed
+                          text={shownCase.plan.next_check}
+                          version={runVersion(shownCase)}
+                          delay={300}
+                        />
+                      </p>
                       <button
                         className="text-button"
                         onClick={() => openCaseTab("Monitoring")}
@@ -923,7 +943,7 @@ export default function Workspace() {
             </div>
           )}
 
-          {activeCase && eventSimulator}
+          {shownCase && eventSimulator}
 
           <footer>
             <span>Evidence-backed plans. Human-approved actions.</span>
@@ -981,7 +1001,7 @@ function CaseProgress({
   ];
   return (
     <section
-      className={`case-progress ${item.status}`}
+      className={`case-progress case-in ${item.status}`}
       aria-label="Case progress"
     >
       <div className="case-next-step" role="status" aria-atomic="true">
@@ -996,7 +1016,12 @@ function CaseProgress({
                 : "CLEAR is working on this case"
               : nextStepTitles[item.status]}
           </h2>
-          <p>{item.status_reason || statusDescriptions[item.status]}</p>
+          <p>
+            <Typed
+              text={item.status_reason || statusDescriptions[item.status]}
+              version={runVersion(item)}
+            />
+          </p>
           {active && (
             <p className="run-update">
               <strong>{latest?.actor || "Orchestrator"}</strong>
@@ -1262,7 +1287,9 @@ function Overview({ item }: { item: Case }) {
             Plant {transfer.destination_plant}
           </p>
         )}
-        <p>{plan.recommendation}</p>
+        <p>
+          <Typed text={plan.recommendation} version={runVersion(item)} />
+        </p>
       </div>
       <dl className="figures">
         <Figure
@@ -1297,13 +1324,21 @@ function Overview({ item }: { item: Case }) {
         <div className="escalation" role="note">
           <div>
             <strong>A decision needs your attention</strong>
-            <p>{plan.escalation}</p>
+            <p>
+              <Typed
+                text={plan.escalation}
+                version={runVersion(item)}
+                delay={200}
+              />
+            </p>
           </div>
         </div>
       )}
       <section className="brief" aria-labelledby="brief-heading">
         <h4 id="brief-heading">What happened</h4>
-        <p className="exception-title">{plan.exception}</p>
+        <p className="exception-title">
+          <Typed text={plan.exception} version={runVersion(item)} delay={300} />
+        </p>
       </section>
       <section aria-labelledby="options-heading">
         <div className="subsection-heading">
@@ -1320,12 +1355,74 @@ function Overview({ item }: { item: Case }) {
               recommended={option.name === plan.recommended_option}
               chosen={option.name === item.resolution?.option}
               note={option.note}
+              version={runVersion(item)}
               valid={option.validation?.valid}
             />
           ))}
         </div>
       </section>
     </>
+  );
+}
+
+// Agent-written text types itself in when a run's result first appears,
+// fast enough that a long paragraph still lands within about a second. The
+// untyped rest is laid out but transparent, so nothing reflows and a screen
+// reader reads the whole text. version is the case's updated_at: the same
+// text from the same run, on another tab or after switching back to the case,
+// appears at once; a new run types it again.
+const typedBefore = new Set<string>();
+// While a run is in progress the text on screen is the previous result, so
+// it shows as it is; only a finished run's text types in.
+const runVersion = (item: Case) => (item.running ? null : item.updated_at);
+function Typed({
+  text,
+  version = "",
+  delay = 0,
+}: {
+  text: string;
+  version?: string | null;
+  delay?: number;
+}) {
+  const id = `${version}\u0000${text}`;
+  if (version === null) typedBefore.add(id);
+  const [state, setState] = useState(() => ({
+    id,
+    count: typedBefore.has(id) ? text.length : 0,
+  }));
+  const current =
+    state.id === id
+      ? state
+      : { id, count: typedBefore.has(id) ? text.length : 0 };
+  if (current !== state) setState(current);
+  useEffect(() => {
+    if (typedBefore.has(id)) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      typedBefore.add(id);
+      setState({ id, count: text.length });
+      return;
+    }
+    const duration = Math.min(1100, Math.max(250, text.length * 9));
+    let frame = 0;
+    let start = 0;
+    const step = (now: number) => {
+      start ||= now + delay;
+      const progress = Math.max(0, now - start) / duration;
+      const count = Math.min(text.length, Math.ceil(progress * text.length));
+      setState({ id, count });
+      if (count < text.length) frame = requestAnimationFrame(step);
+      else typedBefore.add(id);
+    };
+    frame = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(frame);
+  }, [id, text, delay]);
+  const count = current.count;
+  if (count >= text.length) return <>{text}</>;
+  return (
+    <span className="typed">
+      {text.slice(0, count)}
+      <span className="typed-rest">{text.slice(count)}</span>
+    </span>
   );
 }
 
@@ -1362,6 +1459,7 @@ function Option({
   recommended,
   chosen = false,
   note,
+  version,
   valid,
 }: {
   name: string;
@@ -1369,6 +1467,7 @@ function Option({
   recommended: boolean;
   chosen?: boolean;
   note?: string;
+  version?: string | null;
   valid?: boolean;
 }) {
   const coverage =
@@ -1434,7 +1533,11 @@ function Option({
           {assessment.deferred_orders.map((o) => o.order_id).join(", ")}
         </p>
       )}
-      {note && <p className="option-note">{note}</p>}
+      {note && (
+        <p className="option-note">
+          <Typed text={note} version={version} delay={400} />
+        </p>
+      )}
     </div>
   );
 }

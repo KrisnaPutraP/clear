@@ -340,26 +340,6 @@ export function Harbour({
         />
       </g>
 
-      {/* congestion: vessels queued off the port */}
-      {congestion &&
-        [900, 1000, 1080].map((x, i) => (
-          <g
-            key={x}
-            className="queued"
-            transform={`translate(${x} ${244 + i * 2}) scale(${0.32 + i * 0.04})`}
-          >
-            <path d="M0 -26 H232 L214 6 H18 Z" fill={ink.dark} />
-            <rect
-              x={30}
-              y={-50}
-              width={150}
-              height={23}
-              fill={[ink.red, ink.blue, ink.yellow][i]}
-            />
-            <rect x={190} y={-74} width={34} height={48} fill={ink.white} />
-          </g>
-        ))}
-
       {/* land */}
       <path d={`M0 ${GROUND} H860 V${H} H0 Z`} fill={ink.land} />
       <rect x={0} y={GROUND} width={860} height={6} fill={ink.quay} />
@@ -463,8 +443,9 @@ export function Harbour({
         />
       )}
       </g>
-      <circle cx={980} cy={-30} r={18} fill="#f3ead2" />
-      <circle cx={988} cy={-36} r={16} fill={ink.sky[0]} />
+      {/* The moon sits far right, clear of the status heading at any width. */}
+      <circle cx={1100} cy={-44} r={18} fill="#f3ead2" />
+      <circle cx={1108} cy={-50} r={16} fill={ink.sky[0]} />
 
     </svg>
   );
