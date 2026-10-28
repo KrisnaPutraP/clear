@@ -924,13 +924,11 @@ export default function Workspace() {
                   {shownCase.plan && (
                     <section className="next-check">
                       <h3>What happens next</h3>
-                      <p>
-                        <Typed
-                          text={shownCase.plan.next_check}
-                          version={runVersion(shownCase)}
-                          delay={300}
-                        />
-                      </p>
+                      <FollowUp
+                        text={shownCase.plan.next_check}
+                        version={runVersion(shownCase)}
+                        compact
+                      />
                       <button
                         className="text-button"
                         onClick={() => openCaseTab("Monitoring")}
@@ -1104,10 +1102,11 @@ function Monitoring({ item }: { item: Case }) {
       {item.resolution && <ResolutionNote resolution={item.resolution} />}
       <div className="monitoring-follow-up">
         <h3>Next follow-up</h3>
-        <p>
-          {plan?.next_check ||
-            "Follow-up will be available after CLEAR prepares a recovery plan."}
-        </p>
+        {plan?.next_check ? (
+          <FollowUp text={plan.next_check} version={runVersion(item)} />
+        ) : (
+          <p>Follow-up will be available after CLEAR prepares a recovery plan.</p>
+        )}
         <p className="panel-footnote">
           New logistics events trigger a reassessment. These records do not
           confirm delivery or customs release.
@@ -1426,6 +1425,70 @@ function Typed({
       {text.slice(0, count)}
       <span className="typed-rest">{text.slice(count)}</span>
     </span>
+  );
+}
+
+// An agent often writes its follow-up as one paragraph of numbered points,
+// "1. CUSTOMS HOLD (binding constraint): … 2. …". Split it on the numbers
+// only when they count up from 1, so a figure such as "4.83" or a sentence
+// ending in a number never breaks it, and lift an upper-case lead-in before
+// a colon out as the point's label.
+type FollowUpPoint = { label: string | null; text: string };
+function followUpPoints(text: string): FollowUpPoint[] | null {
+  const marks: { at: number; end: number }[] = [];
+  for (const match of text.matchAll(/(^|\s)(\d{1,2})\.\s+/g)) {
+    if (Number(match[2]) !== marks.length + 1) continue;
+    const at = match.index + match[1].length;
+    marks.push({ at, end: match.index + match[0].length });
+  }
+  if (marks.length < 2 || text.slice(0, marks[0].at).trim()) return null;
+  return marks.map((mark, i) => {
+    const point = text.slice(mark.end, marks[i + 1]?.at ?? text.length).trim();
+    const lead = point.match(/^([^:a-z]{3,60}?)(?:\s*\(([^)]*)\))?:\s+([\s\S]*)$/);
+    if (!lead || !/[A-Z]{2}/.test(lead[1])) return { label: null, text: point };
+    const label = lead[1].trim() + (lead[2] ? ` · ${lead[2]}` : "");
+    return { label, text: lead[3] };
+  });
+}
+
+function FollowUp({
+  text,
+  version,
+  compact = false,
+}: {
+  text: string;
+  version: string | null;
+  compact?: boolean;
+}) {
+  const points = followUpPoints(text);
+  if (!points)
+    return (
+      <p className={`follow-up-text ${compact ? "clamped" : ""}`}>
+        <Typed text={text} version={version} delay={300} />
+      </p>
+    );
+  // The rail lists what to watch; the Monitoring tab carries the detail.
+  if (compact && points.every((point) => point.label))
+    return (
+      <ol className="follow-up compact">
+        {points.map((point, i) => (
+          <li key={i}>
+            <Typed text={point.label!} version={version} delay={300 + i * 80} />
+          </li>
+        ))}
+      </ol>
+    );
+  return (
+    <ol className={`follow-up ${compact ? "compact" : ""}`}>
+      {points.map((point, i) => (
+        <li key={i}>
+          {point.label && <strong>{point.label}</strong>}
+          <span className={compact ? "clamped" : ""}>
+            <Typed text={point.text} version={version} delay={300 + i * 80} />
+          </span>
+        </li>
+      ))}
+    </ol>
   );
 }
 

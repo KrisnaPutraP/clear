@@ -2565,6 +2565,7 @@ textarea:focus-visible {
   position: sticky;
   top: 80px;
   max-height: calc(100vh - 100px);
+  overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
   display: flex;
@@ -2797,6 +2798,68 @@ textarea:focus-visible {
 .next-check p {
   color: var(--ink-2);
   font-size: 14px;
+}
+
+/* A follow-up split into its numbered points: a counter, an upper-case
+   label set small, then the detail. The rail lists the labels only. */
+.follow-up {
+  counter-reset: point;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+  max-width: 76ch;
+}
+
+.follow-up li {
+  counter-increment: point;
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr);
+  column-gap: 8px;
+  row-gap: 2px;
+  color: var(--ink-2);
+}
+
+.follow-up li::before {
+  content: counter(point, decimal-leading-zero);
+  grid-row: span 2;
+  padding-top: 1px;
+  color: var(--ink-3);
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.follow-up strong {
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.follow-up.compact {
+  gap: 8px;
+}
+
+.follow-up.compact li {
+  grid-template-columns: 22px minmax(0, 1fr);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.follow-up.compact li::before {
+  grid-row: auto;
+}
+
+.clamped {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  overflow: hidden;
 }
 
 .text-button {
