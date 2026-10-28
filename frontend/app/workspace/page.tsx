@@ -727,7 +727,10 @@ export default function Workspace() {
             </Notice>
           )}
 
-          {!shownCase && eventSimulator}
+          {/* Until the first answer arrives, or while a case opens, the
+              harbour holds the screen alone; the simulator leads only when
+              there is no case at all. */}
+          {!shownCase && !loading && !selectedId && eventSimulator}
 
           <div id="workspace" tabIndex={-1} className="workspace-anchor">
             <h2 className="sr-only">Case workspace</h2>
@@ -741,12 +744,16 @@ export default function Workspace() {
                   <h2>
                     {selectedId
                       ? "Opening your case…"
-                      : "Your next move starts here."}
+                      : loading
+                        ? "Opening the workspace…"
+                        : "Your next move starts here."}
                   </h2>
                   <p>
                     {selectedId
                       ? "Gathering the latest evidence, plan, and agent activity."
-                      : "The harbour is quiet. Send a logistics event and CLEAR investigates the evidence, sizes the impact, and brings you one validated decision."}
+                      : loading
+                        ? "Gathering the cases and their agent activity."
+                        : "The harbour is quiet. Send a logistics event and CLEAR investigates the evidence, sizes the impact, and brings you one validated decision."}
                   </p>
                 </div>
               </div>

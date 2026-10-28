@@ -59,6 +59,43 @@
 html {
   -webkit-text-size-adjust: 100%;
   scrollbar-color: var(--line-strong) transparent;
+  /* The night shows between two documents, never a white flash. */
+  background: var(--ground);
+}
+
+/* Moving between the landing page and the workspace: the page you leave
+   fades, the next one rises in. Browsers without cross-document view
+   transitions simply navigate. */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root) {
+  animation: page-leave 240ms ease-in both;
+}
+
+::view-transition-new(root) {
+  animation: page-enter 560ms var(--ease-out) 60ms both;
+}
+
+@keyframes page-leave {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
 }
 
 body {
