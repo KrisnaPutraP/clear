@@ -697,7 +697,7 @@ export default function Workspace() {
               </div>
             </section>
           ) : (
-            <>
+            <div className="case-grid">
               <section className="case-banner scene" aria-label="Case">
                 <div className="scene-stage">
                   <Harbour item={activeCase} running={activeCase.running} />
@@ -739,7 +739,6 @@ export default function Workspace() {
                 entries={logs}
                 onNavigate={openCaseTab}
               />
-              <div className="case-grid">
                 <section className="detail-panel">
                   <div
                     className="tabs"
@@ -840,6 +839,11 @@ export default function Workspace() {
                   </div>
                 </section>
                 <div className="case-rail">
+                  <Timeline
+                    key={activeCase.case_id}
+                    entries={logs}
+                    running={activeCase.running}
+                  />
                   {activeCase.plan && (
                     <section
                       className="case-evidence"
@@ -859,11 +863,6 @@ export default function Workspace() {
                       </ul>
                     </section>
                   )}
-                  <Timeline
-                    key={activeCase.case_id}
-                    entries={logs}
-                    running={activeCase.running}
-                  />
                   {activeCase.plan && (
                     <section className="next-check">
                       <h3>What happens next</h3>
@@ -877,8 +876,7 @@ export default function Workspace() {
                     </section>
                   )}
                 </div>
-              </div>
-            </>
+            </div>
           )}
 
           {activeCase && eventSimulator}
@@ -1860,7 +1858,7 @@ function Timeline({
   return (
     <section className="timeline-panel" aria-labelledby="timeline-heading">
       <div className="rail-heading">
-        <h3 id="timeline-heading">Signal log</h3>
+        <h3 id="timeline-heading">Agent activity</h3>
         <span className={running ? "activity-live" : ""}>
           {running ? "Live" : `${visibleEntries.length} steps`}
         </span>

@@ -822,7 +822,7 @@ main {
 .harbour {
   mask-image:
     linear-gradient(to bottom, #000 88%, transparent),
-    linear-gradient(to right, transparent, #000 9%);
+    linear-gradient(to right, transparent, #000 9%, #000 96%, transparent);
   mask-composite: intersect;
   position: absolute;
   inset: 0;
@@ -1142,6 +1142,7 @@ main {
 /* Case progress ------------------------------------------------------------ */
 
 .case-progress {
+  container-type: inline-size;
   display: flex;
   flex-direction: column;
   background: var(--surface);
@@ -1255,7 +1256,8 @@ main {
 
 .workflow-steps {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  /* The last step has no connector, so it takes only its own width. */
+  grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
   margin: 0;
   padding: 14px 22px 16px;
   list-style: none;
@@ -1338,11 +1340,28 @@ main {
 
 /* Case grid ---------------------------------------------------------------- */
 
+/* The agents' activity rides beside the whole case, from the harbour down,
+   so the planner can watch them work without scrolling. Extra height from the
+   rail goes to the last row, never between the banner and the progress. */
 .case-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) var(--rail);
+  grid-template-rows: auto auto 1fr;
   gap: 20px;
   align-items: start;
+}
+
+.case-grid > :not(.case-rail) {
+  grid-column: 1;
+  min-width: 0;
+}
+
+.case-grid > .scene {
+  margin-right: 0;
+}
+
+.case-grid .scene-stage {
+  min-height: 240px;
 }
 
 .detail-panel {
@@ -2354,9 +2373,33 @@ textarea:focus-visible {
   font-size: 16px;
 }
 
+/* Beside the activity rail the progress card can run narrow; the steps fold
+   onto two rows rather than truncating their names. */
+@container (max-width: 620px) {
+  .workflow-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 16px;
+  }
+
+  .workflow-steps li:not(:last-child)::after {
+    display: none;
+  }
+
+  .case-next-step {
+    flex-wrap: wrap;
+  }
+}
+
 /* Right rail --------------------------------------------------------------- */
 
 .case-rail {
+  grid-column: 2;
+  grid-row: 1 / span 3;
+  position: sticky;
+  top: 80px;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -2464,7 +2507,7 @@ textarea:focus-visible {
 }
 
 .timeline-scroll {
-  max-height: 460px;
+  max-height: min(460px, calc(100vh - 300px));
   overflow-y: auto;
   margin: 0 -6px;
   padding: 0 6px;
@@ -2818,6 +2861,19 @@ footer {
 
   .case-grid {
     grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+  }
+
+  .case-rail {
+    grid-column: 1;
+    grid-row: auto;
+    position: static;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .case-grid > .scene {
+    margin-right: -32px;
   }
 }
 
@@ -2871,6 +2927,10 @@ footer {
 
   .scene {
     margin-inline: -16px;
+  }
+
+  .case-grid > .scene {
+    margin-right: -16px;
   }
 
   .scene-copy {
