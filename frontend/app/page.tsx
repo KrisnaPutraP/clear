@@ -23,6 +23,7 @@ import type {
   LogEntry,
 } from "../lib/types";
 import { Harbour } from "./harbour";
+import { Sky } from "./sky";
 
 const statuses: Record<CaseStatus, string> = {
   analyzing: "Analyzing",
@@ -509,6 +510,7 @@ export default function Workspace() {
     <div
       className={`app-shell ${activeCase ? "has-case" : ""} ${navigationOpen ? "navigation-open" : ""}`}
     >
+      <Sky />
       <a className="skip-link" href="#workspace">
         Skip to case workspace
       </a>

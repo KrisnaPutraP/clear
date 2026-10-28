@@ -192,6 +192,17 @@ h4 {
 
 /* Shell ---------------------------------------------------------------- */
 
+/* One sky over the whole workspace, behind every surface. Cards keep their
+   solid fills, so the stars show only on the open ground between them. */
+.night-sky {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+}
+
 .app-shell {
   display: grid;
   grid-template-columns: var(--sidebar) minmax(0, 1fr);
@@ -230,7 +241,7 @@ main {
   padding: 22px 0 18px;
   /* Same ground as the workspace, so the two read as one room; a hairline
      is the only seam. The drawer on small screens keeps the darker mast. */
-  background: var(--ground);
+  background: transparent;
   border-right: 1px solid var(--line);
   color: var(--mast-ink);
   overflow-y: auto;
@@ -857,6 +868,8 @@ main {
 }
 
 .case-voyage {
+  position: relative;
+  background: var(--ground);
   display: flex;
   flex-wrap: wrap;
   gap: 10px 36px;
@@ -2474,6 +2487,8 @@ textarea:focus-visible {
 /* Right rail --------------------------------------------------------------- */
 
 .case-rail {
+  /* Ground-coloured, so the sky's stars never sit behind the log text. */
+  background: var(--ground);
   grid-column: 2;
   grid-row: 1 / span 3;
   position: sticky;
