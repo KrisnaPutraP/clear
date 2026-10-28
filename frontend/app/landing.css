@@ -281,7 +281,7 @@
   font-stretch: var(--wide);
   text-transform: uppercase;
   color: transparent;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 172' preserveAspectRatio='none'%3E%3Crect width='1' height='115' fill='%23eef1f6'/%3E%3Crect y='115' width='1' height='57' fill='%230c1830'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 172' preserveAspectRatio='none'%3E%3Crect width='1' height='115' fill='%23eef1f6'/%3E%3Crect y='115' width='1' height='57' fill='%238fa9dc'/%3E%3C/svg%3E");
   background-size: 100% 100%;
   -webkit-background-clip: text;
   background-clip: text;
