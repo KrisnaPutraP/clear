@@ -98,9 +98,10 @@ html {
   }
 }
 
+/* The ground is on <html> alone: a body background would be painted over the
+   fixed sky (sky.tsx), which sits behind the page. */
 body {
   margin: 0;
-  background: var(--ground);
   color: var(--ink);
   font-family: var(--font-archivo), system-ui, sans-serif;
   font-size: 15px;
