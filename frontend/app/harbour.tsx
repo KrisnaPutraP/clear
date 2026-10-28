@@ -215,19 +215,21 @@ function Vessel({
   name,
   far,
   running,
+  atSea,
 }: {
   flags: FlagCode[];
   name: string;
   far: boolean;
   running: boolean;
+  atSea: boolean;
 }) {
   const cargo = [ink.red, ink.blue, ink.yellow, ink.white, ink.blue, ink.red];
-  // While the agents work the vessel is under way offshore; when they finish
-  // it glides in to the anchorage off the crane and drops its anchor. A held
-  // or delayed vessel stays out at sea. It never berths: that would claim a
-  // customs release the case does not have.
-  const position = running
-    ? "translate(1040px, 254px) scale(0.6)"
+  // While the agents work the vessel is under way on open water; when they
+  // finish it glides in to the anchorage off the crane and drops its anchor.
+  // A held or delayed vessel stays out in the roads. It never berths: that
+  // would claim a customs release the case does not have.
+  const position = atSea
+    ? "translate(470px, 272px) scale(0.9)"
     : far
       ? "translate(980px, 252px) scale(0.62)"
       : "translate(880px, 284px) scale(1)";
@@ -371,6 +373,9 @@ export function Harbour({
         } as const
       )[item.status]
     : null;
+  // While the agents work the camera rides with the vessel on open water;
+  // when they finish the port pans in and the vessel comes to anchor.
+  const atSea = Boolean(item && running);
   const flags: FlagCode[] = [
     ...(customs ? (["Q"] as FlagCode[]) : []),
     ...(statusFlag ? [statusFlag] : []),
@@ -412,38 +417,24 @@ export function Harbour({
     >
       {/* sky in flat bands, a dusk glow on the horizon */}
       <rect y={-SKY} width={W} height={H + SKY} fill={ink.sky[0]} />
+      {/* The camera: close on the vessel at sea, pulled back over the port
+          once the run is done. Stars and moon stay put outside it. */}
+      <g
+        className="camera"
+        style={{ transform: atSea ? "scale(1.9)" : "scale(1)" }}
+      >
       <rect y={110} width={W} height={60} fill={ink.sky[1]} />
       <rect y={170} width={W} height={38} fill={ink.sky[2]} />
       <rect y={208} width={W} height={22} fill={ink.sky[3]} />
-      <rect y={226} width={W} height={10} fill={ink.glow} opacity={0.55} />
-      {stars.map(([x, y], i) => (
-        <circle
-          key={i}
-          className="star"
-          cx={x}
-          cy={y}
-          r={i % 3 ? 1.2 : 1.8}
-          fill={ink.white}
-          style={{ "--d": `${(i * 0.7) % 4}s` } as CSSProperties}
-        />
-      ))}
-      <circle cx={980} cy={-30} r={18} fill="#f3ead2" />
-      <circle cx={988} cy={-36} r={16} fill={ink.sky[0]} />
-
-      {/* the far shore */}
-      <path
-        d="M0 236 V218 h40 v-8 h30 v12 h46 v-16 h22 v16 h60 v-6 h50 v10 h70 v-12 h24 v12 h90 v-8 h40 v8 h120 V236 Z"
-        fill={ink.distant}
-      />
-
+      <rect y={228} width={W} height={8} fill={ink.glow} opacity={0.3} />
       {/* sea */}
       <rect y={SEA} x={0} width={W} height={H - SEA} fill={ink.sea} />
-      <rect y={300} x={0} width={W} height={40} fill={ink.seaDeep} />
+      <rect y={300} x={0} width={W} height={260} fill={ink.seaDeep} />
       {[250, 266, 282, 298, 314, 328].map((y, i) => (
         <line
           key={y}
           className="ripple"
-          x1={830}
+          x1={0}
           x2={W}
           y1={y}
           y2={y}
@@ -453,6 +444,17 @@ export function Harbour({
           style={{ "--d": `${3 + i}s` } as CSSProperties}
         />
       ))}
+
+      {/* Everything ashore, panned out of view while the vessel is at sea. */}
+      <g
+        className="port"
+        style={{ transform: atSea ? "translateX(-1320px)" : "translateX(0)" }}
+      >
+        {/* the far shore */}
+        <path
+          d="M0 236 V218 h40 v-8 h30 v12 h46 v-16 h22 v16 h60 v-6 h50 v10 h70 v-12 h24 v12 h90 v-8 h40 v8 h120 V236 Z"
+          fill={ink.distant}
+        />
 
       {/* lighthouse on the breakwater, its beam sweeping */}
       <g transform="translate(1168 236)">
@@ -610,6 +612,7 @@ export function Harbour({
           </text>
         )}
       </g>
+      </g>
 
       {item && (
         <Vessel
@@ -617,8 +620,24 @@ export function Harbour({
           name={item.shipment.vessel || item.shipment_id}
           far={item.status === "needs_human_decision" || congestion}
           running={running}
+          atSea={atSea}
         />
       )}
+      </g>
+      {stars.map(([x, y], i) => (
+        <circle
+          key={i}
+          className="star"
+          cx={x}
+          cy={y}
+          r={i % 3 ? 1.2 : 1.8}
+          fill={ink.white}
+          style={{ "--d": `${(i * 0.7) % 4}s` } as CSSProperties}
+        />
+      ))}
+      <circle cx={980} cy={-30} r={18} fill="#f3ead2" />
+      <circle cx={988} cy={-36} r={16} fill={ink.sky[0]} />
+
     </svg>
   );
 }

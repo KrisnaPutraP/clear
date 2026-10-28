@@ -1039,6 +1039,16 @@ main {
   transition: transform 3.2s cubic-bezier(0.33, 0, 0.15, 1);
 }
 
+.port {
+  transition: transform 3.6s cubic-bezier(0.33, 0, 0.15, 1);
+}
+
+.camera {
+  transform-box: view-box;
+  transform-origin: 575px 255px;
+  transition: transform 3.6s cubic-bezier(0.45, 0, 0.2, 1);
+}
+
 /* Under way: the sea runs past faster, the hull pitches, a wake trails. */
 .running .ripple {
   animation-duration: 1.4s;
