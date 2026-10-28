@@ -15,6 +15,7 @@ import {
   GitBranch,
   Info,
   Layers3,
+  Menu,
   Package,
   Play,
   Radio,
@@ -65,7 +66,7 @@ const statusDetails: Record<
   monitoring: {
     icon: CheckCircle2,
     description:
-      "No decision is pending. Review what CLEAR is monitoring next.",
+      "No decision is pending. Open monitoring to review the latest records and follow-up.",
   },
   needs_human_decision: {
     icon: TriangleAlert,
@@ -105,8 +106,14 @@ const date = (value: string) =>
     minute: "2-digit",
     timeZoneName: "short",
   });
-type Tab = "Overview" | "Documents" | "Inventory" | "Approval";
-const tabs: Tab[] = ["Overview", "Documents", "Inventory", "Approval"];
+type Tab = "Overview" | "Documents" | "Inventory" | "Approval" | "Monitoring";
+const tabs: Tab[] = [
+  "Overview",
+  "Documents",
+  "Inventory",
+  "Approval",
+  "Monitoring",
+];
 const tabDescriptions: Record<Tab, string> = {
   Overview:
     "Understand the disruption, compare recovery options, and see the next step.",
@@ -116,6 +123,8 @@ const tabDescriptions: Record<Tab, string> = {
     "Check available stock, safety thresholds, and which orders are affected.",
   Approval:
     "Review the validated transfer and record your decision before an ERP write.",
+  Monitoring:
+    "Review the latest shipment and stock records, and the follow-up needed for this case.",
 };
 
 function ClearMark({
@@ -215,7 +224,50 @@ export default function Workspace() {
     message: string;
   } | null>(null);
   const [eventsExpanded, setEventsExpanded] = useState(true);
+  const [navigationOpen, setNavigationOpen] = useState(false);
+  const navigationButton = useRef<HTMLButtonElement>(null);
+  const navigationClose = useRef<HTMLButtonElement>(null);
   const mutationLock = useRef(false);
+
+  function openCaseTab(next: Tab) {
+    setTab(next);
+    requestAnimationFrame(() => {
+      const panel = document.getElementById("case-tabpanel");
+      panel?.focus({ preventScroll: true });
+      panel?.scrollIntoView({ block: "nearest" });
+    });
+  }
+
+  useEffect(() => {
+    if (!navigationOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    navigationClose.current?.focus();
+    function closeOnEscape(event: KeyboardEvent) {
+      const pickerOpen =
+        CSS.supports("selector(select:open)") &&
+        document.querySelector("select:open");
+      if (event.defaultPrevented || pickerOpen) return;
+      if (event.key === "Escape") {
+        setNavigationOpen(false);
+        navigationButton.current?.focus();
+      }
+    }
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("keydown", closeOnEscape);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [navigationOpen]);
+
+  useEffect(() => {
+    const desktop = window.matchMedia("(min-width: 1101px)");
+    const closeOnDesktop = () => {
+      if (desktop.matches) setNavigationOpen(false);
+    };
+    desktop.addEventListener("change", closeOnDesktop);
+    return () => desktop.removeEventListener("change", closeOnDesktop);
+  }, []);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -379,25 +431,149 @@ export default function Workspace() {
     }
   }
 
+  const eventSimulator = (
+    <section
+      className="event-section"
+      id="event-simulator"
+      aria-labelledby="event-heading"
+    >
+      <button
+        className="event-toggle"
+        aria-expanded={eventsExpanded}
+        aria-controls="event-options"
+        onClick={() => setEventsExpanded(!eventsExpanded)}
+      >
+        <div className="section-heading">
+          <h2 id="event-heading">
+            <Radio size={17} />
+            Demo event simulator <span className="subtle-tag">Simulated</span>
+          </h2>
+          <span>
+            {eventsExpanded
+              ? "Choose an event to start or reassess a case"
+              : "Start another case or send an ETA update"}
+          </span>
+        </div>
+        <ChevronDown size={18} />
+      </button>
+      <div className="event-grid" id="event-options" hidden={!eventsExpanded}>
+        {events.map((event, i) => {
+          const etaNeedsCase =
+            event.type === "eta_change" &&
+            !cases.some((c) => c.shipment_id === event.shipment_id);
+          const Icon =
+            event.type === "customs_document_hold"
+              ? FileText
+              : event.type === "eta_change"
+                ? Clock3
+                : Ship;
+          return (
+            <button
+              className="event-card"
+              key={event.event_id}
+              disabled={disabled || etaNeedsCase}
+              onClick={() => void sendEvent(event)}
+              title={
+                etaNeedsCase
+                  ? "Start the customs document hold case first."
+                  : event.description
+              }
+            >
+              <div className="event-card-top">
+                <span className={`event-icon event-${i}`}>
+                  <Icon size={21} />
+                </span>
+                <span className="event-scenario">
+                  {event.scenario}
+                  {event.type === "eta_change"
+                    ? " · Follow-up"
+                    : " · New exception"}
+                </span>
+                <ArrowUpRight size={17} className="event-arrow" />
+              </div>
+              <h3>
+                {eventTitles[event.event_id] || event.type.replaceAll("_", " ")}
+              </h3>
+              <p>{event.description}</p>
+              <div className="event-card-bottom">
+                <span>{event.shipment_id}</span>
+                <span>
+                  {etaNeedsCase
+                    ? "Start the document case first"
+                    : busy
+                      ? "Wait for the current run"
+                      : event.type === "eta_change"
+                        ? "Reassess case"
+                        : "Start investigation"}
+                  <Play size={11} />
+                </span>
+              </div>
+            </button>
+          );
+        })}
+        {!events.length && (
+          <div className="event-placeholder">
+            {loading ? (
+              <>
+                <ClearMark active size={32} />
+                Loading available events…
+              </>
+            ) : (
+              "Events are unavailable. Check your API connection."
+            )}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+
   return (
-    <div className={`app-shell ${activeCase ? "has-case" : ""}`}>
+    <div
+      className={`app-shell ${activeCase ? "has-case" : ""} ${navigationOpen ? "navigation-open" : ""}`}
+    >
       <a className="skip-link" href="#workspace">
         Skip to case workspace
       </a>
-      <aside className="sidebar">
+      {navigationOpen && (
+        <button
+          className="navigation-backdrop"
+          aria-label="Close navigation"
+          tabIndex={-1}
+          onClick={() => {
+            setNavigationOpen(false);
+            navigationButton.current?.focus();
+          }}
+        />
+      )}
+      <aside
+        className="sidebar"
+        id="planner-navigation"
+        aria-label="Planner navigation"
+      >
+        <button
+          ref={navigationClose}
+          className="navigation-close"
+          onClick={() => {
+            setNavigationOpen(false);
+            navigationButton.current?.focus();
+          }}
+          aria-label="Close navigation"
+        >
+          <X size={20} />
+        </button>
         <a className="brand" href="/" aria-label="CLEAR home">
           <span className="brand-icon">
             <ClearMark />
           </span>
           CLEAR<span className="brand-period">.</span>
         </a>
-        <div className="workspace-label">PLANNER WORKSPACE</div>
+        <div className="workspace-label">Planner workspace</div>
         <div className="nav-current">
           <Layers3 size={17} />
-          Exception workspace<span>{cases.length}</span>
+          Exception workspace
         </div>
         <div className="sidebar-heading">
-          YOUR CASES<span>{loading ? "…" : cases.length}</span>
+          Cases<span>{loading ? "…" : cases.length}</span>
         </div>
         <nav className="case-list" aria-label="Cases">
           {cases.map((item) => (
@@ -410,6 +586,7 @@ export default function Workspace() {
                 setTab("Overview");
                 setActionError("");
                 setFeedback(null);
+                setNavigationOpen(false);
               }}
             >
               <span className="case-link-top">
@@ -440,6 +617,7 @@ export default function Workspace() {
           </label>
           <select
             id="planner"
+            aria-describedby="planner-caption"
             value={approver}
             onChange={(e) => setApprover(e.target.value)}
             disabled={busy}
@@ -447,12 +625,27 @@ export default function Workspace() {
             <option>Rina Hartono</option>
             <option>Bayu Pratama</option>
           </select>
-          <div className="planner-caption">Fictional demo identities</div>
+          <div className="planner-caption" id="planner-caption">
+            Fictional demo identities
+          </div>
         </div>
       </aside>
 
       <div className="main-shell">
         <header className="topbar">
+          <button
+            ref={navigationButton}
+            className="navigation-toggle"
+            aria-expanded={navigationOpen}
+            aria-controls="planner-navigation"
+            aria-label="Open navigation"
+            onClick={() => setNavigationOpen(!navigationOpen)}
+          >
+            <Menu size={20} />
+          </button>
+          <a className="mobile-brand" href="/" aria-label="CLEAR home">
+            <ClearMark size={23} /> CLEAR.
+          </a>
           <span>
             Operations <ChevronRight size={13} />
             <strong>Exception workspace</strong>
@@ -486,7 +679,7 @@ export default function Workspace() {
             </div>
           </div>
         </header>
-        <main>
+        <main inert={navigationOpen || undefined}>
           <div className="page-heading">
             <div>
               <h1>Exception workspace</h1>
@@ -494,25 +687,39 @@ export default function Workspace() {
                 See what is at risk. Review the evidence. Decide the next move.
               </p>
             </div>
-            <div className="live-indicator">
-              {busy ? (
-                <ClearMark active size={22} />
-              ) : (
-                <ShieldCheck size={16} />
+            <div className="workspace-tools">
+              <a
+                className="simulator-shortcut"
+                href="#event-simulator"
+                onClick={() => setEventsExpanded(true)}
+              >
+                <Radio size={16} />
+                Simulate event
+              </a>
+              {(busy || !activeCase) && (
+                <div className="live-indicator">
+                  {busy ? (
+                    <ClearMark active size={22} />
+                  ) : (
+                    <ShieldCheck size={16} />
+                  )}
+                  {busy
+                    ? "Agents working"
+                    : attention.length
+                      ? "Decision pending"
+                      : "Ready for the next event"}
+                </div>
               )}
-              {busy
-                ? "Agents working"
-                : attention.length
-                  ? "Decision pending"
-                  : "Ready for the next event"}
             </div>
           </div>
 
           {health?.mode === "scripted" && (
-            <Notice title="Scripted development mode.">
-              Predefined agent responses and synthetic data. Live AI reasoning
-              is off.
-            </Notice>
+            <div className="environment-notice">
+              <Notice title="Scripted development mode.">
+                Predefined agent responses and synthetic data. Live AI reasoning
+                is off.
+              </Notice>
+            </div>
           )}
           {error && (
             <Notice
@@ -554,101 +761,7 @@ export default function Workspace() {
             </Notice>
           )}
 
-          <section className="event-section" aria-labelledby="event-heading">
-            <button
-              className="event-toggle"
-              aria-expanded={eventsExpanded}
-              aria-controls="event-options"
-              onClick={() => setEventsExpanded(!eventsExpanded)}
-            >
-              <div className="section-heading">
-                <h2 id="event-heading">
-                  <Radio size={17} />
-                  Demo event simulator{" "}
-                  <span className="subtle-tag">Simulated</span>
-                </h2>
-                <span>
-                  {eventsExpanded
-                    ? "Choose an event to start or reassess a case"
-                    : "Start another case or send an ETA update"}
-                </span>
-              </div>
-              <ChevronDown size={18} />
-            </button>
-            <div
-              className="event-grid"
-              id="event-options"
-              hidden={!eventsExpanded}
-            >
-              {events.map((event, i) => {
-                const etaNeedsCase =
-                  event.type === "eta_change" &&
-                  !cases.some((c) => c.shipment_id === event.shipment_id);
-                const Icon =
-                  event.type === "customs_document_hold"
-                    ? FileText
-                    : event.type === "eta_change"
-                      ? Clock3
-                      : Ship;
-                return (
-                  <button
-                    className="event-card"
-                    key={event.event_id}
-                    disabled={disabled || etaNeedsCase}
-                    onClick={() => void sendEvent(event)}
-                    title={
-                      etaNeedsCase
-                        ? "Start the customs document hold case first."
-                        : event.description
-                    }
-                  >
-                    <div className="event-card-top">
-                      <span className={`event-icon event-${i}`}>
-                        <Icon size={21} />
-                      </span>
-                      <span className="event-scenario">
-                        {event.scenario}
-                        {event.type === "eta_change"
-                          ? " · Follow-up"
-                          : " · New exception"}
-                      </span>
-                      <ArrowUpRight size={17} className="event-arrow" />
-                    </div>
-                    <h3>
-                      {eventTitles[event.event_id] ||
-                        event.type.replaceAll("_", " ")}
-                    </h3>
-                    <p>{event.description}</p>
-                    <div className="event-card-bottom">
-                      <span>{event.shipment_id}</span>
-                      <span>
-                        {etaNeedsCase
-                          ? "Start the document case first"
-                          : busy
-                            ? "Wait for the current run"
-                            : event.type === "eta_change"
-                              ? "Reassess case"
-                              : "Start investigation"}
-                        <Play size={11} />
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
-              {!events.length && (
-                <div className="event-placeholder">
-                  {loading ? (
-                    <>
-                      <ClearMark active size={32} />
-                      Loading available events…
-                    </>
-                  ) : (
-                    "Events are unavailable. Check your API connection."
-                  )}
-                </div>
-              )}
-            </div>
-          </section>
+          {!activeCase && eventSimulator}
 
           <div className="workspace-heading" id="workspace" tabIndex={-1}>
             <h2>Case workspace</h2>
@@ -730,7 +843,7 @@ export default function Workspace() {
               <CaseProgress
                 item={activeCase}
                 entries={logs}
-                onReview={() => setTab("Approval")}
+                onNavigate={openCaseTab}
               />
               <div className="case-grid">
                 <section className="detail-panel">
@@ -758,11 +871,13 @@ export default function Workspace() {
                               e.key === "Home"
                                 ? tabs[0]
                                 : e.key === "End"
-                                  ? tabs[3]
+                                  ? tabs[tabs.length - 1]
                                   : tabs[
                                       (tabs.indexOf(name) +
-                                        (e.key === "ArrowRight" ? 1 : 3)) %
-                                        4
+                                        (e.key === "ArrowRight"
+                                          ? 1
+                                          : tabs.length - 1)) %
+                                        tabs.length
                                     ];
                             setTab(next);
                             document.getElementById(`tab-${next}`)?.focus();
@@ -799,14 +914,10 @@ export default function Workspace() {
                     aria-labelledby={`tab-${tab}`}
                   >
                     <p className="tab-description">{tabDescriptions[tab]}</p>
-                    {tab === "Overview" && (
-                      <Overview
-                        item={activeCase}
-                        onReview={() => setTab("Approval")}
-                      />
-                    )}
+                    {tab === "Overview" && <Overview item={activeCase} />}
                     {tab === "Documents" && <Documents item={activeCase} />}
                     {tab === "Inventory" && <Inventory item={activeCase} />}
+                    {tab === "Monitoring" && <Monitoring item={activeCase} />}
                     {tab === "Approval" && (
                       <div className="approval-list">
                         <div className="panel-heading">
@@ -841,14 +952,55 @@ export default function Workspace() {
                     )}
                   </div>
                 </section>
-                <Timeline
-                  key={activeCase.case_id}
-                  entries={logs}
-                  running={activeCase.running}
-                />
+                <div className="case-rail">
+                  {activeCase.plan && (
+                    <section
+                      className="case-evidence"
+                      aria-labelledby="evidence-heading"
+                    >
+                      <div className="subsection-heading">
+                        <h3 id="evidence-heading">Supporting evidence</h3>
+                        <span>{activeCase.plan.evidence.length} findings</span>
+                      </div>
+                      <div className="evidence-list">
+                        {activeCase.plan.evidence.map((evidence, i) => (
+                          <div key={i}>
+                            <CheckCircle2 size={15} />
+                            <div>
+                              <p>{evidence.fact}</p>
+                              <span>{evidence.source}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </section>
+                  )}
+                  <Timeline
+                    key={activeCase.case_id}
+                    entries={logs}
+                    running={activeCase.running}
+                  />
+                  {activeCase.plan && (
+                    <section className="next-check">
+                      <Radio size={17} />
+                      <div>
+                        <h3>What happens next</h3>
+                        <p>{activeCase.plan.next_check}</p>
+                        <button
+                          className="text-button"
+                          onClick={() => openCaseTab("Monitoring")}
+                        >
+                          View monitoring <ArrowRight size={14} />
+                        </button>
+                      </div>
+                    </section>
+                  )}
+                </div>
               </div>
             </>
           )}
+
+          {activeCase && eventSimulator}
 
           <footer>
             <span>
@@ -866,11 +1018,11 @@ export default function Workspace() {
 function CaseProgress({
   item,
   entries,
-  onReview,
+  onNavigate,
 }: {
   item: Case;
   entries: LogEntry[];
-  onReview: () => void;
+  onNavigate: (tab: Tab) => void;
 }) {
   const latest = entries.findLast((entry) => entry.kind === "tool");
   const phase =
@@ -895,6 +1047,14 @@ function CaseProgress({
         : "Review & approve",
     "Monitor",
   ];
+  const destinations: Tab[] = [
+    "Documents",
+    "Overview",
+    item.status === "needs_human_decision" || !item.plan?.actions.length
+      ? "Overview"
+      : "Approval",
+    "Monitoring",
+  ];
   return (
     <section
       className={`case-progress ${item.status}`}
@@ -915,8 +1075,19 @@ function CaseProgress({
           <p>{item.status_reason || statusDetails[item.status].description}</p>
         </div>
         {item.status === "awaiting_approval" && !active && (
-          <button className="primary-button" onClick={onReview}>
+          <button
+            className="primary-button"
+            onClick={() => onNavigate("Approval")}
+          >
             Review transfer <ArrowRight size={16} />
+          </button>
+        )}
+        {item.status === "monitoring" && !active && (
+          <button
+            className="primary-button"
+            onClick={() => onNavigate("Monitoring")}
+          >
+            View monitoring <ArrowRight size={16} />
           </button>
         )}
       </div>
@@ -928,7 +1099,7 @@ function CaseProgress({
             aria-current={i === phase ? "step" : undefined}
           >
             <span>{i < phase ? <Check size={13} /> : i + 1}</span>
-            {step}
+            <button onClick={() => onNavigate(destinations[i])}>{step}</button>
           </li>
         ))}
       </ol>
@@ -958,7 +1129,157 @@ function CaseProgress({
   );
 }
 
-function Overview({ item, onReview }: { item: Case; onReview: () => void }) {
+function Monitoring({ item }: { item: Case }) {
+  const plan = item.plan;
+  const executed =
+    plan?.actions.filter((action) => action.status === "executed") || [];
+  return (
+    <div className="monitoring-view">
+      {item.status !== "monitoring" && (
+        <Notice
+          title={
+            item.running
+              ? "Case reassessment in progress"
+              : "Monitoring is not the current stage"
+          }
+        >
+          {item.running
+            ? "The records below may change when the current run finishes."
+            : `This case is ${statuses[item.status].toLowerCase()}. Review the current stage before following up.`}
+        </Notice>
+      )}
+      <div className="monitoring-follow-up">
+        <h3>Next follow-up</h3>
+        <p>
+          {plan?.next_check ||
+            "Follow-up will be available after CLEAR prepares a recovery plan."}
+        </p>
+        <p className="panel-footnote">
+          New logistics events trigger a reassessment. These records do not
+          confirm delivery or customs release.
+        </p>
+      </div>
+      <section
+        className="monitoring-section"
+        aria-labelledby="shipment-monitor-heading"
+      >
+        <h3 id="shipment-monitor-heading">Shipment arrival</h3>
+        <dl className="monitoring-facts">
+          <div>
+            <dt>Shipment</dt>
+            <dd>{item.shipment_id}</dd>
+          </div>
+          <div>
+            <dt>Latest recorded ETA</dt>
+            <dd>{date(item.shipment.eta)}</dd>
+          </div>
+          <div>
+            <dt>Arrival port</dt>
+            <dd>{item.shipment.port_of_discharge}</dd>
+          </div>
+          {item.shipment.vessel && (
+            <div>
+              <dt>Vessel</dt>
+              <dd>{item.shipment.vessel}</dd>
+            </div>
+          )}
+        </dl>
+      </section>
+      <section
+        className="monitoring-section"
+        aria-labelledby="transfer-monitor-heading"
+      >
+        <h3 id="transfer-monitor-heading">Transfer follow-up</h3>
+        {executed.length ? (
+          executed.map((action) => (
+            <div className="monitoring-transfer" key={action.validation_id}>
+              <p className="monitoring-order">
+                <CheckCircle2 size={16} />
+                Order created:{" "}
+                {action.sto?.purchase_order || "See agent activity"}
+              </p>
+              <dl className="monitoring-facts">
+                <div>
+                  <dt>Route</dt>
+                  <dd>
+                    Plant {action.validation.source_plant}{" "}
+                    <ArrowRight size={14} aria-label="to" /> Plant{" "}
+                    {action.validation.destination_plant}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Quantity</dt>
+                  <dd>
+                    {number(
+                      action.sto?.quantity_t ?? action.validation.quantity,
+                    )}{" "}
+                    t
+                  </dd>
+                </div>
+                {action.approval && (
+                  <div>
+                    <dt>Approved by</dt>
+                    <dd>{action.approval.approver}</dd>
+                  </div>
+                )}
+              </dl>
+              <p className="panel-footnote">
+                Confirm delivery and goods receipt with the receiving plant.
+              </p>
+            </div>
+          ))
+        ) : (
+          <p>
+            {item.status === "monitoring" && plan && !plan.actions.length
+              ? "No stock transfer required by the current plan. Follow the shipment and next follow-up above."
+              : "No stock transport order has been created in the current plan."}
+          </p>
+        )}
+      </section>
+      <section
+        className="monitoring-section"
+        aria-labelledby="stock-monitor-heading"
+      >
+        <h3 id="stock-monitor-heading">
+          Stock position · {item.inventory.material}
+        </h3>
+        <p className="panel-footnote">
+          In-transit stock is separate from available stock until goods receipt.
+        </p>
+        <div className="table-scroll">
+          <table
+            className="monitoring-stock"
+            aria-labelledby="stock-monitor-heading"
+          >
+            <thead>
+              <tr>
+                <th scope="col">Plant</th>
+                <th scope="col">Available</th>
+                <th scope="col">In transit</th>
+                <th scope="col">Safety stock</th>
+              </tr>
+            </thead>
+            <tbody>
+              {item.inventory.plants.map((plant) => (
+                <tr key={plant.plant}>
+                  <th scope="row">{plant.plant}</th>
+                  <td>{number(plant.unrestricted_t)} t</td>
+                  <td>{number(plant.in_transit_t)} t</td>
+                  <td>{number(plant.safety_stock_t)} t</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="panel-footnote">
+          Source: S/4HANA (mock). Case updated {date(item.updated_at)}.
+        </p>
+      </section>
+    </div>
+  );
+}
+
+function Overview({ item }: { item: Case }) {
   const plan = item.plan;
   if (!plan)
     return (
@@ -990,13 +1311,27 @@ function Overview({ item, onReview }: { item: Case; onReview: () => void }) {
       </div>
     );
   const impact = plan.impact;
+  const transfer = plan.actions.find(
+    (action) => action.validation.valid,
+  )?.validation;
   return (
     <>
-      <div className="panel-heading">
-        <h3>Exception brief</h3>
-        <span className="source-label">{item.shipment_id}</span>
+      <div className="recommendation">
+        <GitBranch size={20} />
+        <div>
+          <h3>Recommended next move</h3>
+          {transfer && (
+            <p className="recommendation-route">
+              Transfer <strong>{number(transfer.quantity)} t</strong>
+              <span>
+                Plant {transfer.source_plant} <ArrowRight size={14} /> Plant{" "}
+                {transfer.destination_plant}
+              </span>
+            </p>
+          )}
+          <p>{plan.recommendation}</p>
+        </div>
       </div>
-      <h3 className="exception-title">{plan.exception}</h3>
       <div className="metric-grid">
         <Metric
           label="Resolution estimate"
@@ -1018,26 +1353,17 @@ function Overview({ item, onReview }: { item: Case; onReview: () => void }) {
           warning={!impact.covered}
         />
       </div>
+      <div className="panel-heading">
+        <h3>Exception brief</h3>
+        <span className="source-label">{item.shipment_id}</span>
+      </div>
+      <p className="exception-title">{plan.exception}</p>
       {impact.prediction.basis.fallback_reason && (
         <Notice tone="warning" title="Backup estimate in use">
           SAP-RPT is unavailable. The estimate uses the historical median;
           review the prediction source before deciding.
         </Notice>
       )}
-      <div className="recommendation">
-        <div className="recommendation-icon">
-          <GitBranch size={20} />
-        </div>
-        <div>
-          <h4>Recommended next move</h4>
-          <p>{plan.recommendation}</p>
-          {item.status === "awaiting_approval" && (
-            <button onClick={onReview}>
-              Review transfer <ArrowRight size={14} />
-            </button>
-          )}
-        </div>
-      </div>
       {plan.escalation && (
         <div className="escalation">
           <TriangleAlert size={18} />
@@ -1063,28 +1389,6 @@ function Overview({ item, onReview }: { item: Case; onReview: () => void }) {
             valid={option.validation?.valid}
           />
         ))}
-      </div>
-      <div className="subsection-heading">
-        <h4>Supporting evidence</h4>
-        <span>{plan.evidence.length} findings</span>
-      </div>
-      <div className="evidence-list">
-        {plan.evidence.map((evidence, i) => (
-          <div key={i}>
-            <CheckCircle2 size={15} />
-            <div>
-              <p>{evidence.fact}</p>
-              <span>{evidence.source}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-      <div className="next-check">
-        <Radio size={17} />
-        <div>
-          <strong>What happens next</strong>
-          <p>{plan.next_check}</p>
-        </div>
       </div>
     </>
   );
@@ -1660,6 +1964,7 @@ function Timeline({
 }) {
   const scroll = useRef<HTMLDivElement>(null);
   const follow = useRef(true);
+  const hasRunLive = useRef(running);
   const [showNotes, setShowNotes] = useState(false);
   const [following, setFollowing] = useState(true);
   const visibleEntries = showNotes
@@ -1668,9 +1973,10 @@ function Timeline({
         (entry) => entry.kind !== "note" && entry.kind !== "delegation",
       );
   useEffect(() => {
-    if (follow.current && scroll.current)
+    if (running) hasRunLive.current = true;
+    if (follow.current && scroll.current && hasRunLive.current)
       scroll.current.scrollTop = scroll.current.scrollHeight;
-  }, [entries.length]);
+  }, [entries.length, running]);
   return (
     <aside className="timeline-panel">
       <div className="timeline-heading">

@@ -184,7 +184,6 @@ textarea {
 .case-link.selected {
   background: white;
   border-color: #d7e2d6;
-  box-shadow: 0 3px 7px #243b2b06;
 }
 .case-link-top {
   display: flex;
@@ -288,7 +287,6 @@ textarea {
 }
 .connection-dot.online {
   background: #4a9b74;
-  box-shadow: 0 0 0 3px #e5f1e5;
 }
 .connection-dot.offline {
   background: var(--red);
@@ -403,11 +401,9 @@ main {
   border-radius: var(--radius);
   color: var(--ink);
   min-height: 186px;
-  box-shadow: 0 2px 2px #163c1a02;
 }
 .event-card:not(:disabled):hover {
   border-color: #9abb9e;
-  box-shadow: 0 5px 15px #1d472609;
 }
 .event-card-top {
   display: flex;
@@ -990,7 +986,6 @@ main {
   border: 2px solid white;
   border-radius: 50%;
   background: #acc29d;
-  box-shadow: 0 0 0 1px #dae5d3;
   display: grid;
   place-items: center;
 }
@@ -1977,7 +1972,6 @@ td,
 }
 .event-card {
   min-height: 176px;
-  box-shadow: none;
 }
 .event-card h3 {
   font-size: 14px;
