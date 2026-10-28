@@ -119,7 +119,7 @@ function ClearMark({
       {active && (
         <img
           className="compass-animated"
-          src="/clear-compass-loading.svg"
+          src="/clear-compass-loading.webp"
           width={size}
           height={size}
           alt=""
