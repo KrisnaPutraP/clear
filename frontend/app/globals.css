@@ -744,6 +744,11 @@ main {
   transition: background-color 160ms;
 }
 
+/* The event the landing page handed over, waiting to be sent. */
+.event-card.suggested {
+  box-shadow: inset 0 0 0 2px var(--signal-yellow);
+}
+
 .event-card:hover:not(:disabled) {
   background: var(--surface-2);
 }

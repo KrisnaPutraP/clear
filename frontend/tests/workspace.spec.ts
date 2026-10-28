@@ -17,7 +17,7 @@ test("planner can investigate, approve, reassess, and review a covered case", as
     });
   });
   page.on("pageerror", (error) => errors.push(error.message));
-  await page.goto("/");
+  await page.goto("/workspace");
   await expect(page.getByText("API connected", { exact: true })).toBeVisible();
   await expect(
     page.getByText("Scripted development mode.", { exact: true }),
@@ -427,7 +427,7 @@ test("connection errors explain paused decisions and allow recovery", async ({
         })
       : route.continue(),
   );
-  await page.goto("/");
+  await page.goto("/workspace");
   await expect(page.locator(".notice-error[role='alert']")).toContainText(
     "Decisions are disabled",
   );

@@ -60,7 +60,7 @@ cd frontend
 npm run dev
 ```
 
-Open `http://127.0.0.1:3000`. API documentation is at
+Open `http://127.0.0.1:3000/workspace` (the landing page is at `/`). API documentation is at
 `http://127.0.0.1:8000/docs`.
 
 The API initializes local runtime data from the seed only when the runtime
