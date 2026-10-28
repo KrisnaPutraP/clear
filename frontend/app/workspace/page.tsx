@@ -965,9 +965,7 @@ export default function Workspace() {
                       </ul>
                     </section>
                   )}
-                  {/* On the Monitoring tab the follow-up is already in full
-                      beside it. */}
-                  {shownCase.plan && tab !== "Monitoring" && (
+                  {shownCase.plan && (
                     <section className="next-check">
                       <h3>What happens next</h3>
                       <FollowUp
