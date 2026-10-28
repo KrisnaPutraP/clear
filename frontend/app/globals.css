@@ -2987,6 +2987,19 @@ textarea:focus-visible {
   overflow: hidden;
 }
 
+.clamped-2 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.follow-up-more {
+  margin-top: 4px;
+  color: var(--ink-3);
+  font-size: 13px;
+}
+
 .text-button {
   display: inline-flex;
   align-items: center;

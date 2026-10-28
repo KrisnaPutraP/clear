@@ -965,7 +965,9 @@ export default function Workspace() {
                       </ul>
                     </section>
                   )}
-                  {shownCase.plan && (
+                  {/* On the Monitoring tab the follow-up is already in full
+                      beside it. */}
+                  {shownCase.plan && tab !== "Monitoring" && (
                     <section className="next-check">
                       <h3>What happens next</h3>
                       <FollowUp
@@ -1475,8 +1477,9 @@ function Typed({
 // The plan stores a follow-up one point per line as "1. ", "2. "; older plans
 // ran them together, numbered "1." or "1)". Split it on the numbers
 // only when they count up from 1, so a figure such as "4.83" or a sentence
-// ending in a number never breaks it, and lift an upper-case lead-in before
-// a colon out as the point's label.
+// ending in a number never breaks it, and lift a short lead-in before a
+// colon ("Document resolution:", "CUSTOMS HOLD (binding constraint):") out as
+// the point's label.
 type FollowUpPoint = { label: string | null; text: string };
 function followUpPoints(text: string): FollowUpPoint[] | null {
   const marks: { at: number; end: number }[] = [];
@@ -1488,10 +1491,12 @@ function followUpPoints(text: string): FollowUpPoint[] | null {
   if (marks.length < 2 || text.slice(0, marks[0].at).trim()) return null;
   return marks.map((mark, i) => {
     const point = text.slice(mark.end, marks[i + 1]?.at ?? text.length).trim();
-    const lead = point.match(/^([^:a-z]{3,60}?)(?:\s*\(([^)]*)\))?:\s+([\s\S]*)$/);
-    if (!lead || !/[A-Z]{2}/.test(lead[1])) return { label: null, text: point };
+    const lead = point.match(/^([^:.,;()]{3,48}?)(?:\s*\(([^)]*)\))?:\s+([\s\S]*)$/);
+    if (!lead || lead[1].trim().split(/\s+/).length > 5)
+      return { label: null, text: point };
     const label = lead[1].trim() + (lead[2] ? ` · ${lead[2]}` : "");
-    return { label, text: lead[3] };
+    // The detail now opens its own line, so it opens with a capital.
+    return { label, text: lead[3].charAt(0).toUpperCase() + lead[3].slice(1) };
   });
 }
 
@@ -1511,7 +1516,8 @@ function FollowUp({
         <Typed text={text} version={version} delay={300} />
       </p>
     );
-  // The rail lists what to watch; the Monitoring tab carries the detail.
+  // The rail points at the follow-up; the Monitoring tab carries it in full.
+  // With labels it lists them; without, it shows the first point and a count.
   if (compact && points.every((point) => point.label))
     return (
       <ol className="follow-up compact">
@@ -1521,6 +1527,18 @@ function FollowUp({
           </li>
         ))}
       </ol>
+    );
+  if (compact)
+    return (
+      <>
+        <p className="follow-up-text clamped-2">
+          <Typed text={points[0].text} version={version} delay={300} />
+        </p>
+        <p className="follow-up-more">
+          and {points.length - 1} more{" "}
+          {points.length - 1 === 1 ? "check" : "checks"}
+        </p>
+      </>
     );
   return (
     <ol className={`follow-up ${compact ? "compact" : ""}`}>
