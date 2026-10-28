@@ -9,4 +9,4 @@ npm run preview   # Render one preview with Remotion
 npm run assets    # Export the vector assets used by the app
 ```
 
-The scene is `src/compass.mjs`. The exported SVG animation is 72 frames at 24 fps with a seamless three-second loop. The frontend serves a static 3D frame for reduced motion, and the original outline mark in the sidebar. Remotion is an authoring dependency only; the app uses ordinary SVG image assets.
+The scene is `src/compass.mjs`. The SVG runs at 60 fps in a four-second loop: three revolutions that start slowly, accelerate sharply, then settle onto the starting pose. Reused vector poses keep the export small. Both the SVG and the Remotion scene have transparent backgrounds. The frontend serves a static 3D frame for reduced motion, and the original outline mark in the sidebar. Remotion is an authoring dependency only; the app uses ordinary SVG image assets.

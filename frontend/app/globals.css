@@ -2051,6 +2051,9 @@ td,
   background: #ffffff90;
   border-radius: 10px;
 }
+.case-state-icon:has(.clear-mark[data-active="true"]) {
+  background: transparent;
+}
 .case-next-step h2 {
   font-size: 16px;
   font-weight: 650;

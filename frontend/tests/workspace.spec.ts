@@ -43,6 +43,10 @@ test("planner can investigate, approve, reassess, and review a covered case", as
     page.locator(".analysis-icon .clear-mark[data-active='true']"),
   ).toBeVisible();
   const compass = page.locator(".analysis-icon .clear-mark");
+  await expect(page.locator(".case-state-icon")).toHaveCSS(
+    "background-color",
+    "rgba(0, 0, 0, 0)",
+  );
   await expect
     .poll(async () =>
       compass
@@ -57,7 +61,7 @@ test("planner can investigate, approve, reassess, and review a covered case", as
     .toBeTruthy();
   await expect(compass.locator(".compass-animated")).toBeVisible();
   const movingFrame = await compass.screenshot();
-  await page.waitForTimeout(250);
+  await page.waitForTimeout(650);
   expect(Buffer.compare(movingFrame, await compass.screenshot())).not.toBe(0);
   await expect(page.locator(".clear-orbit, .compass-edge")).toHaveCount(0);
   await page.screenshot({
@@ -66,6 +70,9 @@ test("planner can investigate, approve, reassess, and review a covered case", as
   });
   await page.locator(".analysis-state").screenshot({
     path: "test-results/compass-loading-3d.png",
+  });
+  await page.locator(".case-next-step").screenshot({
+    path: "test-results/compass-loading-banner.png",
   });
   await page.setViewportSize({ width: 390, height: 844 });
   expect(

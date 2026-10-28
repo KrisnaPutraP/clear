@@ -1,9 +1,10 @@
-import { interpolate } from "remotion";
+import { Easing, interpolate } from "remotion";
 
 // Like the portfolio's CafeNight scene: geometry, light and frame timing are
 // authored in code. Project the solid into SVG instead of baking a raster clip.
-export const FPS = 24;
-export const FRAMES = 72;
+export const FPS = 60;
+export const FRAMES = 240;
+const spinEase = Easing.bezier(0.76, 0, 0.24, 1);
 const TAU = Math.PI * 2;
 const SEGMENTS = 64;
 const faces = [];
@@ -89,8 +90,15 @@ const normalize = (v) => {
 const light = normalize([-0.55, -0.8, 1.5]);
 const round = (n) => Number(n.toFixed(1));
 
+export function turnsAtFrame(frame) {
+  return interpolate(frame, [0, FRAMES], [0, 3], { easing: spinEase });
+}
+
 export function framePaths(frame) {
-  const turn = interpolate(frame, [0, FRAMES], [-0.36, TAU - 0.36]);
+  // Reusable three-degree poses keep the vector asset small while the timeline
+  // accelerates through three revolutions and settles back onto its first pose.
+  const turn =
+    ((Math.round(turnsAtFrame(frame) * 120) % 120) / 120) * TAU - 0.36;
   const tilt = -0.25;
   const rotate = ([x, y, z]) => {
     const u = x * Math.cos(turn) + z * Math.sin(turn);
