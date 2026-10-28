@@ -14,7 +14,7 @@ const documentFace = JetBrains_Mono({ // taste-skill-ignore
 });
 
 export const metadata: Metadata = {
-  title: "CLEAR — Exception workspace",
+  title: "CLEAR",
   description:
     "Investigate shipment exceptions, assess supply exposure, and approve validated recovery plans.",
 };
