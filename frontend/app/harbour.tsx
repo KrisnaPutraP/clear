@@ -222,14 +222,44 @@ function Vessel({
   running: boolean;
 }) {
   const cargo = [ink.red, ink.blue, ink.yellow, ink.white, ink.blue, ink.red];
+  // While the agents work the vessel is under way offshore; when they finish
+  // it glides in to the anchorage off the crane and drops its anchor. A held
+  // or delayed vessel stays out at sea. It never berths: that would claim a
+  // customs release the case does not have.
+  const position = running
+    ? "translate(1040px, 254px) scale(0.6)"
+    : far
+      ? "translate(980px, 252px) scale(0.62)"
+      : "translate(880px, 284px) scale(1)";
   return (
     <g
-      className={`vessel ${far ? "far" : ""}`}
-      transform={far ? "translate(980 252) scale(0.62)" : "translate(880 284)"}
+      className={`vessel ${running ? "sailing" : "anchored"}`}
+      style={{ transform: position }}
     >
       <g className="bob">
-        {/* anchor chain */}
-        <path d="M14 0 L-6 30" stroke={ink.steel} strokeWidth={2} />
+        {running ? (
+          <g className="wake">
+            <path d="M-4 4 q-10 -2 -16 -10" stroke={ink.white} strokeWidth={2} fill="none" />
+            <path d="M-2 8 q-14 -1 -24 -8" stroke={ink.white} strokeWidth={1.5} fill="none" opacity={0.6} />
+            {[0, 1, 2, 3].map((i) => (
+              <line
+                key={i}
+                className="wake-line"
+                x1={240}
+                x2={420}
+                y1={-2 + i * 5}
+                y2={-2 + i * 5}
+                stroke={ink.white}
+                strokeWidth={2}
+                strokeDasharray={`${14 + i * 6} ${22 + i * 8}`}
+                opacity={0.5 - i * 0.1}
+                style={{ "--d": `${0.8 + i * 0.3}s` } as CSSProperties}
+              />
+            ))}
+          </g>
+        ) : (
+          <path className="anchor-chain" d="M14 0 L-6 30" stroke={ink.steel} strokeWidth={2} />
+        )}
         <path d="M0 -26 H232 L214 6 H18 Z" fill={ink.dark} />
         <path d="M6 -6 H228 L222 4 H12 Z" fill="#b8261d" />
         <text className="hull-name" x={44} y={-12}>

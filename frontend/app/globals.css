@@ -1036,7 +1036,44 @@ main {
 }
 
 .vessel {
-  transition: transform 1.6s var(--ease-out);
+  transition: transform 3.2s cubic-bezier(0.33, 0, 0.15, 1);
+}
+
+/* Under way: the sea runs past faster, the hull pitches, a wake trails. */
+.running .ripple {
+  animation-duration: 1.4s;
+}
+
+.vessel.sailing .bob {
+  animation: pitch 2.4s ease-in-out infinite;
+}
+
+.wake-line {
+  animation: ripple var(--d) linear infinite;
+}
+
+.anchor-chain {
+  stroke-dasharray: 40;
+  animation: drop-anchor 1.2s var(--ease-out) 3s both;
+}
+
+@keyframes pitch {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(3px) rotate(-1.2deg);
+  }
+}
+
+@keyframes drop-anchor {
+  from {
+    stroke-dashoffset: 40;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
 }
 
 .mast-flag > g {
