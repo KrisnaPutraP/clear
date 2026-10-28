@@ -24,6 +24,9 @@ write before it reaches the ERP.
   policies** let each agent's IAM role call only its own tools and forbid the
   STO without the Action agent and an approval. The tools run in **AWS
   Lambda** on **DynamoDB**.
+- A planner can also work a case from **SAP Joule**: Joule calls CLEAR over
+  A2A through a BTP destination, and the agents answer from a Cloud Foundry
+  app on SAP BTP, with the same tools, gateway, and policies.
 - **The LLM proposes, code computes and validates, a human approves:** every
   number comes from data, deterministic tools, or SAP-RPT-1.6, and shows its
   source.
@@ -69,6 +72,8 @@ To run the agents live (SAP AI Core) and the tools on AWS, follow
 | `python scripts/reset_data.py` | Fresh demo data (`--aws` for the DynamoDB table) |
 | `python scripts/check_policies.py` | What the gateway's Cedar policies allow and deny |
 | `python scripts/gateway_env.py` | The `.env` lines for the deployed gateway |
+| `python scripts/run_joule_agent.py` | CLEAR as an A2A agent for SAP Joule (`--scripted` without credentials) |
+| `python scripts/cf_env.py --gateway` | The Joule app's settings on Cloud Foundry, from `.env` |
 
 ## Repository
 
