@@ -1969,6 +1969,21 @@ function Approval({
     action.status === "awaiting_approval" &&
     caseItem.status === "awaiting_approval" &&
     action.approval?.decision !== "rejected";
+  // The options this transfer serves: the planner picks one as they approve.
+  // They differ only in which orders go first, so the choice travels with the
+  // approval as its note and the transfer itself stays the validated one.
+  const courses = (caseItem.plan?.options || []).filter(
+    (option) => option.validation?.validation_id === action.validation_id,
+  );
+  const [course, setCourse] = useState(
+    courses.find((option) => option.name === caseItem.plan?.recommended_option)
+      ?.name ??
+      courses[0]?.name ??
+      "",
+  );
+  const approvalNote = [course && `Course: ${course}`, reason.trim()]
+    .filter(Boolean)
+    .join(" · ");
   return (
     <div
       className={`approval-card ${isPending ? "pending" : ""} ${action.status}`}
@@ -1998,7 +2013,7 @@ function Approval({
           <strong>Plant {valid.destination_plant}</strong>
         </div>
       </div>
-      <ApprovalPlan action={action} caseItem={caseItem} />
+      {!isPending && <ApprovalPlan action={action} caseItem={caseItem} />}
       <p className="approval-rationale">{caseItem.plan?.recommendation}</p>
       <p className="panel-footnote">
         Quantity and route come from the validation record. Stock is rechecked
@@ -2035,6 +2050,38 @@ function Approval({
             {valid.source_plant} to plant {valid.destination_plant}. Your
             decision is recorded as {approver}.
           </Notice>
+          {courses.length > 0 && (
+            <fieldset className="resolve-options" disabled={disabled}>
+              <legend>Course to follow</legend>
+              {courses.map((option) => (
+                <label className="resolve-option" key={option.name}>
+                  <input
+                    type="radio"
+                    name={`course-${action.validation_id}`}
+                    checked={course === option.name}
+                    onChange={() => setCourse(option.name)}
+                  />
+                  <span>
+                    <strong>{option.name}</strong>
+                    <small>
+                      {option.assessment.covered
+                        ? "Covered"
+                        : `${number(option.assessment.shortage_t)} t short`}
+                      {" · "}
+                      {number(option.assessment.coverage_days)} of{" "}
+                      {number(option.assessment.required_coverage_days)} days
+                      {option.assessment.deferred_orders.length > 0 &&
+                        ` · defers ${option.assessment.deferred_orders
+                          .map((order) => order.order_id)
+                          .join(", ")}`}
+                      {option.name === caseItem.plan?.recommended_option &&
+                        " · Recommended"}
+                    </small>
+                  </span>
+                </label>
+              ))}
+            </fieldset>
+          )}
           <label
             className="reason-label"
             htmlFor={`reason-${action.validation_id}`}
@@ -2080,7 +2127,7 @@ function Approval({
             <button
               className="approve-button"
               disabled={disabled || !valid.valid}
-              onClick={() => void onDecision(action, "approved", reason)}
+              onClick={() => void onDecision(action, "approved", approvalNote)}
             >
               Approve transfer
             </button>
