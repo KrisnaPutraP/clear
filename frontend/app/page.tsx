@@ -132,34 +132,47 @@ function ClearMark({
   size?: number;
 }) {
   return (
-    <svg
+    <span
       className="clear-mark"
       data-active={active}
-      width={size}
-      height={size}
-      viewBox="0 0 40 40"
-      fill="none"
+      style={
+        {
+          width: size,
+          height: size,
+          "--compass-size": `${size}px`,
+        } as CSSProperties
+      }
       aria-hidden="true"
     >
-      <circle cx="20" cy="20" r="16" stroke="currentColor" strokeWidth="1.8" />
-      <path
-        className="clear-orbit"
-        d="M20 4a16 16 0 0 1 16 16"
-        stroke="currentColor"
-        strokeWidth="3.2"
-        strokeLinecap="round"
-      />
-      <g className="clear-needle">
-        <path
-          d="m26.5 13.5-4 9-9 4 4-9 9-4Z"
-          stroke="currentColor"
-          strokeWidth="1.8"
-          strokeLinejoin="round"
+      <span className="compass-rotor">
+        {active &&
+          [-3, -2, -1, 0, 1, 2, 3].map((slice) => (
+            <span
+              key={slice}
+              className="compass-edge"
+              style={{ "--slice": slice } as CSSProperties}
+            />
+          ))}
+        <img
+          className="compass-face compass-front"
+          src="/clear-compass.svg"
+          width="256"
+          height="256"
+          alt=""
+          draggable={false}
         />
-        <path d="m26.5 13.5-9 4 5 5 4-9Z" fill="currentColor" />
-      </g>
-      <circle cx="20" cy="20" r="1.7" fill="currentColor" />
-    </svg>
+        {active && (
+          <img
+            className="compass-face compass-back"
+            src="/clear-compass.svg"
+            width="256"
+            height="256"
+            alt=""
+            draggable={false}
+          />
+        )}
+      </span>
+    </span>
   );
 }
 

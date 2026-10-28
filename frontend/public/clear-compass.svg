@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 128 128" fill="none" shape-rendering="geometricPrecision">
+  <title>CLEAR compass</title>
+  <defs>
+    <linearGradient id="rim" x1="24" y1="12" x2="106" y2="116" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#b7d7c5"/>
+      <stop offset=".28" stop-color="#f1f8f3"/>
+      <stop offset=".55" stop-color="#749d88"/>
+      <stop offset=".8" stop-color="#205d47"/>
+      <stop offset="1" stop-color="#8bb39c"/>
+    </linearGradient>
+    <linearGradient id="face" x1="38" y1="20" x2="89" y2="112" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fffef8"/>
+      <stop offset="1" stop-color="#dfece1"/>
+    </linearGradient>
+    <linearGradient id="needle" x1="43" y1="43" x2="83" y2="84" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#398568"/>
+      <stop offset="1" stop-color="#0b4633"/>
+    </linearGradient>
+  </defs>
+  <circle cx="64" cy="64" r="58" fill="#103f30"/>
+  <circle cx="64" cy="63" r="56" fill="url(#rim)"/>
+  <circle cx="64" cy="64" r="51" fill="#14583e"/>
+  <circle cx="64" cy="64" r="47" fill="url(#face)"/>
+  <circle cx="64" cy="64" r="43" stroke="#b2c7b8"/>
+  <path d="M64 24v7m33 33h7M64 97v7M24 64h7" stroke="#28654d" stroke-width="2" stroke-linecap="round"/>
+  <path d="m36 36 3 3m50-3-3 3m3 50-3-3m-50 3 3-3" stroke="#8cae99" stroke-width="2" stroke-linecap="round"/>
+  <path d="m88 41-15 34-34 15 15-34 34-15Z" fill="#8aa896"/>
+  <path d="m88 39-15 34-34 15 15-34 34-15Z" fill="#f9fff9" stroke="#154d36" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M88 39 54 54l19 19 15-34Z" fill="url(#needle)"/>
+  <path d="m88 39-24 25 9 9 15-34Z" fill="#0e4e37"/>
+  <path d="m39 88 25-24-10-10-15 34Z" fill="#d1e3d5"/>
+  <path d="m55 54 18 18" stroke="#8fb5a0" stroke-width="1.5"/>
+  <circle cx="64" cy="64" r="5" fill="#14543b"/>
+  <circle cx="64" cy="63" r="2.5" fill="#e9f5e9"/>
+</svg>
