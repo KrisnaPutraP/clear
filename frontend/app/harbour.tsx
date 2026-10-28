@@ -275,22 +275,6 @@ export function Harbour({
   // Stock moves only with the case state: the plant by the port fills up
   // once an approved transfer has been delivered.
   const received = Boolean(action && (driving || delivered));
-  const stars = [
-    [80, -20],
-    [190, 30],
-    [260, -60],
-    [410, 60],
-    [520, -30],
-    [640, 40],
-    [720, -64],
-    [860, 4],
-    [940, 52],
-    [1020, -40],
-    [1110, 24],
-    [1170, -70],
-    [350, 96],
-    [590, 84],
-  ];
 
   return (
     <svg
@@ -300,10 +284,11 @@ export function Harbour({
       aria-hidden="true"
       focusable="false"
     >
-      {/* sky in flat bands, a dusk glow on the horizon */}
-      <rect y={-SKY} width={W} height={H + SKY} fill={ink.sky[0]} />
-      {/* The camera: close on the vessel at sea, pulled back over the port
-          once the run is done. Stars and moon stay put outside it. */}
+      {/* The night above the horizon is left open: it is the page's own sky
+          (sky.tsx), whose stars stay fixed while the page scrolls. Below it,
+          flat bands and a dusk glow on the horizon. The camera: close on the
+          vessel at sea, pulled back over the port once the run is done. The
+          moon stays put outside it. */}
       <g
         className="camera"
         style={{ transform: atSea ? "scale(1.9)" : "scale(1)" }}
@@ -478,17 +463,6 @@ export function Harbour({
         />
       )}
       </g>
-      {stars.map(([x, y], i) => (
-        <circle
-          key={i}
-          className="star"
-          cx={x}
-          cy={y}
-          r={i % 3 ? 1.2 : 1.8}
-          fill={ink.white}
-          style={{ "--d": `${(i * 0.7) % 4}s` } as CSSProperties}
-        />
-      ))}
       <circle cx={980} cy={-30} r={18} fill="#f3ead2" />
       <circle cx={988} cy={-36} r={16} fill={ink.sky[0]} />
 
