@@ -14,7 +14,7 @@ Unit Price: USD 540.00 per MT
 Total Amount: USD 64,800.00
 Incoterms: CIF Tanjung Priok
 
-Vessel / Voyage: Cookusan Ship / CS-2641
+Vessel / Voyage: MV Northern Lumen / NL-2641
 Port of Loading: Hamburg
 Port of Discharge: Tanjung Priok
 

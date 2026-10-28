@@ -13,7 +13,7 @@
       "scenario": "S1",
       "type": "eta_change",
       "shipment_id": "SHP-1001",
-      "description": "Berth congestion at Tanjung Priok: the carrier moved the ETA of Cookusan Ship back by one day."
+      "description": "Berth congestion at Tanjung Priok: the carrier moved the ETA of MV Northern Lumen back by one day."
     },
     {
       "event_id": "S2-CONGESTION",
@@ -43,8 +43,8 @@
       "purchase_order": "4500001021",
       "status": "exception",
       "mode": "sea",
-      "vessel": "Cookusan Ship",
-      "voyage": "CS-2641",
+      "vessel": "MV Northern Lumen",
+      "voyage": "NL-2641",
       "port_of_loading": "Hamburg",
       "port_of_discharge": "Tanjung Priok",
       "eta": "2026-10-31T14:00:00+07:00",
@@ -91,7 +91,7 @@
       "documents": [
         {
           "document_type": "commercial_invoice",
-          "text": "COMMERCIAL INVOICE\n\nInvoice No.: INV-VC-26-0917\nInvoice Date: 2026-09-30\n\nSeller: Veltrona Chemicals GmbH, Hamburg, Germany\nBuyer: PT Arunika Pulp & Paper, Arunika West Mill, Indonesia\n\nBuyer PO No.: 4500001021\nBuyer Material No.: CHEM-BX40\nDescription of Goods: Bleaching agent BX-40\nQuantity: 120 MT\nUnit Price: USD 540.00 per MT\nTotal Amount: USD 64,800.00\nIncoterms: CIF Tanjung Priok\n\nVessel / Voyage: Cookusan Ship / CS-2641\nPort of Loading: Hamburg\nPort of Discharge: Tanjung Priok\n\nWe certify that this invoice is true and correct.\n"
+          "text": "COMMERCIAL INVOICE\n\nInvoice No.: INV-VC-26-0917\nInvoice Date: 2026-09-30\n\nSeller: Veltrona Chemicals GmbH, Hamburg, Germany\nBuyer: PT Arunika Pulp & Paper, Arunika West Mill, Indonesia\n\nBuyer PO No.: 4500001021\nBuyer Material No.: CHEM-BX40\nDescription of Goods: Bleaching agent BX-40\nQuantity: 120 MT\nUnit Price: USD 540.00 per MT\nTotal Amount: USD 64,800.00\nIncoterms: CIF Tanjung Priok\n\nVessel / Voyage: MV Northern Lumen / NL-2641\nPort of Loading: Hamburg\nPort of Discharge: Tanjung Priok\n\nWe certify that this invoice is true and correct.\n"
         },
         {
           "document_type": "packing_list",
@@ -99,7 +99,7 @@
         },
         {
           "document_type": "bill_of_lading",
-          "text": "BILL OF LADING (NON-NEGOTIABLE COPY)\n\nB/L No.: BL-VC-26-0917\nShipper: Veltrona Chemicals GmbH, Hamburg, Germany\nConsignee: PT Arunika Pulp & Paper, Indonesia\nNotify Party: Same as consignee\n\nVessel / Voyage: Cookusan Ship / CS-2641\nPort of Loading: Hamburg\nPort of Discharge: Tanjung Priok\n\nDescription of Goods: 112 FIBC bulk bags said to contain Bleaching agent BX-40\nGross Weight: 112,336 kg\nReference: Buyer PO No. 4500001021\nFreight: Prepaid\n"
+          "text": "BILL OF LADING (NON-NEGOTIABLE COPY)\n\nB/L No.: BL-VC-26-0917\nShipper: Veltrona Chemicals GmbH, Hamburg, Germany\nConsignee: PT Arunika Pulp & Paper, Indonesia\nNotify Party: Same as consignee\n\nVessel / Voyage: MV Northern Lumen / NL-2641\nPort of Loading: Hamburg\nPort of Discharge: Tanjung Priok\n\nDescription of Goods: 112 FIBC bulk bags said to contain Bleaching agent BX-40\nGross Weight: 112,336 kg\nReference: Buyer PO No. 4500001021\nFreight: Prepaid\n"
         },
         {
           "document_type": "certificate_of_analysis",
@@ -437,8 +437,8 @@
       "purchase_order": "4500001021",
       "status": "exception",
       "mode": "sea",
-      "vessel": "Cookusan Ship",
-      "voyage": "CS-2641",
+      "vessel": "MV Northern Lumen",
+      "voyage": "NL-2641",
       "port_of_loading": "Hamburg",
       "port_of_discharge": "Tanjung Priok",
       "eta": "2026-10-31T14:00:00+07:00",
@@ -485,7 +485,7 @@
       "documents": [
         {
           "document_type": "commercial_invoice",
-          "text": "COMMERCIAL INVOICE\n\nInvoice No.: INV-VC-26-0917\nInvoice Date: 2026-09-30\n\nSeller: Veltrona Chemicals GmbH, Hamburg, Germany\nBuyer: PT Arunika Pulp & Paper, Arunika West Mill, Indonesia\n\nBuyer PO No.: 4500001021\nBuyer Material No.: CHEM-BX40\nDescription of Goods: Bleaching agent BX-40\nQuantity: 120 MT\nUnit Price: USD 540.00 per MT\nTotal Amount: USD 64,800.00\nIncoterms: CIF Tanjung Priok\n\nVessel / Voyage: Cookusan Ship / CS-2641\nPort of Loading: Hamburg\nPort of Discharge: Tanjung Priok\n\nWe certify that this invoice is true and correct.\n"
+          "text": "COMMERCIAL INVOICE\n\nInvoice No.: INV-VC-26-0917\nInvoice Date: 2026-09-30\n\nSeller: Veltrona Chemicals GmbH, Hamburg, Germany\nBuyer: PT Arunika Pulp & Paper, Arunika West Mill, Indonesia\n\nBuyer PO No.: 4500001021\nBuyer Material No.: CHEM-BX40\nDescription of Goods: Bleaching agent BX-40\nQuantity: 120 MT\nUnit Price: USD 540.00 per MT\nTotal Amount: USD 64,800.00\nIncoterms: CIF Tanjung Priok\n\nVessel / Voyage: MV Northern Lumen / NL-2641\nPort of Loading: Hamburg\nPort of Discharge: Tanjung Priok\n\nWe certify that this invoice is true and correct.\n"
         },
         {
           "document_type": "packing_list",
@@ -493,7 +493,7 @@
         },
         {
           "document_type": "bill_of_lading",
-          "text": "BILL OF LADING (NON-NEGOTIABLE COPY)\n\nB/L No.: BL-VC-26-0917\nShipper: Veltrona Chemicals GmbH, Hamburg, Germany\nConsignee: PT Arunika Pulp & Paper, Indonesia\nNotify Party: Same as consignee\n\nVessel / Voyage: Cookusan Ship / CS-2641\nPort of Loading: Hamburg\nPort of Discharge: Tanjung Priok\n\nDescription of Goods: 112 FIBC bulk bags said to contain Bleaching agent BX-40\nGross Weight: 112,336 kg\nReference: Buyer PO No. 4500001021\nFreight: Prepaid\n"
+          "text": "BILL OF LADING (NON-NEGOTIABLE COPY)\n\nB/L No.: BL-VC-26-0917\nShipper: Veltrona Chemicals GmbH, Hamburg, Germany\nConsignee: PT Arunika Pulp & Paper, Indonesia\nNotify Party: Same as consignee\n\nVessel / Voyage: MV Northern Lumen / NL-2641\nPort of Loading: Hamburg\nPort of Discharge: Tanjung Priok\n\nDescription of Goods: 112 FIBC bulk bags said to contain Bleaching agent BX-40\nGross Weight: 112,336 kg\nReference: Buyer PO No. 4500001021\nFreight: Prepaid\n"
         },
         {
           "document_type": "certificate_of_analysis",
@@ -938,8 +938,8 @@
       "purchase_order": "4500001021",
       "status": "exception",
       "mode": "sea",
-      "vessel": "Cookusan Ship",
-      "voyage": "CS-2641",
+      "vessel": "MV Northern Lumen",
+      "voyage": "NL-2641",
       "port_of_loading": "Hamburg",
       "port_of_discharge": "Tanjung Priok",
       "eta": "2026-11-01T14:00:00+07:00",
@@ -977,7 +977,7 @@
           "event_id": "S1-ETA-SLIP",
           "type": "eta_change",
           "occurred_at": "2026-10-30T15:40:00+07:00",
-          "description": "Berth congestion at Tanjung Priok: the carrier moved the ETA of Cookusan Ship back by one day."
+          "description": "Berth congestion at Tanjung Priok: the carrier moved the ETA of MV Northern Lumen back by one day."
         }
       ]
     },
@@ -992,7 +992,7 @@
       "documents": [
         {
           "document_type": "commercial_invoice",
-          "text": "COMMERCIAL INVOICE\n\nInvoice No.: INV-VC-26-0917\nInvoice Date: 2026-09-30\n\nSeller: Veltrona Chemicals GmbH, Hamburg, Germany\nBuyer: PT Arunika Pulp & Paper, Arunika West Mill, Indonesia\n\nBuyer PO No.: 4500001021\nBuyer Material No.: CHEM-BX40\nDescription of Goods: Bleaching agent BX-40\nQuantity: 120 MT\nUnit Price: USD 540.00 per MT\nTotal Amount: USD 64,800.00\nIncoterms: CIF Tanjung Priok\n\nVessel / Voyage: Cookusan Ship / CS-2641\nPort of Loading: Hamburg\nPort of Discharge: Tanjung Priok\n\nWe certify that this invoice is true and correct.\n"
+          "text": "COMMERCIAL INVOICE\n\nInvoice No.: INV-VC-26-0917\nInvoice Date: 2026-09-30\n\nSeller: Veltrona Chemicals GmbH, Hamburg, Germany\nBuyer: PT Arunika Pulp & Paper, Arunika West Mill, Indonesia\n\nBuyer PO No.: 4500001021\nBuyer Material No.: CHEM-BX40\nDescription of Goods: Bleaching agent BX-40\nQuantity: 120 MT\nUnit Price: USD 540.00 per MT\nTotal Amount: USD 64,800.00\nIncoterms: CIF Tanjung Priok\n\nVessel / Voyage: MV Northern Lumen / NL-2641\nPort of Loading: Hamburg\nPort of Discharge: Tanjung Priok\n\nWe certify that this invoice is true and correct.\n"
         },
         {
           "document_type": "packing_list",
@@ -1000,7 +1000,7 @@
         },
         {
           "document_type": "bill_of_lading",
-          "text": "BILL OF LADING (NON-NEGOTIABLE COPY)\n\nB/L No.: BL-VC-26-0917\nShipper: Veltrona Chemicals GmbH, Hamburg, Germany\nConsignee: PT Arunika Pulp & Paper, Indonesia\nNotify Party: Same as consignee\n\nVessel / Voyage: Cookusan Ship / CS-2641\nPort of Loading: Hamburg\nPort of Discharge: Tanjung Priok\n\nDescription of Goods: 112 FIBC bulk bags said to contain Bleaching agent BX-40\nGross Weight: 112,336 kg\nReference: Buyer PO No. 4500001021\nFreight: Prepaid\n"
+          "text": "BILL OF LADING (NON-NEGOTIABLE COPY)\n\nB/L No.: BL-VC-26-0917\nShipper: Veltrona Chemicals GmbH, Hamburg, Germany\nConsignee: PT Arunika Pulp & Paper, Indonesia\nNotify Party: Same as consignee\n\nVessel / Voyage: MV Northern Lumen / NL-2641\nPort of Loading: Hamburg\nPort of Discharge: Tanjung Priok\n\nDescription of Goods: 112 FIBC bulk bags said to contain Bleaching agent BX-40\nGross Weight: 112,336 kg\nReference: Buyer PO No. 4500001021\nFreight: Prepaid\n"
         },
         {
           "document_type": "certificate_of_analysis",
@@ -1762,7 +1762,7 @@
       "at": "2026-10-11T08:03:53+00:00",
       "actor": "Event feed",
       "kind": "event",
-      "summary": "Berth congestion at Tanjung Priok: the carrier moved the ETA of Cookusan Ship back by one day.",
+      "summary": "Berth congestion at Tanjung Priok: the carrier moved the ETA of MV Northern Lumen back by one day.",
       "source": "logistics event feed (simulated)",
       "event_id": "S1-ETA-SLIP"
     },

@@ -88,8 +88,8 @@ SHIPMENTS = [
         "purchase_order": "4500001021",
         "status": "in_transit",
         "mode": "sea",
-        "vessel": "Cookusan Ship",
-        "voyage": "CS-2641",
+        "vessel": "MV Northern Lumen",
+        "voyage": "NL-2641",
         "port_of_loading": "Hamburg",
         "port_of_discharge": "Tanjung Priok",
         "eta": "2026-10-31T14:00:00+07:00",
@@ -142,7 +142,7 @@ EVENT_CATALOG = [
         "shipment_id": "SHP-1001",
         "occurred_at": "2026-10-30T15:40:00+07:00",
         "description": "Berth congestion at Tanjung Priok: the carrier moved the ETA of "
-        "Cookusan Ship back by one day.",
+        "MV Northern Lumen back by one day.",
         "details": {"new_eta": "2026-11-01T14:00:00+07:00", "congestion_level": "high"},
     },
     {

@@ -5,7 +5,7 @@ Shipper: Veltrona Chemicals GmbH, Hamburg, Germany
 Consignee: PT Arunika Pulp & Paper, Indonesia
 Notify Party: Same as consignee
 
-Vessel / Voyage: Cookusan Ship / CS-2641
+Vessel / Voyage: MV Northern Lumen / NL-2641
 Port of Loading: Hamburg
 Port of Discharge: Tanjung Priok
 
