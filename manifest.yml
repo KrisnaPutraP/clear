@@ -1,0 +1,12 @@
+# CLEAR's A2A server for SAP Joule on Cloud Foundry: cf push from this folder.
+# Settings and secrets are set with cf set-env, never here.
+---
+applications:
+  - name: cookusan-clear-a2a
+    memory: 1G
+    disk_quota: 2G
+    instances: 1
+    buildpacks:
+      - python_buildpack
+    # src/ first: CLEAR is imported from the app, not site-packages, so data/seed resolves to the app's copy.
+    command: PYTHONPATH="/home/vcap/app/src:$PYTHONPATH" python scripts/run_joule_agent.py --host 0.0.0.0

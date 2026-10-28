@@ -66,6 +66,12 @@ The same code runs in three configurations:
 
 Deployment details: [deployment.md](deployment.md).
 
+A planner can also work a case from SAP Joule. Joule's `agent-request`
+action calls an A2A server through a BTP destination; the server and the
+same agents run as a Cloud Foundry app on SAP BTP, call their tools through
+the same gateway and Cedar policies, and share the DynamoDB table with the
+UI.
+
 ## A case, step by step
 
 S1 with the planner's approval, in the deployed configuration:

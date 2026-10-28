@@ -84,7 +84,7 @@ deleted without the owner's agreement.
   `Project=ID-Hackathon-2026`, `Team=Cookusan`, `DeleteAfter=2026-10-31`.
 - No NAT gateways, GPUs, always-on endpoints, or high-volume logging.
 
-## Where the project stands (12 October 2026)
+## Where the project stands (29 October 2026)
 
 | Part | State |
 |---|---|
@@ -94,12 +94,13 @@ deleted without the owner's agreement.
 | SAP-RPT-1.6 predictions with the baseline fallback | Done |
 | AgentCore Gateway, Lambda, DynamoDB, Cedar policies (ENFORCE) | Deployed; the agents run on the laptop |
 | AgentCore Runtime | Built, not deployed: the account has no Runtime quota |
-| Evaluation, 20 variants | Done once ([evaluation.md](evaluation.md)); to repeat before the freeze |
+| Evaluation, 20 variants | Done; the final run on 28 October passes every check ([evaluation.md](evaluation.md)) |
+| SAP Joule front door (A2A, Cloud Foundry app) | Works end to end on branch `experiment/joule` |
 | Pitch deck, demo video | Next |
 
 Open items:
 
-- Run all 20 evaluation variants again after the last prompt change.
+- Reset the demo data before presenting: `python scripts/reset_data.py --aws`.
 - Measure the manual baseline for S1, or drop the minutes from the pitch;
   [evaluation.md](evaluation.md) lists them as estimates.
 - Tag the CDK bootstrap stack ([deployment.md](deployment.md)).

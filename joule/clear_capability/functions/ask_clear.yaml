@@ -1,0 +1,17 @@
+# Forwards the user's message to CLEAR over A2A and shows CLEAR's answer. CLEAR answers within
+# Joule's 60-second limit; agent runs that take longer continue in the background.
+action_groups:
+  - actions:
+      - type: status-update
+        message: <? "Asking CLEAR" ?>
+
+      - type: agent-request
+        agent_type: remote  # A code-based agent, called over A2A.
+        system_alias: CLEAR_AGENT
+        result_variable: result
+
+      - type: message
+        message:
+          type: text
+          content: "<? result.body.status.message.parts[0].text ?>"
+          markdown: true

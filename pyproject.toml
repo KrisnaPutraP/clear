@@ -20,6 +20,8 @@ dev = ["pytest>=8"]
 # Agents on this machine with their tools behind AgentCore Gateway (docs/setup.md): the gateway client,
 # pinned as in deploy/runtime, and the CRT that lets boto3 use `aws login` credentials.
 aws = ["mcp-proxy-for-aws==1.7.0", "botocore[crt]"]
+# CLEAR as an A2A agent for SAP Joule. Joule speaks A2A 0.3, so the SDK stays on 0.3.
+joule = ["a2a-sdk[http-server]>=0.3.20,<0.4", "uvicorn>=0.30,<1"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

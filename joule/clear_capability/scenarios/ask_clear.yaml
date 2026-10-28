@@ -1,0 +1,11 @@
+description: >-
+  Inbound shipment exceptions handled by CLEAR. Call this whenever the user reports, starts, or asks
+  about a held, delayed, or congested import shipment or a logistics event (for example "work
+  S1-DOC-HOLD" or "SHP-1002 is stuck at the port"), asks for the status or the recovery plan of a
+  case or shipment (for example "status of SHP-1001"), approves or rejects a validated stock
+  transport order (for example "approve VAL-0002" or "reject VAL-0002 because the plant needs the
+  stock"), or asks what CLEAR can do.
+
+target:
+  type: function
+  name: ask_clear

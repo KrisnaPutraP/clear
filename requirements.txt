@@ -1,0 +1,2 @@
+# For cf push only (manifest.yml): CLEAR with the A2A server for Joule and the gateway client.
+.[joule,aws]
