@@ -2,11 +2,12 @@ import type { CSSProperties } from "react";
 import type { Case } from "../lib/types";
 import { FlagShape, type FlagCode } from "./flags";
 
-// A port of discharge at dusk, drawn in flat shapes and driven by the case:
-// the vessel rides at anchor flying the case's signal flags, the silos at the
-// case's plants hold their real stock against the safety line, and an
-// approved transfer drives from the source plant to the one by the port. The art is decoration for
-// the facts beside it, so the whole scene is hidden from assistive tech.
+// CLEAR's harbour at dusk, drawn in flat shapes. It is the product's global
+// animation, so it shows no names or numbers from the case: only the case's
+// state moves it. The vessel sails while the agents work and anchors when
+// they finish, flies the signal flag of the case state, and a transfer truck
+// runs once a transfer is approved. The art is decoration for the facts
+// beside it, so the whole scene is hidden from assistive tech.
 
 const W = 1200;
 const H = 340;
@@ -33,63 +34,21 @@ const ink = {
   blue: "var(--flag-blue)",
 };
 
-type Plant = Case["inventory"]["plants"][number];
-
-function Silo({
-  x,
-  plant,
-  scale,
-  index,
-}: {
-  x: number;
-  plant: Plant;
-  scale: number;
-  index: number;
-}) {
+function Silo({ x, level }: { x: number; level: number }) {
   const top = 150;
-  const height = GROUND - top;
-  const level = (plant.unrestricted_t / scale) * height;
-  const transit = (plant.in_transit_t / scale) * height;
-  const safety = GROUND - (plant.safety_stock_t / scale) * height;
-  const low = plant.unrestricted_t <= plant.safety_stock_t;
+  const height = GROUND - top - 4;
   return (
     <g className="silo">
-      <rect x={x} y={top} width={46} height={height} rx={3} fill={ink.steel} />
-      <rect
-        x={x + 4}
-        y={top + 4}
-        width={38}
-        height={height - 4}
-        fill={ink.dark}
-      />
+      <rect x={x} y={top} width={46} height={GROUND - top} rx={3} fill={ink.steel} />
+      <rect x={x + 4} y={top + 4} width={38} height={height} fill={ink.dark} />
       <rect
         className="silo-level"
         x={x + 4}
-        y={GROUND - level}
+        y={top + 4}
         width={38}
-        height={level}
-        fill={low ? ink.red : "#5b8ee0"}
-        style={{ "--delay": `${index * 120}ms` } as CSSProperties}
-      />
-      {transit > 0 && (
-        <rect
-          className="silo-transit"
-          x={x + 4}
-          y={GROUND - level - transit}
-          width={38}
-          height={transit}
-          fill="#5b8ee0"
-          opacity={0.45}
-        />
-      )}
-      <line
-        x1={x - 6}
-        x2={x + 52}
-        y1={safety}
-        y2={safety}
-        stroke={ink.white}
-        strokeWidth={2}
-        strokeDasharray="5 4"
+        height={height}
+        fill="#5b8ee0"
+        style={{ transform: `scaleY(${level})` }}
       />
       <path
         d={`M${x} ${top + 2} Q${x + 23} ${top - 16} ${x + 46} ${top + 2}`}
@@ -101,13 +60,11 @@ function Silo({
 
 function Factory({
   x,
-  plant,
-  scale,
+  level,
   receiving,
 }: {
   x: number;
-  plant: Plant;
-  scale: number;
+  level: number;
   receiving: boolean;
 }) {
   return (
@@ -133,32 +90,15 @@ function Factory({
         <circle cx={x + 82} cy={130} r={8} fill="#56617a" opacity={0.7} />
         <circle cx={x + 92} cy={116} r={10} fill="#56617a" opacity={0.4} />
       </g>
-      <Silo x={x + 100} plant={plant} scale={scale} index={0} />
-      <text className="scene-label" x={x + 4} y={GROUND + 26}>
-        PLANT {plant.plant}
-      </text>
-      <text className="scene-figure" x={x + 4} y={GROUND + 46}>
-        {plant.unrestricted_t} t
-        <tspan className="scene-note">
-          {" "}
-          · safety {plant.safety_stock_t} t
-          {plant.in_transit_t > 0 ? ` · ${plant.in_transit_t} t arriving` : ""}
-        </tspan>
-      </text>
+      <Silo x={x + 100} level={level} />
       {receiving && (
-        <circle
-          className="beacon"
-          cx={x + 123}
-          cy={136}
-          r={4}
-          fill={ink.yellow}
-        />
+        <circle className="beacon" cx={x + 123} cy={136} r={4} fill={ink.yellow} />
       )}
     </g>
   );
 }
 
-function Truck({ quantity }: { quantity: number }) {
+function Truck() {
   return (
     <g>
       <rect x={0} y={-22} width={44} height={18} rx={9} fill={ink.white} />
@@ -168,9 +108,6 @@ function Truck({ quantity }: { quantity: number }) {
       <circle cx={12} cy={-2} r={5} fill={ink.dark} />
       <circle cx={34} cy={-2} r={5} fill={ink.dark} />
       <circle cx={56} cy={-2} r={5} fill={ink.dark} />
-      <text className="scene-tag" x={22} y={-28} textAnchor="middle">
-        {quantity} t
-      </text>
     </g>
   );
 }
@@ -343,15 +280,6 @@ export function Harbour({
   item: Case | null;
   running: boolean;
 }) {
-  const plants = item?.inventory.plants || [];
-  const byId = (id: string) => plants.find((p) => p.plant === id);
-  const scale = Math.max(
-    1,
-    ...plants.map(
-      (p) =>
-        Math.max(p.unrestricted_t + p.in_transit_t, p.safety_stock_t) * 1.25,
-    ),
-  );
   const action = item?.plan?.actions.find((a) => a.validation.valid) || null;
   const delivered = action?.status === "executed";
   const proposed = action && !delivered && item?.status === "awaiting_approval";
@@ -378,16 +306,9 @@ export function Harbour({
     ...(customs ? (["Q"] as FlagCode[]) : []),
     ...(statusFlag ? [statusFlag] : []),
   ];
-  // The plant at risk stands by the port; the plant that can give stock
-  // stands inland, so a transfer always drives toward the port.
-  const coverage = (p: Plant) =>
-    p.unrestricted_t / Math.max(p.consumption_t_per_day.all || 0, 0.001);
-  const near =
-    (action && byId(action.validation.destination_plant)) ||
-    [...plants].sort((a, b) => coverage(a) - coverage(b))[0];
-  const inland =
-    (action && byId(action.validation.source_plant)) ||
-    plants.find((p) => p !== near);
+  // Stock moves only with the case state: the plant by the port fills up
+  // once an approved transfer has been delivered.
+  const received = Boolean(action && (driving || delivered));
   const stars = [
     [80, -20],
     [190, 30],
@@ -519,36 +440,12 @@ export function Harbour({
           className={`truck ${driving ? "driving" : delivered ? "delivered" : "waiting"}`}
           style={{ "--from": "232px", "--to": "390px" } as CSSProperties}
         >
-          <Truck quantity={action.validation.quantity} />
+          <Truck />
         </g>
       )}
 
-      {plants.length > 0 ? (
-        <>
-          {inland && (
-            <Factory x={40} plant={inland} scale={scale} receiving={false} />
-          )}
-          {near && (
-            <Factory
-              x={470}
-              plant={near}
-              scale={scale}
-              receiving={Boolean(action && (driving || delivered))}
-            />
-          )}
-        </>
-      ) : (
-        <>
-          <path
-            d="M40 268 V206 l22 -14 v14 l22 -14 v14 l22 -14 v14 l22 -14 V268 Z"
-            fill={ink.dark}
-          />
-          <path
-            d="M470 268 V206 l22 -14 v14 l22 -14 v14 l22 -14 v14 l22 -14 V268 Z"
-            fill={ink.dark}
-          />
-        </>
-      )}
+      <Factory x={40} level={received ? 0.5 : 0.72} receiving={false} />
+      <Factory x={470} level={delivered ? 0.62 : 0.34} receiving={received} />
 
       {/* the port: customs house, signal tower, stacks and a gantry crane */}
       <g>

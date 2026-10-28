@@ -981,28 +981,6 @@ main {
   padding-top: 40px;
 }
 
-.scene-label {
-  font: 700 12px var(--font-archivo), sans-serif;
-  letter-spacing: 0.08em;
-  fill: #f1f2f4;
-}
-
-.scene-figure {
-  font: 700 15px var(--font-archivo), sans-serif;
-  fill: #fff;
-}
-
-.scene-note {
-  font-weight: 500;
-  font-size: 12px;
-  fill: #9fabc4;
-}
-
-.scene-tag {
-  font: 800 12px var(--font-archivo), sans-serif;
-  fill: #fff;
-}
-
 .scene-sign {
   font: 700 10px var(--font-archivo), sans-serif;
   letter-spacing: 0.08em;
@@ -1130,8 +1108,7 @@ main {
 .silo-level {
   transform-box: fill-box;
   transform-origin: bottom;
-  animation: fill-up 1.4s var(--ease-out) both;
-  animation-delay: var(--delay);
+  transition: transform 2.4s var(--ease-out);
 }
 
 .proposed-route {
@@ -1238,12 +1215,6 @@ main {
   71%,
   100% {
     opacity: 0.2;
-  }
-}
-
-@keyframes fill-up {
-  from {
-    transform: scaleY(0);
   }
 }
 
