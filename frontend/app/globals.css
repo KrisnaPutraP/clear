@@ -228,7 +228,10 @@ main {
   display: flex;
   flex-direction: column;
   padding: 22px 0 18px;
-  background: var(--mast);
+  /* Same ground as the workspace, so the two read as one room; a hairline
+     is the only seam. The drawer on small screens keeps the darker mast. */
+  background: var(--ground);
+  border-right: 1px solid var(--line);
   color: var(--mast-ink);
   overflow-y: auto;
 }
@@ -305,11 +308,11 @@ main {
 }
 
 .case-link:hover {
-  background: var(--mast-2);
+  background: var(--surface);
 }
 
 .case-link.selected {
-  background: var(--mast-2);
+  background: var(--surface);
 }
 
 .case-link-copy {
@@ -374,7 +377,7 @@ main {
   z-index: 1;
   margin-top: auto;
   padding: 22px 22px 0;
-  background: var(--mast);
+  background: inherit;
 }
 
 .guardrail {
@@ -811,10 +814,16 @@ main {
   aspect-ratio: 1200 / 430;
   min-height: 300px;
   isolation: isolate;
-  mask-image: linear-gradient(to bottom, #000 88%, transparent);
 }
 
+/* The shore fades into the ground below and the water into the ground at the
+   left, so the scene never meets the sidebar on a hard edge. The mask sits on
+   the drawing alone; the status heading over it stays crisp. */
 .harbour {
+  mask-image:
+    linear-gradient(to bottom, #000 88%, transparent),
+    linear-gradient(to right, transparent, #000 9%);
+  mask-composite: intersect;
   position: absolute;
   inset: 0;
   width: 100%;
@@ -2761,6 +2770,8 @@ footer {
     transform: translateX(-100%);
     transition: transform 280ms var(--ease-out);
     visibility: hidden;
+    background: var(--mast);
+    border-right: 0;
   }
 
   .navigation-open .sidebar {
