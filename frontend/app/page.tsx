@@ -20,8 +20,12 @@ function Ship() {
       <g className="hero-ship-bob">
         <rect x={216} y={-150} width={3} height={76} fill="#7a8aa6" />
         <rect x={200} y={-140} width={36} height={3} fill="#7a8aa6" />
-        <g className="hero-pennant" transform="translate(219 -150)">
-          <polygon points="0,0 24,4 0,8" fill="#e0392f" />
+        {/* The placement sits one level above the flutter, so the
+            animation's transform cannot carry the pennant off the mast. */}
+        <g transform="translate(219 -150)">
+          <g className="hero-pennant">
+            <polygon points="0,0 24,4 0,8" fill="#e0392f" />
+          </g>
         </g>
         <rect x={20} y={-70} width={30} height={22} fill="#e0392f" />
         <rect x={52} y={-70} width={30} height={22} fill="#eef1f6" />
@@ -62,6 +66,7 @@ const credits = [
   {
     title: "Aerial views at night of Cork Container Terminal (CCT) in Ringaskiddy",
     by: "FILMING CORK",
+    changes: "trimmed to 12 seconds, sound removed",
     licence: "CC BY 3.0",
     licenceUrl: "https://creativecommons.org/licenses/by/3.0",
     page: "https://commons.wikimedia.org/wiki/File:Aerial_views_at_night_of_Cork_Container_Terminal_(CCT)_in_Ringaskiddy,_County_Cork,_Ireland.webm",
@@ -244,7 +249,9 @@ export default function Landing() {
                 <span key={credit.page}>
                   <a href={credit.page}>“{credit.title}”</a> by {credit.by},{" "}
                   <a href={credit.licenceUrl}>{credit.licence}</a>, via
-                  Wikimedia Commons{i < credits.length - 1 ? "; " : "."}
+                  Wikimedia Commons
+                  {"changes" in credit ? `, ${credit.changes}` : ""}
+                  {i < credits.length - 1 ? "; " : "."}
                 </span>
               ))}
             </p>
