@@ -8,9 +8,12 @@ const spinEase = Easing.bezier(0.76, 0, 0.24, 1);
 const TAU = Math.PI * 2;
 const SEGMENTS = 64;
 const faces = [];
-const jade = [31, 112, 83];
-const mint = [134, 194, 164];
-const porcelain = [220, 238, 224];
+// Signal-flag inks: a flag-blue ring, a needle with a signal-red north half.
+const jade = [28, 69, 151];
+const mint = [118, 152, 222];
+const porcelain = [236, 236, 230];
+const signal = [208, 35, 27];
+const ink = [34, 37, 44];
 const add = (points, color) =>
   faces.push({ points: [...points].reverse(), color });
 const polar = (r, angle, z) => [r * Math.cos(angle), r * Math.sin(angle), z];
@@ -57,7 +60,7 @@ for (let i = 0; i < needle.length; i++) {
       [...b, 2.8],
       [...b, -2.8],
     ],
-    jade,
+    i === 0 || i === 3 ? signal : ink,
   );
   add(
     [
@@ -65,7 +68,7 @@ for (let i = 0; i < needle.length; i++) {
       [0, 0, 5],
       [...b, 2.8],
     ],
-    i < 2 ? mint : jade,
+    i === 0 || i === 3 ? signal : ink,
   );
   add(
     [
@@ -73,7 +76,7 @@ for (let i = 0; i < needle.length; i++) {
       [0, 0, -4.5],
       [...a, -2.8],
     ],
-    i < 2 ? jade : porcelain,
+    i === 0 || i === 3 ? signal : porcelain,
   );
 }
 

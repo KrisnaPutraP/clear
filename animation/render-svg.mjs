@@ -13,7 +13,7 @@ const out = new URL("../frontend/public/", import.meta.url);
 await mkdir(out, { recursive: true });
 // The static brand preserves the original Lucide Compass silhouette.
 const mark =
-  '<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 24 24" fill="none" stroke="#28694f" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><title>CLEAR compass</title><circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-2.12 6.36-6.36 2.12 2.12-6.36 6.36-2.12z"/></svg>';
+  '<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 24 24" fill="none" stroke="#1C4597" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><title>CLEAR compass</title><circle cx="12" cy="12" r="10"/><path d="M16.24 7.76 14.12 14.12 9.88 9.88Z" fill="#D0231B" stroke="#D0231B"/><path d="M7.76 16.24 9.88 9.88 14.12 14.12Z" fill="#22252C" stroke="#22252C"/></svg>';
 await writeFile(new URL("clear-compass.svg", out), mark + "\n");
 await writeFile(new URL("clear-compass-still.svg", out), frameSvg(0) + "\n");
 

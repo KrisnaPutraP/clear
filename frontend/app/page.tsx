@@ -2,26 +2,11 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
-  Activity,
   ArrowRight,
-  ArrowUpRight,
-  Check,
-  CheckCircle2,
   ChevronDown,
-  ChevronRight,
-  Clock3,
-  FileCheck2,
-  FileText,
-  GitBranch,
   Info,
-  Layers3,
   Menu,
-  Package,
-  Play,
-  Radio,
   RefreshCw,
-  ShieldCheck,
-  Ship,
   TriangleAlert,
   X,
 } from "lucide-react";
@@ -36,6 +21,8 @@ import type {
   Health,
   LogEntry,
 } from "../lib/types";
+import { Flag, Hoist, actorFlag, flagMeaning, type FlagCode } from "./flags";
+import { Harbour } from "./harbour";
 
 const statuses: Record<CaseStatus, string> = {
   analyzing: "Analyzing",
@@ -44,35 +31,34 @@ const statuses: Record<CaseStatus, string> = {
   monitoring: "Monitoring",
   needs_human_decision: "Needs a decision",
 };
-const statusDetails: Record<
-  CaseStatus,
-  { icon: typeof Activity; description: string }
-> = {
-  analyzing: {
-    icon: Activity,
-    description:
-      "CLEAR is investigating. You can review the evidence while the agents work.",
-  },
-  awaiting_approval: {
-    icon: ShieldCheck,
-    description:
-      "Your approval is needed before CLEAR can create this transfer.",
-  },
-  executing: {
-    icon: Package,
-    description:
-      "Approval received. CLEAR is creating the order and checking stock.",
-  },
-  monitoring: {
-    icon: CheckCircle2,
-    description:
-      "No decision is pending. Open monitoring to review the latest records and follow-up.",
-  },
-  needs_human_decision: {
-    icon: TriangleAlert,
-    description:
-      "A planner needs to decide the next step. Review the recommendation below.",
-  },
+// Each state flies the flag whose meaning in the International Code of
+// Signals matches it.
+const statusFlags: Record<CaseStatus, FlagCode> = {
+  analyzing: "answer",
+  awaiting_approval: "K",
+  executing: "P",
+  monitoring: "C",
+  needs_human_decision: "V",
+};
+const statusDescriptions: Record<CaseStatus, string> = {
+  analyzing:
+    "CLEAR is investigating. You can read the evidence while the agents work.",
+  awaiting_approval:
+    "Your approval is needed before CLEAR can create this transfer.",
+  executing:
+    "Approval received. CLEAR is creating the order and checking stock.",
+  monitoring:
+    "No decision is pending. Open monitoring to review the latest records and follow-up.",
+  needs_human_decision:
+    "A planner needs to decide the next step. Review the recommendation below.",
+};
+// The case banner already names the state; this line says what it asks of you.
+const nextStepTitles: Record<CaseStatus, string> = {
+  analyzing: "CLEAR is working on this case",
+  awaiting_approval: "One decision is waiting for you",
+  executing: "Putting your approved plan into action",
+  monitoring: "Nothing needs you right now",
+  needs_human_decision: "This case needs a planner’s call",
 };
 const eventTitles: Record<string, string> = {
   "S1-DOC-HOLD": "Customs document hold",
@@ -89,6 +75,7 @@ const documentTitles: Record<string, string> = {
   packing_list: "Packing list",
   bill_of_lading: "Bill of lading",
   certificate_of_analysis: "Certificate of analysis",
+  purchase_order: "Purchase order",
 };
 const number = (n: number) =>
   new Intl.NumberFormat("en", { maximumFractionDigits: 2 }).format(n);
@@ -114,18 +101,6 @@ const tabs: Tab[] = [
   "Approval",
   "Monitoring",
 ];
-const tabDescriptions: Record<Tab, string> = {
-  Overview:
-    "Understand the disruption, compare recovery options, and see the next step.",
-  Documents:
-    "Compare shipping evidence against the purchase order to find what does not match.",
-  Inventory:
-    "Check available stock, safety thresholds, and which orders are affected.",
-  Approval:
-    "Review the validated transfer and record your decision before an ERP write.",
-  Monitoring:
-    "Review the latest shipment and stock records, and the follow-up needed for this case.",
-};
 
 function ClearMark({
   active = false,
@@ -168,27 +143,37 @@ function Notice({
   title,
   children,
   onDismiss,
+  flag,
 }: {
   tone?: "info" | "success" | "warning" | "error";
   title: string;
   children: ReactNode;
   onDismiss?: () => void;
+  flag?: FlagCode;
 }) {
-  const Icon =
-    tone === "success" ? CheckCircle2 : tone === "info" ? Info : TriangleAlert;
+  // U: "You are running into danger"; V: "I require assistance".
+  const code: FlagCode =
+    flag ||
+    (tone === "success"
+      ? "C"
+      : tone === "info"
+        ? "answer"
+        : tone === "warning"
+          ? "U"
+          : "V");
   return (
     <div
       className={`notice notice-${tone}`}
       role={tone === "error" ? "alert" : "status"}
     >
-      <Icon size={20} aria-hidden="true" />
+      <Flag code={code} height={16} />
       <div className="notice-copy">
         <strong>{title}</strong>
         <div>{children}</div>
       </div>
       {onDismiss && (
         <button onClick={onDismiss} aria-label="Dismiss notification">
-          <X size={17} />
+          <X size={16} />
         </button>
       )}
     </div>
@@ -196,12 +181,8 @@ function Notice({
 }
 
 function Status({ status }: { status: CaseStatus }) {
-  const Icon = statusDetails[status].icon;
   return (
-    <span className={`status ${status}`}>
-      <Icon size={14} aria-hidden="true" />
-      {statuses[status] || status}
-    </span>
+    <span className={`status ${status}`}>{statuses[status] || status}</span>
   );
 }
 
@@ -238,6 +219,11 @@ export default function Workspace() {
     });
   }
 
+  function closeNavigation() {
+    setNavigationOpen(false);
+    navigationButton.current?.focus();
+  }
+
   useEffect(() => {
     if (!navigationOpen) return;
     const previousOverflow = document.body.style.overflow;
@@ -248,10 +234,7 @@ export default function Workspace() {
         CSS.supports("selector(select:open)") &&
         document.querySelector("select:open");
       if (event.defaultPrevented || pickerOpen) return;
-      if (event.key === "Escape") {
-        setNavigationOpen(false);
-        navigationButton.current?.focus();
-      }
+      if (event.key === "Escape") closeNavigation();
     }
     document.addEventListener("keydown", closeOnEscape);
     return () => {
@@ -365,7 +348,7 @@ export default function Workspace() {
       setEventsExpanded(false);
       setFeedback({
         title: "Event received",
-        message: `${eventTitles[event.event_id] || "Logistics event"} was submitted. See the case below for the latest result.`,
+        message: `${eventTitles[event.event_id] || "Logistics event"} was sent to ${result.case_id}.`,
       });
       setTab("Overview");
       setRefreshKey((k) => k + 1);
@@ -415,7 +398,7 @@ export default function Workspace() {
           decision === "approved" ? "Transfer approved" : "Transfer rejected",
         message:
           decision === "approved"
-            ? `Your approval was recorded as ${approver}. Follow the case for order creation and stock verification.`
+            ? `Recorded as ${approver}. CLEAR is creating the order and checking stock.`
             : "Your reason has been recorded. This case now needs a planner's decision.",
       });
       setRefreshKey((k) => k + 1);
@@ -436,6 +419,7 @@ export default function Workspace() {
       className="event-section"
       id="event-simulator"
       aria-labelledby="event-heading"
+      data-expanded={eventsExpanded}
     >
       <button
         className="event-toggle"
@@ -443,30 +427,23 @@ export default function Workspace() {
         aria-controls="event-options"
         onClick={() => setEventsExpanded(!eventsExpanded)}
       >
-        <div className="section-heading">
-          <h2 id="event-heading">
-            <Radio size={17} />
-            Demo event simulator <span className="subtle-tag">Simulated</span>
-          </h2>
+        <span className="event-toggle-copy">
+          <h2 id="event-heading">Demo event simulator</h2>
           <span>
             {eventsExpanded
-              ? "Choose an event to start or reassess a case"
-              : "Start another case or send an ETA update"}
+              ? "Send a simulated logistics event to start or reassess a case."
+              : "Start another case or send an ETA update."}
           </span>
-        </div>
-        <ChevronDown size={18} />
+        </span>
+        <ChevronDown size={18} aria-hidden="true" />
       </button>
       <div className="event-grid" id="event-options" hidden={!eventsExpanded}>
-        {events.map((event, i) => {
+        {events.map((event) => {
           const etaNeedsCase =
             event.type === "eta_change" &&
             !cases.some((c) => c.shipment_id === event.shipment_id);
-          const Icon =
-            event.type === "customs_document_hold"
-              ? FileText
-              : event.type === "eta_change"
-                ? Clock3
-                : Ship;
+          const scenario =
+            event.scenario.replace(/\D/g, "") === "2" ? "2" : "1";
           return (
             <button
               className="event-card"
@@ -479,35 +456,32 @@ export default function Workspace() {
                   : event.description
               }
             >
-              <div className="event-card-top">
-                <span className={`event-icon event-${i}`}>
-                  <Icon size={21} />
+              <span className="event-hoist" aria-hidden="true">
+                <Flag code="S" height={18} />
+                <Flag code={scenario} height={18} />
+              </span>
+              <span className="event-copy">
+                <span className="event-meta">
+                  {event.scenario} ·{" "}
+                  {event.type === "eta_change" ? "Follow-up" : "New exception"}{" "}
+                  · {event.shipment_id}
                 </span>
-                <span className="event-scenario">
-                  {event.scenario}
-                  {event.type === "eta_change"
-                    ? " · Follow-up"
-                    : " · New exception"}
-                </span>
-                <ArrowUpRight size={17} className="event-arrow" />
-              </div>
-              <h3>
-                {eventTitles[event.event_id] || event.type.replaceAll("_", " ")}
-              </h3>
-              <p>{event.description}</p>
-              <div className="event-card-bottom">
-                <span>{event.shipment_id}</span>
-                <span>
-                  {etaNeedsCase
-                    ? "Start the document case first"
-                    : busy
-                      ? "Wait for the current run"
-                      : event.type === "eta_change"
-                        ? "Reassess case"
-                        : "Start investigation"}
-                  <Play size={11} />
-                </span>
-              </div>
+                <h3>
+                  {eventTitles[event.event_id] ||
+                    event.type.replaceAll("_", " ")}
+                </h3>
+                <span className="event-description">{event.description}</span>
+              </span>
+              <span className="event-go">
+                {etaNeedsCase
+                  ? "Start the document case first"
+                  : busy
+                    ? "Wait for the current run"
+                    : event.type === "eta_change"
+                      ? "Reassess case"
+                      : "Start investigation"}
+                <ArrowRight size={15} aria-hidden="true" />
+              </span>
             </button>
           );
         })}
@@ -539,10 +513,7 @@ export default function Workspace() {
           className="navigation-backdrop"
           aria-label="Close navigation"
           tabIndex={-1}
-          onClick={() => {
-            setNavigationOpen(false);
-            navigationButton.current?.focus();
-          }}
+          onClick={closeNavigation}
         />
       )}
       <aside
@@ -553,65 +524,71 @@ export default function Workspace() {
         <button
           ref={navigationClose}
           className="navigation-close"
-          onClick={() => {
-            setNavigationOpen(false);
-            navigationButton.current?.focus();
-          }}
+          onClick={closeNavigation}
           aria-label="Close navigation"
         >
           <X size={20} />
         </button>
         <a className="brand" href="/" aria-label="CLEAR home">
-          <span className="brand-icon">
-            <ClearMark />
-          </span>
-          CLEAR<span className="brand-period">.</span>
+          <ClearMark size={30} />
+          <span className="brand-name">CLEAR</span>
         </a>
-        <div className="workspace-label">Planner workspace</div>
-        <div className="nav-current">
-          <Layers3 size={17} />
-          Exception workspace
-        </div>
+        <p className="brand-line">Shipment exception desk</p>
+
         <div className="sidebar-heading">
-          Cases<span>{loading ? "…" : cases.length}</span>
+          <h2>Cases</h2>
+          <span>{loading ? "…" : cases.length}</span>
         </div>
         <nav className="case-list" aria-label="Cases">
           {cases.map((item) => (
             <button
               key={item.case_id}
-              className={`case-link ${selectedId === item.case_id ? "selected" : ""}`}
+              className={`case-link ${item.status} ${selectedId === item.case_id ? "selected" : ""}`}
               aria-current={selectedId === item.case_id ? "page" : undefined}
               onClick={() => {
                 setSelectedId(item.case_id);
                 setTab("Overview");
                 setActionError("");
                 setFeedback(null);
-                setNavigationOpen(false);
+                if (navigationOpen) closeNavigation();
               }}
             >
-              <span className="case-link-top">
-                <Package size={15} />
-                {item.case_id}
-                <ChevronRight size={14} />
+              <Hoist code={statusFlags[item.status]} height={20} />
+              <span className="case-link-copy">
+                <span className="case-link-id">{item.case_id}</span>
+                <span className="case-link-meta">
+                  {item.shipment_id} · <Status status={item.status} />
+                </span>
               </span>
-              <span className="case-link-shipment">{item.shipment_id}</span>
-              <Status status={item.status} />
             </button>
           ))}
           {!cases.length && (
             <p className="sidebar-empty">
-              Cases will appear here when you send a logistics event.
+              Cases appear here when a logistics event arrives.
             </p>
           )}
         </nav>
+
+        <details className="flag-legend" open>
+          <summary>Read the flags</summary>
+          <ul>
+            {(Object.keys(statusFlags) as CaseStatus[]).map((status) => (
+              <li key={status}>
+                <Flag code={statusFlags[status]} height={14} />
+                <span>
+                  <strong>{statuses[status]}</strong>
+                  {flagMeaning[statusFlags[status]]}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </details>
+
         <div className="sidebar-bottom">
-          <div className="guardrail">
-            <ShieldCheck size={20} />
-            <div>
-              <strong>Human in control</strong>
-              <p>Every ERP write needs your approval.</p>
-            </div>
-          </div>
+          <p className="guardrail">
+            <strong>Human in control.</strong> Every ERP write needs a named
+            planner’s approval.
+          </p>
           <label className="planner-label" htmlFor="planner">
             Demo planner
           </label>
@@ -644,13 +621,16 @@ export default function Workspace() {
             <Menu size={20} />
           </button>
           <a className="mobile-brand" href="/" aria-label="CLEAR home">
-            <ClearMark size={23} /> CLEAR.
+            <ClearMark size={24} />
           </a>
-          <span>
-            Operations <ChevronRight size={13} />
-            <strong>Exception workspace</strong>
-          </span>
+          <h1>Exception workspace</h1>
           <div className="topbar-status">
+            {busy && (
+              <span className="live-indicator">
+                <ClearMark active size={20} />
+                <span className="connection-label">Agents working</span>
+              </span>
+            )}
             {attention.length > 0 && (
               <button
                 className="attention-button"
@@ -663,56 +643,26 @@ export default function Workspace() {
                   );
                 }}
               >
-                <TriangleAlert size={15} />
-                {attention.length} needs attention
+                <Flag code={statusFlags[attention[0].status]} height={13} />
+                <span className="attention-count">{attention.length}</span>
+                <span className="attention-label">needs attention</span>
               </button>
             )}
             <div className="connection" role="status">
               <span
                 className={`connection-dot ${error ? "offline" : health ? "online" : ""}`}
               />
-              {error
-                ? "Connection interrupted"
-                : health
-                  ? "API connected"
-                  : "Connecting…"}
+              <span className="connection-label">
+                {error
+                  ? "Connection interrupted"
+                  : health
+                    ? "API connected"
+                    : "Connecting…"}
+              </span>
             </div>
           </div>
         </header>
         <main inert={navigationOpen || undefined}>
-          <div className="page-heading">
-            <div>
-              <h1>Exception workspace</h1>
-              <p>
-                See what is at risk. Review the evidence. Decide the next move.
-              </p>
-            </div>
-            <div className="workspace-tools">
-              <a
-                className="simulator-shortcut"
-                href="#event-simulator"
-                onClick={() => setEventsExpanded(true)}
-              >
-                <Radio size={16} />
-                Simulate event
-              </a>
-              {(busy || !activeCase) && (
-                <div className="live-indicator">
-                  {busy ? (
-                    <ClearMark active size={22} />
-                  ) : (
-                    <ShieldCheck size={16} />
-                  )}
-                  {busy
-                    ? "Agents working"
-                    : attention.length
-                      ? "Decision pending"
-                      : "Ready for the next event"}
-                </div>
-              )}
-            </div>
-          </div>
-
           {health?.mode === "scripted" && (
             <div className="environment-notice">
               <Notice title="Scripted development mode.">
@@ -728,7 +678,10 @@ export default function Workspace() {
             >
               Displayed data may be out of date. Decisions are disabled until
               the connection recovers.
-              <button onClick={() => setRefreshKey((k) => k + 1)}>
+              <button
+                className="inline-button"
+                onClick={() => setRefreshKey((k) => k + 1)}
+              >
                 <RefreshCw size={14} />
                 Retry
               </button>
@@ -755,6 +708,7 @@ export default function Workspace() {
             <Notice
               tone="success"
               title={feedback.title}
+              flag={feedback.title === "Event received" ? "answer" : "C"}
               onDismiss={() => setFeedback(null)}
             >
               {feedback.message}
@@ -763,82 +717,77 @@ export default function Workspace() {
 
           {!activeCase && eventSimulator}
 
-          <div className="workspace-heading" id="workspace" tabIndex={-1}>
-            <h2>Case workspace</h2>
-            <div className="workspace-counts">
-              <span>
-                {cases.length} {cases.length === 1 ? "case" : "cases"}
-              </span>
-              <span className="divider" />
-              <span className={awaiting ? "attention-text" : ""}>
-                {awaiting} awaiting approval
-              </span>
-            </div>
+          <div id="workspace" tabIndex={-1} className="workspace-anchor">
+            <h2 className="sr-only">Case workspace</h2>
           </div>
 
           {!activeCase ? (
-            <section className="empty-workspace">
-              <div className="empty-route">
-                <span>
-                  <Ship size={25} />
-                </span>
-                <i />
-                <span className="route-middle">
-                  <ClearMark
-                    active={Boolean(selectedId) || loading}
-                    size={42}
-                  />
-                </span>
-                <i />
-                <span>
-                  <Package size={25} />
-                </span>
-              </div>
-              <h2>
-                {selectedId
-                  ? "Opening your case…"
-                  : "Your next move starts here."}
-              </h2>
-              <p>
-                {selectedId
-                  ? "Gathering the latest evidence, plan, and agent activity."
-                  : "Choose a logistics event above. CLEAR will investigate the evidence and prepare a recovery plan for your review."}
-              </p>
-              <div className="empty-steps">
-                <span>
-                  <FileCheck2 size={15} />
-                  Evidence
-                </span>
-                <ArrowRight size={13} />
-                <span>
-                  <Activity size={15} />
-                  Impact
-                </span>
-                <ArrowRight size={13} />
-                <span>
-                  <ShieldCheck size={15} />
-                  Approved action
-                </span>
+            <section className="empty-workspace scene">
+              <div className="scene-stage">
+                <Harbour item={null} running={Boolean(selectedId) || loading} />
+                <div className="scene-copy">
+                  <h2>
+                    {selectedId
+                      ? "Opening your case…"
+                      : "Your next move starts here."}
+                  </h2>
+                  <p>
+                    {selectedId
+                      ? "Gathering the latest evidence, plan, and agent activity."
+                      : "The harbour is quiet. Send a logistics event and CLEAR investigates the evidence, sizes the impact, and brings you one validated decision."}
+                  </p>
+                </div>
               </div>
             </section>
           ) : (
             <>
-              <section className="case-banner">
-                <div>
-                  <span className="case-banner-id">{activeCase.case_id}</span>
-                  <Status status={activeCase.status} />
+              <section className="case-banner scene" aria-label="Case">
+                <div className="scene-stage">
+                  <Harbour item={activeCase} running={activeCase.running} />
+                  <div className="scene-copy">
+                    <h2>
+                      <Status status={activeCase.status} />
+                    </h2>
+                    <p className="case-flag-meaning">
+                      <Hoist
+                        code={statusFlags[activeCase.status]}
+                        height={18}
+                        flying={activeCase.running}
+                      />
+                      Flag{" "}
+                      {statusFlags[activeCase.status] === "answer"
+                        ? "answering pennant"
+                        : statusFlags[activeCase.status]}
+                      : “{flagMeaning[statusFlags[activeCase.status]]}”
+                    </p>
+                  </div>
                 </div>
-                <div className="case-route">
-                  <Ship size={15} />
-                  <strong>{activeCase.shipment.port_of_loading}</strong>
-                  <ArrowRight size={14} />
-                  <strong>{activeCase.shipment.port_of_discharge}</strong>
-                  <span>{activeCase.shipment_id}</span>
-                </div>
-                <div className="case-eta">
-                  <Clock3 size={14} />
-                  ETA {date(activeCase.shipment.eta)}
-                </div>
+                <dl className="case-voyage">
+                  <div>
+                    <dt>Case</dt>
+                    <dd>
+                      {activeCase.case_id} · {activeCase.shipment_id}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Voyage</dt>
+                    <dd>
+                      {activeCase.shipment.port_of_loading}
+                      <ArrowRight size={14} aria-label="to" />
+                      {activeCase.shipment.port_of_discharge}
+                    </dd>
+                  </div>
+                  {activeCase.shipment.vessel && (
+                    <div>
+                      <dt>Vessel</dt>
+                      <dd>{activeCase.shipment.vessel}</dd>
+                    </div>
+                  )}
+                  <div>
+                    <dt>ETA</dt>
+                    <dd>{date(activeCase.shipment.eta)}</dd>
+                  </div>
+                </dl>
               </section>
               <CaseProgress
                 item={activeCase}
@@ -897,8 +846,8 @@ export default function Workspace() {
                           Boolean(
                             activeCase.reconciliation?.discrepancies.length,
                           ) && (
-                            <TriangleAlert
-                              size={13}
+                            <span
+                              className="tab-alert"
                               aria-label="Discrepancy found"
                             />
                           )}
@@ -913,27 +862,20 @@ export default function Workspace() {
                     id="case-tabpanel"
                     aria-labelledby={`tab-${tab}`}
                   >
-                    <p className="tab-description">{tabDescriptions[tab]}</p>
                     {tab === "Overview" && <Overview item={activeCase} />}
                     {tab === "Documents" && <Documents item={activeCase} />}
                     {tab === "Inventory" && <Inventory item={activeCase} />}
                     {tab === "Monitoring" && <Monitoring item={activeCase} />}
                     {tab === "Approval" && (
                       <div className="approval-list">
-                        <div className="panel-heading">
-                          <ShieldCheck size={20} />
-                          <div>
-                            <h3>Decision desk</h3>
-                            <p>
-                              Review the validated action before an ERP write.
-                            </p>
-                          </div>
-                        </div>
                         {!activeCase.plan?.actions.length ? (
                           <div className="panel-empty">
-                            No transfer is awaiting approval. Check the plan for
-                            monitoring instructions or a decision that needs
-                            your attention.
+                            <h3>No transfer to approve</h3>
+                            <p>
+                              No transfer is awaiting approval. Check the
+                              overview for monitoring instructions or a decision
+                              that needs your attention.
+                            </p>
                           </div>
                         ) : (
                           activeCase.plan.actions.map((action) => (
@@ -958,21 +900,18 @@ export default function Workspace() {
                       className="case-evidence"
                       aria-labelledby="evidence-heading"
                     >
-                      <div className="subsection-heading">
-                        <h3 id="evidence-heading">Supporting evidence</h3>
+                      <div className="rail-heading">
+                        <h3 id="evidence-heading">Evidence</h3>
                         <span>{activeCase.plan.evidence.length} findings</span>
                       </div>
-                      <div className="evidence-list">
+                      <ul className="evidence-list">
                         {activeCase.plan.evidence.map((evidence, i) => (
-                          <div key={i}>
-                            <CheckCircle2 size={15} />
-                            <div>
-                              <p>{evidence.fact}</p>
-                              <span>{evidence.source}</span>
-                            </div>
-                          </div>
+                          <li key={i}>
+                            <p>{evidence.fact}</p>
+                            <span>{evidence.source}</span>
+                          </li>
                         ))}
-                      </div>
+                      </ul>
                     </section>
                   )}
                   <Timeline
@@ -982,17 +921,14 @@ export default function Workspace() {
                   />
                   {activeCase.plan && (
                     <section className="next-check">
-                      <Radio size={17} />
-                      <div>
-                        <h3>What happens next</h3>
-                        <p>{activeCase.plan.next_check}</p>
-                        <button
-                          className="text-button"
-                          onClick={() => openCaseTab("Monitoring")}
-                        >
-                          View monitoring <ArrowRight size={14} />
-                        </button>
-                      </div>
+                      <h3>What happens next</h3>
+                      <p>{activeCase.plan.next_check}</p>
+                      <button
+                        className="text-button"
+                        onClick={() => openCaseTab("Monitoring")}
+                      >
+                        View monitoring <ArrowRight size={14} />
+                      </button>
                     </section>
                   )}
                 </div>
@@ -1003,11 +939,11 @@ export default function Workspace() {
           {activeCase && eventSimulator}
 
           <footer>
+            <span>Evidence-backed plans. Human-approved actions.</span>
             <span>
-              <ShieldCheck size={14} />
-              Evidence-backed plans. Human-approved actions.
+              Synthetic demo data · {health?.model || "CLEAR"} · {awaiting}{" "}
+              awaiting approval
             </span>
-            <span>Synthetic demo data · {health?.model || "CLEAR"}</span>
           </footer>
         </main>
       </div>
@@ -1036,7 +972,6 @@ function CaseProgress({
         ? 3
         : 2;
   const active = item.running;
-  const StageIcon = statusDetails[item.status].icon;
   const steps = [
     "Investigate",
     "Assess impact",
@@ -1062,21 +997,36 @@ function CaseProgress({
     >
       <div className="case-next-step" role="status" aria-atomic="true">
         <span className="case-state-icon">
-          {active ? <ClearMark active size={32} /> : <StageIcon size={24} />}
+          {active && <ClearMark active size={36} />}
         </span>
-        <div>
+        <div className="case-next-copy">
           <h2>
             {active
               ? item.status === "executing"
                 ? "Putting your approved plan into action"
                 : "CLEAR is working on this case"
-              : statuses[item.status]}
+              : nextStepTitles[item.status]}
           </h2>
-          <p>{item.status_reason || statusDetails[item.status].description}</p>
+          <p>{item.status_reason || statusDescriptions[item.status]}</p>
+          {active && (
+            <p className="run-update">
+              <strong>{latest?.actor || "Orchestrator"}</strong>
+              {latest
+                ? ` · ${latest.summary}`
+                : " · Starting the investigation. Results appear as each tool finishes."}
+            </p>
+          )}
+          {active && item.plan && (
+            <p className="updating-plan">
+              <Info size={14} />
+              The plan below is from the previous run. CLEAR is reassessing it;
+              decisions are paused.
+            </p>
+          )}
         </div>
         {item.status === "awaiting_approval" && !active && (
           <button
-            className="primary-button"
+            className="primary-button decision"
             onClick={() => onNavigate("Approval")}
           >
             Review transfer <ArrowRight size={16} />
@@ -1098,33 +1048,11 @@ function CaseProgress({
             className={i < phase ? "complete" : i === phase ? "current" : ""}
             aria-current={i === phase ? "step" : undefined}
           >
-            <span>{i < phase ? <Check size={13} /> : i + 1}</span>
+            <span className="step-mark" aria-hidden="true" />
             <button onClick={() => onNavigate(destinations[i])}>{step}</button>
           </li>
         ))}
       </ol>
-      {active && (
-        <div className="run-update">
-          <span className="working-dots" aria-hidden="true">
-            <i />
-            <i />
-            <i />
-          </span>
-          <p>
-            <strong>{latest?.actor || "Orchestrator"}</strong>
-            {latest
-              ? ` · ${latest.summary}`
-              : " · Starting the investigation. Live results will appear as each tool finishes."}
-          </p>
-        </div>
-      )}
-      {active && item.plan && (
-        <p className="updating-plan">
-          <Info size={14} />
-          The plan below is from the previous run. CLEAR is reassessing it;
-          decisions are paused.
-        </p>
-      )}
     </section>
   );
 }
@@ -1194,7 +1122,7 @@ function Monitoring({ item }: { item: Case }) {
           executed.map((action) => (
             <div className="monitoring-transfer" key={action.validation_id}>
               <p className="monitoring-order">
-                <CheckCircle2 size={16} />
+                <Flag code="C" height={16} />
                 Order created:{" "}
                 {action.sto?.purchase_order || "See agent activity"}
               </p>
@@ -1286,7 +1214,7 @@ function Overview({ item }: { item: Case }) {
       <div className="analysis-state">
         <span className="analysis-icon">
           {item.running ? (
-            <ClearMark active size={84} />
+            <ClearMark active size={96} />
           ) : (
             <TriangleAlert size={30} />
           )}
@@ -1298,8 +1226,8 @@ function Overview({ item }: { item: Case }) {
         </h3>
         <p>
           {item.running
-            ? "The agents are investigating this exception. Follow their progress in the activity timeline."
-            : "Review the case status and activity timeline for the reason."}
+            ? "The agents are reading the documents, checking stock, and sizing the impact. Follow each step in the signal log."
+            : "Review the case status and the signal log for the reason."}
         </p>
         {item.running && (
           <div className="analysis-skeleton" aria-hidden="true">
@@ -1317,47 +1245,47 @@ function Overview({ item }: { item: Case }) {
   return (
     <>
       <div className="recommendation">
-        <GitBranch size={20} />
-        <div>
-          <h3>Recommended next move</h3>
-          {transfer && (
-            <p className="recommendation-route">
+        <h3 className="recommendation-move">
+          {transfer ? (
+            <>
               Transfer <strong>{number(transfer.quantity)} t</strong>
-              <span>
-                Plant {transfer.source_plant} <ArrowRight size={14} /> Plant{" "}
-                {transfer.destination_plant}
-              </span>
-            </p>
+            </>
+          ) : plan.escalation ? (
+            "Escalate to a planner"
+          ) : (
+            "Keep the current plan"
           )}
-          <p>{plan.recommendation}</p>
-        </div>
+        </h3>
+        {transfer && (
+          <p className="move-route">
+            Plant {transfer.source_plant}
+            <ArrowRight size={22} aria-label="to" />
+            Plant {transfer.destination_plant}
+          </p>
+        )}
+        <p>{plan.recommendation}</p>
       </div>
-      <div className="metric-grid">
-        <Metric
+      <dl className="figures">
+        <Figure
           label="Resolution estimate"
           value={number(impact.prediction.predicted_days)}
           unit="days"
           note={impact.prediction.source}
         />
-        <Metric
-          label="Current coverage"
+        <Figure
+          label="Stock coverage"
           value={number(impact.coverage_days)}
           unit="days"
           note={`${number(impact.required_coverage_days)} days required`}
         />
-        <Metric
-          label="Current shortage"
+        <Figure
+          label="Shortage before recovery"
           value={number(impact.shortage_t)}
           unit="t"
-          note="Before recovery"
+          note={impact.covered ? "Covered" : "Not covered"}
           warning={!impact.covered}
         />
-      </div>
-      <div className="panel-heading">
-        <h3>Exception brief</h3>
-        <span className="source-label">{item.shipment_id}</span>
-      </div>
-      <p className="exception-title">{plan.exception}</p>
+      </dl>
       {impact.prediction.basis.fallback_reason && (
         <Notice tone="warning" title="Backup estimate in use">
           SAP-RPT is unavailable. The estimate uses the historical median;
@@ -1365,36 +1293,42 @@ function Overview({ item }: { item: Case }) {
         </Notice>
       )}
       {plan.escalation && (
-        <div className="escalation">
-          <TriangleAlert size={18} />
+        <div className="escalation" role="note">
+          <Flag code="V" height={22} />
           <div>
             <strong>A decision needs your attention</strong>
             <p>{plan.escalation}</p>
           </div>
         </div>
       )}
-      <div className="subsection-heading">
-        <h4>Recovery options</h4>
-        <span>Calculated by tools</span>
-      </div>
-      <div className="options">
-        <Option name="Current plan" assessment={impact} recommended={false} />
-        {plan.options.map((option) => (
-          <Option
-            key={option.name}
-            name={option.name}
-            assessment={option.assessment}
-            recommended={option.name === plan.recommended_option}
-            note={option.note}
-            valid={option.validation?.valid}
-          />
-        ))}
-      </div>
+      <section className="brief" aria-labelledby="brief-heading">
+        <h4 id="brief-heading">What happened</h4>
+        <p className="exception-title">{plan.exception}</p>
+      </section>
+      <section aria-labelledby="options-heading">
+        <div className="subsection-heading">
+          <h4 id="options-heading">Recovery options</h4>
+          <span>Calculated by tools, checked by the validator</span>
+        </div>
+        <div className="options">
+          <Option name="Current plan" assessment={impact} recommended={false} />
+          {plan.options.map((option) => (
+            <Option
+              key={option.name}
+              name={option.name}
+              assessment={option.assessment}
+              recommended={option.name === plan.recommended_option}
+              note={option.note}
+              valid={option.validation?.valid}
+            />
+          ))}
+        </div>
+      </section>
     </>
   );
 }
 
-function Metric({
+function Figure({
   label,
   value,
   unit,
@@ -1409,12 +1343,14 @@ function Metric({
 }) {
   return (
     <div className={`metric ${warning ? "metric-warning" : ""}`}>
-      <span>{label}</span>
-      <strong>
-        {value}
-        <small>{unit}</small>
-      </strong>
-      <p>{note}</p>
+      <dt>{label}</dt>
+      <dd>
+        <strong>
+          {value}
+          <small>{unit}</small>
+        </strong>
+        <span>{note}</span>
+      </dd>
     </div>
   );
 }
@@ -1432,14 +1368,28 @@ function Option({
   note?: string;
   valid?: boolean;
 }) {
+  const coverage =
+    assessment.required_coverage_days > 0
+      ? Math.min(
+          100,
+          Math.max(
+            0,
+            (assessment.coverage_days / assessment.required_coverage_days) *
+              100,
+          ),
+        )
+      : 100;
   return (
-    <div className={`option ${recommended ? "recommended" : ""}`}>
+    <div
+      className={`option ${recommended ? "recommended" : ""} ${valid === false ? "rejected" : ""}`}
+    >
       <div className="option-title">
         <strong>{name}</strong>
-        {recommended && (
-          <span>
-            <Check size={12} />
-            Recommended
+        {recommended && <span className="option-mark">Recommended</span>}
+        {valid === false && (
+          <span className="validation-rejected">
+            <Flag code="N" height={12} />
+            Rejected by validator
           </span>
         )}
       </div>
@@ -1458,12 +1408,12 @@ function Option({
             : `${number(assessment.shortage_t)} t short`}
         </span>
       </div>
-      <div className="coverage-bar">
-        <span
-          style={{
-            width: `${assessment.required_coverage_days > 0 ? Math.min(100, Math.max(0, (assessment.coverage_days / assessment.required_coverage_days) * 100)) : 100}%`,
-          }}
-        />
+      <div
+        className="coverage-bar"
+        role="img"
+        aria-label={`${number(assessment.coverage_days)} of ${number(assessment.required_coverage_days)} days covered`}
+      >
+        <span style={{ width: `${coverage}%` }} />
       </div>
       <div className="coverage-caption">
         <span>{number(assessment.coverage_days)} days coverage</span>
@@ -1471,7 +1421,7 @@ function Option({
       </div>
       {assessment.transfer && (
         <p className="option-note">
-          Transfer cost: ${number(assessment.transfer.cost_usd)} · Lead time:{" "}
+          Transfer cost ${number(assessment.transfer.cost_usd)} · lead time{" "}
           {number(assessment.transfer.lead_time_days)} days
         </p>
       )}
@@ -1479,12 +1429,6 @@ function Option({
         <p className="option-note">
           Deferred:{" "}
           {assessment.deferred_orders.map((o) => o.order_id).join(", ")}
-        </p>
-      )}
-      {valid === false && (
-        <p className="validation-rejected">
-          <X size={13} />
-          Rejected by validator
         </p>
       )}
       {note && <p className="option-note">{note}</p>}
@@ -1500,13 +1444,6 @@ function Documents({ item }: { item: Case }) {
   const reference = reconciliation?.purchase_order;
   return (
     <>
-      <div className="panel-heading">
-        <FileText size={20} />
-        <div>
-          <h3>Shipping evidence</h3>
-          <p>Supplier documents compared with the S/4HANA purchase order.</p>
-        </div>
-      </div>
       {quantityIssue && (
         <Notice tone="warning" title="Quantity mismatch found">
           The purchase order expects{" "}
@@ -1517,14 +1454,17 @@ function Documents({ item }: { item: Case }) {
                 `${documentTitles[doc] || doc}: ${number(Number(quantityIssue.document_values[doc]))} t`,
             )
             .join("; ")}
-          . Review the highlighted source lines below.
+          . The lines that disagree are marked below.
         </Notice>
       )}
       {reference && (
-        <div className="reconciliation-summary">
+        <section
+          className="reconciliation-summary"
+          aria-labelledby="comparison-heading"
+        >
           <div className="subsection-heading">
-            <h4>Quantity comparison</h4>
-            <span>Verified source values</span>
+            <h4 id="comparison-heading">Quantity on each record</h4>
+            <span>Normalized to tonnes</span>
           </div>
           <div
             className="quantity-comparison"
@@ -1532,14 +1472,12 @@ function Documents({ item }: { item: Case }) {
             aria-label="Quantity comparison"
           >
             <div role="listitem" className="quantity-source reference">
-              <span>Purchase order</span>
+              <span className="source-name">Purchase order</span>
               <strong>
                 {number(reference.quantity)} <small>t</small>
               </strong>
-              <span>PO {reference.purchase_order}</span>
               <span className="comparison-result">
-                <ShieldCheck size={13} />
-                ERP reference
+                S/4HANA · PO {reference.purchase_order}
               </span>
             </div>
             {item.documents.required_documents
@@ -1557,9 +1495,9 @@ function Documents({ item }: { item: Case }) {
                   <div
                     role="listitem"
                     key={type}
-                    className={`quantity-source ${mismatch ? "mismatch" : ""}`}
+                    className={`quantity-source ${mismatch ? "mismatch" : "match"}`}
                   >
-                    <span>{documentTitles[type]}</span>
+                    <span className="source-name">{documentTitles[type]}</span>
                     <strong>
                       {extraction ? (
                         <>
@@ -1569,36 +1507,22 @@ function Documents({ item }: { item: Case }) {
                         "Not verified"
                       )}
                     </strong>
-                    <span>Supplier document</span>
                     <span className="comparison-result">
-                      {extraction ? (
-                        mismatch ? (
-                          <>
-                            <TriangleAlert size={13} />
-                            Does not match
-                          </>
-                        ) : (
-                          <>
-                            <CheckCircle2 size={13} />
-                            Matches PO
-                          </>
-                        )
-                      ) : (
-                        <>
-                          <Info size={13} />
-                          Review source
-                        </>
-                      )}
+                      {extraction
+                        ? mismatch
+                          ? "Does not match the PO"
+                          : "Matches the PO"
+                        : "Review the source"}
                     </span>
                   </div>
                 );
               })}
           </div>
           <p className="panel-footnote">
-            Quantities are normalized to tonnes. Package counts and gross
-            weights are not treated as a stated goods quantity.
+            Package counts and gross weights are not treated as a stated goods
+            quantity.
           </p>
-        </div>
+        </section>
       )}
       <div className="subsection-heading">
         <h4>Source documents</h4>
@@ -1607,99 +1531,92 @@ function Documents({ item }: { item: Case }) {
           {item.documents.required_documents.length} available
         </span>
       </div>
-      {item.documents.required_documents.map((type) => {
-        const doc = item.documents.documents.find(
-          (d) => d.document_type === type,
-        );
-        const findings =
-          reconciliation?.discrepancies.filter((d) =>
-            d.mismatched_documents.includes(type),
-          ) || [];
-        const compared = Boolean(
-          reconciliation?.verified_extractions.some(
-            (e) => e.document_type === type && quantityIssue?.field === e.field,
-          ),
-        );
-        return (
-          <details
-            className="document"
-            key={type}
-            open={findings.length > 0 || compared}
-          >
-            <summary>
-              <span>
-                <FileText size={17} />
-                {documentTitles[type] || type}
-              </span>
-              <span
-                className={`document-badge ${!doc || findings.length ? "warning" : ""}`}
-              >
-                {findings.length ? (
-                  <TriangleAlert size={13} />
-                ) : doc && reconciliation ? (
-                  <CheckCircle2 size={13} />
-                ) : (
-                  <FileText size={13} />
-                )}
-                {!doc
-                  ? "Missing"
-                  : findings.length
-                    ? "Discrepancy"
-                    : reconciliation
-                      ? "Reviewed"
-                      : "Available"}
-                <ChevronRight size={14} />
-              </span>
-            </summary>
-            {doc ? (
-              <pre>
-                {doc.text.split("\n").map((line, i) => {
-                  const extraction = reconciliation?.verified_extractions.find(
-                    (e) =>
-                      e.document_type === type &&
-                      e.quote.trim() === line.trim() &&
-                      reconciliation.discrepancies.some(
-                        (f) => f.field === e.field,
-                      ),
-                  );
-                  return (
-                    <span
-                      key={i}
-                      className={
-                        extraction
-                          ? findings.some((f) => f.field === extraction.field)
-                            ? "doc-mismatch"
-                            : "doc-match"
-                          : ""
-                      }
-                    >
-                      {line}
-                      {"\n"}
-                    </span>
-                  );
-                })}
-              </pre>
-            ) : (
-              <p className="missing-document">
-                The required document is missing from the connected records.
-              </p>
-            )}
-            {findings.length > 0 && (
-              <div className="document-findings">
-                <TriangleAlert size={14} />
-                <span>
+      <div className="document-stack">
+        {item.documents.required_documents.map((type) => {
+          const doc = item.documents.documents.find(
+            (d) => d.document_type === type,
+          );
+          const findings =
+            reconciliation?.discrepancies.filter((d) =>
+              d.mismatched_documents.includes(type),
+            ) || [];
+          const compared = Boolean(
+            reconciliation?.verified_extractions.some(
+              (e) =>
+                e.document_type === type && quantityIssue?.field === e.field,
+            ),
+          );
+          return (
+            <details
+              className={`document ${findings.length ? "has-finding" : ""}`}
+              key={type}
+              open={findings.length > 0 || compared}
+            >
+              <summary>
+                <span className="document-name">
+                  {documentTitles[type] || type}
+                </span>
+                <span
+                  className={`document-badge ${!doc || findings.length ? "warning" : ""}`}
+                >
+                  {!doc
+                    ? "Missing"
+                    : findings.length
+                      ? "Discrepancy"
+                      : reconciliation
+                        ? "Reviewed"
+                        : "Available"}
+                </span>
+                <ChevronDown size={16} aria-hidden="true" />
+              </summary>
+              {doc ? (
+                <pre>
+                  {doc.text.split("\n").map((line, i) => {
+                    const extraction =
+                      reconciliation?.verified_extractions.find(
+                        (e) =>
+                          e.document_type === type &&
+                          e.quote.trim() === line.trim() &&
+                          reconciliation.discrepancies.some(
+                            (f) => f.field === e.field,
+                          ),
+                      );
+                    return (
+                      <span
+                        key={i}
+                        className={
+                          extraction
+                            ? findings.some((f) => f.field === extraction.field)
+                              ? "doc-mismatch"
+                              : "doc-match"
+                            : ""
+                        }
+                      >
+                        {line}
+                        {"\n"}
+                      </span>
+                    );
+                  })}
+                </pre>
+              ) : (
+                <p className="missing-document">
+                  The required document is missing from the connected records.
+                </p>
+              )}
+              {findings.length > 0 && (
+                <p className="document-findings">
                   {findings
                     .map(
                       (f) =>
-                        `${f.field === "quantity" ? "Quantity" : f.field}: ${f.document_values[type]}${f.field === "quantity" ? " t" : ""} in this document vs ${f.purchase_order_value}${f.field === "quantity" ? " t" : ""} in the purchase order`,
+                        `${f.field === "quantity" ? "Quantity" : f.field}: ${f.document_values[type]}${f.field === "quantity" ? " t" : ""} here vs ${f.purchase_order_value}${f.field === "quantity" ? " t" : ""} on the purchase order`,
                     )
                     .join(". ")}
-                </span>
-              </div>
-            )}
-          </details>
-        );
-      })}
+                </p>
+              )}
+            </details>
+          );
+        })}
+      </div>
       {!reconciliation && (
         <Notice title="Evidence check pending">
           Documents are available to read. CLEAR has not reconciled them for
@@ -1711,91 +1628,121 @@ function Documents({ item }: { item: Case }) {
 }
 
 function Inventory({ item }: { item: Case }) {
+  const scale = Math.max(
+    1,
+    ...item.inventory.plants.map(
+      (p) =>
+        Math.max(p.unrestricted_t + p.in_transit_t, p.safety_stock_t) * 1.15,
+    ),
+  );
   return (
     <>
-      <div className="panel-heading">
-        <Package size={20} />
-        <div>
-          <h3>Material {item.inventory.material}</h3>
-          <p>
-            Stock position from S/4HANA (mock). All quantities are in tonnes.
-          </p>
-        </div>
+      <div className="subsection-heading">
+        <h4>Material {item.inventory.material}</h4>
+        <span>S/4HANA (mock) · tonnes</span>
       </div>
-      {item.inventory.plants.map((plant) => (
-        <div className="plant" key={plant.plant}>
-          <div className="plant-heading">
-            <h4>Plant {plant.plant}</h4>
-            <span
-              className={
-                plant.unrestricted_t <= plant.safety_stock_t
-                  ? "short"
-                  : "covered"
-              }
+      {item.inventory.plants.map((plant) => {
+        const state =
+          plant.unrestricted_t < plant.safety_stock_t
+            ? "short"
+            : plant.unrestricted_t === plant.safety_stock_t
+              ? "at-threshold"
+              : "covered";
+        const spare = Math.max(0, plant.unrestricted_t - plant.safety_stock_t);
+        const use = plant.consumption_t_per_day.all;
+        return (
+          <section className={`plant ${state}`} key={plant.plant}>
+            <div className="plant-heading">
+              <h4>Plant {plant.plant}</h4>
+              <span className={state === "covered" ? "covered" : "short"}>
+                {state === "short"
+                  ? "Below safety stock"
+                  : state === "at-threshold"
+                    ? "At safety stock · no spare stock"
+                    : `${number(spare)} t above safety stock`}
+              </span>
+            </div>
+            <div
+              className="stock-gauge"
+              role="img"
+              aria-label={`${number(plant.unrestricted_t)} t unrestricted, ${number(plant.in_transit_t)} t in transit, safety stock ${number(plant.safety_stock_t)} t`}
             >
-              {plant.unrestricted_t < plant.safety_stock_t
-                ? "Below safety stock"
-                : plant.unrestricted_t === plant.safety_stock_t
-                  ? "At safety stock · no spare stock"
-                  : "Above safety threshold"}
-            </span>
-          </div>
-          <div className="metric-grid">
-            <Metric
-              label="Unrestricted"
-              value={number(plant.unrestricted_t)}
-              unit="t"
-              note="Available stock"
-            />
-            <Metric
-              label="Safety stock"
-              value={number(plant.safety_stock_t)}
-              unit="t"
-              note="Protected threshold"
-            />
-            <Metric
-              label="In transit"
-              value={number(plant.in_transit_t)}
-              unit="t"
-              note="Not physically received"
-            />
-          </div>
-          <div className="stock-consumption">
-            <span>Daily use · all demand</span>
-            <strong>{number(plant.consumption_t_per_day.all)} t/day</strong>
-          </div>
-          <div className="table-scroll">
-            <table>
-              <caption className="sr-only">
-                Daily material demand at plant {plant.plant}
-              </caption>
-              <thead>
-                <tr>
-                  <th scope="col">Order</th>
-                  <th scope="col">Priority</th>
-                  <th scope="col">Use / day</th>
-                </tr>
-              </thead>
-              <tbody>
-                {plant.orders.map((order) => (
-                  <tr key={order.order_id}>
-                    <td>
-                      <strong>{order.order_id}</strong>
-                      <span>{order.product}</span>
-                    </td>
-                    <td>
-                      <span className={`priority ${order.priority}`}>
-                        {order.priority}
-                      </span>
-                    </td>
-                    <td>{number(order.consumption_t_per_day)} t</td>
+              <span
+                className="gauge-stock"
+                style={{ width: `${(plant.unrestricted_t / scale) * 100}%` }}
+              />
+              {plant.in_transit_t > 0 && (
+                <span
+                  className="gauge-transit"
+                  style={{
+                    left: `${(plant.unrestricted_t / scale) * 100}%`,
+                    width: `${(plant.in_transit_t / scale) * 100}%`,
+                  }}
+                />
+              )}
+              <span
+                className="gauge-safety"
+                style={{ left: `${(plant.safety_stock_t / scale) * 100}%` }}
+              >
+                <span>Safety {number(plant.safety_stock_t)} t</span>
+              </span>
+            </div>
+            <dl className="plant-figures">
+              <div>
+                <dt>Unrestricted</dt>
+                <dd>{number(plant.unrestricted_t)} t</dd>
+              </div>
+              <div>
+                <dt>Safety stock</dt>
+                <dd>{number(plant.safety_stock_t)} t</dd>
+              </div>
+              <div>
+                <dt>In transit</dt>
+                <dd>{number(plant.in_transit_t)} t</dd>
+              </div>
+              <div>
+                <dt>Daily use</dt>
+                <dd>
+                  {number(use)} t/day
+                  {use > 0 && (
+                    <small> · {number(plant.unrestricted_t / use)} days</small>
+                  )}
+                </dd>
+              </div>
+            </dl>
+            <div className="table-scroll">
+              <table>
+                <caption className="sr-only">
+                  Daily material demand at plant {plant.plant}
+                </caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Order</th>
+                    <th scope="col">Priority</th>
+                    <th scope="col">Use / day</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      ))}
+                </thead>
+                <tbody>
+                  {plant.orders.map((order) => (
+                    <tr key={order.order_id}>
+                      <td>
+                        <strong>{order.order_id}</strong>
+                        <span>{order.product}</span>
+                      </td>
+                      <td>
+                        <span className={`priority ${order.priority}`}>
+                          {order.priority}
+                        </span>
+                      </td>
+                      <td>{number(order.consumption_t_per_day)} t</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        );
+      })}
     </>
   );
 }
@@ -1826,43 +1773,42 @@ function Approval({
     caseItem.status === "awaiting_approval" &&
     action.approval?.decision !== "rejected";
   return (
-    <div className="approval-card">
+    <div
+      className={`approval-card ${isPending ? "pending" : ""} ${action.status}`}
+    >
       <div className="approval-card-heading">
-        <span className="approval-shield">
-          <ShieldCheck size={24} />
+        <h3>Stock transport order</h3>
+        <span className={valid.valid ? "valid" : "invalid"}>
+          {action.validation_id} ·{" "}
+          {valid.valid ? "Validation passed" : "Validation rejected"}
         </span>
-        <div>
-          <h3>Stock transport order</h3>
-          <p>
-            {action.validation_id} ·{" "}
-            {valid.valid ? "Validation passed" : "Validation rejected"}
-          </p>
-        </div>
       </div>
       <div className="transfer-route">
-        <div>
-          <span>FROM</span>
-          <strong>Plant {valid.source_plant}</strong>
-        </div>
-        <ArrowRight size={20} />
-        <div>
-          <span>TO</span>
-          <strong>Plant {valid.destination_plant}</strong>
-        </div>
         <div className="transfer-quantity">
           <strong>
-            {number(valid.quantity)} <small>t</small>
+            {number(valid.quantity)}
+            <small>t</small>
           </strong>
+          <span>{caseItem.inventory.material}</span>
+        </div>
+        <div className="transfer-leg">
+          <span>From</span>
+          <strong>Plant {valid.source_plant}</strong>
+        </div>
+        <ArrowRight size={24} aria-hidden="true" />
+        <div className="transfer-leg">
+          <span>To</span>
+          <strong>Plant {valid.destination_plant}</strong>
         </div>
       </div>
-      <p>{caseItem.plan?.recommendation}</p>
+      <p className="approval-rationale">{caseItem.plan?.recommendation}</p>
       <p className="panel-footnote">
         Quantity and route come from the validation record. Stock is rechecked
         before the order is created.
       </p>
       {action.status === "executed" ? (
         <div className="approval-executed">
-          <CheckCircle2 size={18} />
+          <Flag code="C" height={22} />
           <div>
             <strong>
               Order created: {action.sto?.purchase_order || "See timeline"}
@@ -1880,10 +1826,10 @@ function Approval({
         </Notice>
       ) : !isPending ? (
         <div className="panel-empty">
-          This plan is not currently accepting a decision.
+          <p>This plan is not currently accepting a decision.</p>
         </div>
       ) : (
-        <>
+        <div className="decision-desk">
           <Notice
             tone="warning"
             title="Approval creates a stock transport order"
@@ -1906,35 +1852,33 @@ function Approval({
             onChange={(e) => setReason(e.target.value)}
             disabled={disabled}
           />
-          {!reason.trim() && (
-            <p className="decision-help">
-              To reject this transfer, add a reason above. A note is optional
-              when approving.
-            </p>
-          )}
           {error && (
-            <div className="notice notice-error decision-error">
-              <TriangleAlert size={18} />
-              <div>
+            <div className="notice notice-error decision-error" role="alert">
+              <Flag code="V" height={16} />
+              <div className="notice-copy">
                 <strong>Decision not recorded</strong>
-                <p>
+                <div>
                   The request failed. Review the current case before trying
                   again.
-                </p>
-                <details className="error-details">
-                  <summary>Request details</summary>
-                  {error}
-                </details>
+                  <details className="error-details">
+                    <summary>Request details</summary>
+                    {error}
+                  </details>
+                </div>
               </div>
             </div>
           )}
           <div className="approval-buttons">
+            <p className="approval-signature">
+              Signed as <strong>{approver}</strong>
+              {!reason.trim() && " · a note is needed only to reject"}
+            </p>
             <button
               className="reject-button"
               disabled={disabled || !reason.trim()}
               onClick={() => void onDecision(action, "rejected", reason)}
             >
-              <X size={16} />
+              <Flag code="N" height={13} />
               Reject
             </button>
             <button
@@ -1942,14 +1886,11 @@ function Approval({
               disabled={disabled || !valid.valid}
               onClick={() => void onDecision(action, "approved", reason)}
             >
-              <Check size={16} />
+              <Flag code="C" height={13} />
               Approve transfer
             </button>
           </div>
-          <p className="approval-signature">
-            Decision will be recorded as <strong>{approver}</strong>.
-          </p>
-        </>
+        </div>
       )}
     </div>
   );
@@ -1978,18 +1919,16 @@ function Timeline({
       scroll.current.scrollTop = scroll.current.scrollHeight;
   }, [entries.length, running]);
   return (
-    <aside className="timeline-panel">
-      <div className="timeline-heading">
-        <h3>
-          <Activity size={17} />
-          Agent activity
-        </h3>
-        <span className={running ? "activity-live" : "source-label"}>
-          {running ? "Live" : `${visibleEntries.length} key steps`}
+    <section className="timeline-panel" aria-labelledby="timeline-heading">
+      <div className="rail-heading">
+        <h3 id="timeline-heading">Signal log</h3>
+        <span className={running ? "activity-live" : ""}>
+          {running ? "Live" : `${visibleEntries.length} steps`}
         </span>
       </div>
       <p className="timeline-caption">
-        Evidence, checks, and decisions as they happen.
+        Every agent signs with the flag of its initial. Tool results and
+        decisions are recorded.
       </p>
       <label className="timeline-filter">
         <input
@@ -2013,46 +1952,45 @@ function Timeline({
         aria-label="Agent activity timeline"
         aria-relevant="additions"
         aria-live="off"
+        tabIndex={0}
       >
         {visibleEntries.map((entry) => (
           <div className={`timeline-entry ${entry.flag || ""}`} key={entry.seq}>
-            <span className="timeline-node">
-              {entry.flag === "rejected" || entry.flag === "error" ? (
-                <X size={10} />
-              ) : entry.flag === "write" ? (
-                <Check size={10} />
-              ) : null}
-            </span>
-            <div className="timeline-entry-heading">
-              <strong>{entry.actor}</strong>
-              <time dateTime={entry.at}>{time(entry.at)}</time>
-            </div>
-            {entry.flag && (
-              <span className="timeline-flag">
-                {entry.flag === "rejected"
-                  ? "Validator rejected"
-                  : entry.flag.replaceAll("_", " ")}
-              </span>
-            )}
-            {entry.kind === "note" || entry.kind === "delegation" ? (
-              <details className="agent-note">
-                <summary>
-                  {entry.kind === "delegation"
-                    ? "Delegation details"
-                    : "Agent explanation"}
-                </summary>
+            <Flag code={actorFlag(entry.actor)} height={14} />
+            <div className="timeline-entry-body">
+              <div className="timeline-entry-heading">
+                <strong>{entry.actor}</strong>
+                <time dateTime={entry.at}>{time(entry.at)}</time>
+              </div>
+              {entry.flag && (
+                <span className="timeline-flag">
+                  {entry.flag === "rejected"
+                    ? "Validator rejected"
+                    : entry.flag === "write"
+                      ? "ERP write"
+                      : entry.flag.replaceAll("_", " ")}
+                </span>
+              )}
+              {entry.kind === "note" || entry.kind === "delegation" ? (
+                <details className="agent-note">
+                  <summary>
+                    {entry.kind === "delegation"
+                      ? "Delegation details"
+                      : "Agent explanation"}
+                  </summary>
+                  <p>{entry.summary}</p>
+                </details>
+              ) : (
                 <p>{entry.summary}</p>
-              </details>
-            ) : (
-              <p>{entry.summary}</p>
-            )}
-            {entry.source && (
-              <div className="timeline-source">{entry.source}</div>
-            )}
+              )}
+              {entry.source && (
+                <div className="timeline-source">{entry.source}</div>
+              )}
+            </div>
           </div>
         ))}
         {!entries.length && (
-          <div className="timeline-empty">Waiting for the first activity…</div>
+          <div className="timeline-empty">Waiting for the first signal…</div>
         )}
         {running && (
           <div className="timeline-working">
@@ -2071,13 +2009,9 @@ function Timeline({
             setFollowing(true);
           }}
         >
-          Jump to latest activity <ChevronDown size={14} />
+          Jump to latest <ChevronDown size={14} />
         </button>
       )}
-      <div className="timeline-bottom">
-        <ShieldCheck size={13} />
-        Tool results and decisions are recorded.
-      </div>
-    </aside>
+    </section>
   );
 }
