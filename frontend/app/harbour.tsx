@@ -212,13 +212,11 @@ function Containers({
 
 function Vessel({
   flags,
-  name,
   far,
   running,
   atSea,
 }: {
   flags: FlagCode[];
-  name: string;
   far: boolean;
   running: boolean;
   atSea: boolean;
@@ -265,7 +263,7 @@ function Vessel({
         <path d="M0 -26 H232 L214 6 H18 Z" fill={ink.dark} />
         <path d="M6 -6 H228 L222 4 H12 Z" fill="#b8261d" />
         <text className="hull-name" x={44} y={-12}>
-          {name.toUpperCase()}
+          COOKUSAN SHIP
         </text>
         {cargo.map((fill, i) => (
           <rect
@@ -606,18 +604,12 @@ export function Harbour({
             <rect x={918} y={196} width={20} height={6} fill={ink.white} />
           </g>
         </g>
-        {item && (
-          <text className="scene-label" x={668} y={GROUND + 26}>
-            {item.shipment.port_of_discharge.toUpperCase()}
-          </text>
-        )}
       </g>
       </g>
 
       {item && (
         <Vessel
           flags={flags}
-          name={item.shipment.vessel || item.shipment_id}
           far={item.status === "needs_human_decision" || congestion}
           running={running}
           atSea={atSea}
