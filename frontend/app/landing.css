@@ -138,6 +138,17 @@
   letter-spacing: 0.06em;
 }
 
+.landing-mark .ship-on-light,
+.landing-bar[data-ink="paper"] .ship-on-dark,
+.landing-bar[data-ink="yellow"] .ship-on-dark {
+  display: none;
+}
+
+.landing-bar[data-ink="paper"] .ship-on-light,
+.landing-bar[data-ink="yellow"] .ship-on-light {
+  display: block;
+}
+
 .landing-bar nav {
   display: flex;
   gap: 24px;

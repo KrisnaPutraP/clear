@@ -577,7 +577,13 @@ export default function Workspace() {
           <X size={20} />
         </button>
         <a className="brand" href="/" aria-label="CLEAR home">
-          <ClearMark size={30} />
+          <img
+            className="brand-ship"
+            src="/clear-logo-mark-dark.svg"
+            width={61}
+            height={30}
+            alt=""
+          />
           <span className="brand-name">CLEAR</span>
         </a>
         <p className="brand-line">Shipment exception desk</p>
@@ -653,7 +659,13 @@ export default function Workspace() {
             <Menu size={20} />
           </button>
           <a className="mobile-brand" href="/" aria-label="CLEAR home">
-            <ClearMark size={24} />
+            <img
+              className="brand-ship"
+              src="/clear-logo-mark-dark.svg"
+              width={48}
+              height={24}
+              alt=""
+            />
           </a>
           <h1>Exception workspace</h1>
           <div className="topbar-status">

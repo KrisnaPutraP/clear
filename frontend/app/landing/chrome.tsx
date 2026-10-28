@@ -22,11 +22,9 @@ export function Header() {
   return (
     <header className="landing-bar" data-ink={ink}>
       <a className="landing-mark" href="#top" aria-label="CLEAR, back to the top">
-        <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
-          <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="1.8" />
-          <path d="M16.24 7.76 14.12 14.12 9.88 9.88Z" fill="#e0392f" />
-          <path d="M7.76 16.24 9.88 9.88 14.12 14.12Z" fill="currentColor" />
-        </svg>
+        {/* The bar changes field per chapter; each ship suits one kind. */}
+        <img className="ship-on-dark" src="/clear-logo-mark-dark.svg" width={57} height={28} alt="" />
+        <img className="ship-on-light" src="/clear-logo-mark.svg" width={57} height={28} alt="" />
         CLEAR
       </a>
       <nav aria-label="Sections">

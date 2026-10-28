@@ -298,28 +298,24 @@ main {
   text-decoration: none;
 }
 
-.brand .clear-mark img {
-  filter: brightness(1.6) saturate(0.85);
-}
-
-/* The mark answers the pointer like a compass: on hover the needle swings
-   past north, back, and settles; a press sinks it a little. The name opens
-   its letters as it does. */
-.brand .clear-mark,
-.landing-mark svg {
+/* The ship answers the pointer: on hover it noses forward over a swell and
+   settles; a press sinks it a little. The name opens its letters as it does. */
+.brand-ship,
+.landing-mark img {
+  display: block;
   transition: transform 160ms var(--ease-out);
 }
 
-.brand:hover .clear-mark,
-.brand:focus-visible .clear-mark,
-.landing-mark:hover svg,
-.landing-mark:focus-visible svg {
-  animation: compass-seek 1.1s var(--ease-out);
+.brand:hover .brand-ship,
+.brand:focus-visible .brand-ship,
+.landing-mark:hover img,
+.landing-mark:focus-visible img {
+  animation: ship-sail 1s var(--ease-out);
 }
 
-.brand:active .clear-mark,
-.landing-mark:active svg {
-  transform: scale(0.88);
+.brand:active .brand-ship,
+.landing-mark:active img {
+  transform: scale(0.92);
 }
 
 .brand-name {
@@ -335,29 +331,22 @@ main {
   letter-spacing: 0.01em;
 }
 
-@keyframes compass-seek {
-  0% {
-    rotate: 0deg;
+@keyframes ship-sail {
+  40% {
+    translate: 5px -2px;
+    rotate: -4deg;
   }
-  35% {
-    rotate: 210deg;
-  }
-  60% {
-    rotate: 330deg;
-  }
-  80% {
-    rotate: 372deg;
-  }
-  100% {
-    rotate: 360deg;
+  70% {
+    translate: 2px 0;
+    rotate: 1deg;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .brand:hover .clear-mark,
-  .brand:focus-visible .clear-mark,
-  .landing-mark:hover svg,
-  .landing-mark:focus-visible svg {
+  .brand:hover .brand-ship,
+  .brand:focus-visible .brand-ship,
+  .landing-mark:hover img,
+  .landing-mark:focus-visible img {
     animation: none;
   }
 }
@@ -371,7 +360,7 @@ main {
 }
 
 .brand-line {
-  margin: 8px 22px 0 62px;
+  margin: 8px 22px 0 93px;
   color: var(--mast-ink-2);
   font-size: 13px;
 }
