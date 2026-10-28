@@ -1,6 +1,5 @@
 import type { CSSProperties } from "react";
 import type { Case } from "../lib/types";
-import { FlagShape, type FlagCode } from "./flags";
 
 // CLEAR's harbour at dusk, drawn in flat shapes. It is the product's global
 // animation, so it shows no names or numbers from the case: only the case's
@@ -148,12 +147,10 @@ function Containers({
 }
 
 function Vessel({
-  flags,
   far,
   running,
   atSea,
 }: {
-  flags: FlagCode[];
   far: boolean;
   running: boolean;
   atSea: boolean;
@@ -234,7 +231,7 @@ function Vessel({
           />
         ))}
         <rect x={198} y={-90} width={14} height={16} fill="#b8261d" />
-        {/* mast, yard and the hoist */}
+        {/* mast, yard and a plain pennant */}
         <rect x={216} y={-150} width={3} height={76} fill={ink.steel} />
         <rect x={200} y={-140} width={36} height={3} fill={ink.steel} />
         <circle
@@ -244,30 +241,14 @@ function Vessel({
           r={2.5}
           fill={ink.lit}
         />
-        <line
-          x1={234}
-          y1={-138}
-          x2={234}
-          y2={-138 + flags.length * 17 + 2}
-          stroke={ink.white}
-          strokeWidth={1}
-        />
-        {flags.map((code, i) => (
-          <g
-            key={`${code}-${i}`}
-            className={`mast-flag ${running ? "flying" : ""}`}
-            transform={`translate(235 ${-136 + i * 17})`}
-            style={{ "--i": i } as CSSProperties}
-          >
-            {/* CSS animates this group; the scale lives one level down so
-                the animation's transform cannot replace it. */}
-            <g>
-              <g transform="scale(0.36)">
-                <FlagShape code={code} />
-              </g>
-            </g>
+        <g
+          className={`mast-flag ${running ? "flying" : ""}`}
+          transform="translate(219 -150)"
+        >
+          <g>
+            <polygon points="0,0 24,4 0,8" fill={ink.red} />
           </g>
-        ))}
+        </g>
       </g>
     </g>
   );
@@ -288,24 +269,9 @@ export function Harbour({
   const congestion = Boolean(
     item && !customs && item.plan && !item.plan.actions.length,
   );
-  const statusFlag: FlagCode | null = item
-    ? (
-        {
-          analyzing: "answer",
-          awaiting_approval: "K",
-          executing: "P",
-          monitoring: "C",
-          needs_human_decision: "V",
-        } as const
-      )[item.status]
-    : null;
   // While the agents work the camera rides with the vessel on open water;
   // when they finish the port pans in and the vessel comes to anchor.
   const atSea = Boolean(item && running);
-  const flags: FlagCode[] = [
-    ...(customs ? (["Q"] as FlagCode[]) : []),
-    ...(statusFlag ? [statusFlag] : []),
-  ];
   // Stock moves only with the case state: the plant by the port fills up
   // once an approved transfer has been delivered.
   const received = Boolean(action && (driving || delivered));
@@ -506,7 +472,6 @@ export function Harbour({
 
       {item && (
         <Vessel
-          flags={flags}
           far={item.status === "needs_human_decision" || congestion}
           running={running}
           atSea={atSea}

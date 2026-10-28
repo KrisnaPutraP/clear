@@ -21,7 +21,6 @@ import type {
   Health,
   LogEntry,
 } from "../lib/types";
-import { Flag, Hoist, actorFlag, flagMeaning, type FlagCode } from "./flags";
 import { Harbour } from "./harbour";
 
 const statuses: Record<CaseStatus, string> = {
@@ -30,15 +29,6 @@ const statuses: Record<CaseStatus, string> = {
   executing: "Executing",
   monitoring: "Monitoring",
   needs_human_decision: "Needs a decision",
-};
-// Each state flies the flag whose meaning in the International Code of
-// Signals matches it.
-const statusFlags: Record<CaseStatus, FlagCode> = {
-  analyzing: "answer",
-  awaiting_approval: "K",
-  executing: "P",
-  monitoring: "C",
-  needs_human_decision: "V",
 };
 const statusDescriptions: Record<CaseStatus, string> = {
   analyzing:
@@ -143,30 +133,18 @@ function Notice({
   title,
   children,
   onDismiss,
-  flag,
 }: {
   tone?: "info" | "success" | "warning" | "error";
   title: string;
   children: ReactNode;
   onDismiss?: () => void;
-  flag?: FlagCode;
 }) {
-  // U: "You are running into danger"; V: "I require assistance".
-  const code: FlagCode =
-    flag ||
-    (tone === "success"
-      ? "C"
-      : tone === "info"
-        ? "answer"
-        : tone === "warning"
-          ? "U"
-          : "V");
   return (
     <div
       className={`notice notice-${tone}`}
       role={tone === "error" ? "alert" : "status"}
     >
-      <Flag code={code} height={16} />
+      <span className="notice-mark" aria-hidden="true" />
       <div className="notice-copy">
         <strong>{title}</strong>
         <div>{children}</div>
@@ -456,10 +434,6 @@ export default function Workspace() {
                   : event.description
               }
             >
-              <span className="event-hoist" aria-hidden="true">
-                <Flag code="S" height={18} />
-                <Flag code={scenario} height={18} />
-              </span>
               <span className="event-copy">
                 <span className="event-meta">
                   {event.scenario} ·{" "}
@@ -553,7 +527,7 @@ export default function Workspace() {
                 if (navigationOpen) closeNavigation();
               }}
             >
-              <Hoist code={statusFlags[item.status]} height={20} />
+              <span className="case-mark" aria-hidden="true" />
               <span className="case-link-copy">
                 <span className="case-link-id">{item.case_id}</span>
                 <span className="case-link-meta">
@@ -568,21 +542,6 @@ export default function Workspace() {
             </p>
           )}
         </nav>
-
-        <details className="flag-legend" open>
-          <summary>Read the flags</summary>
-          <ul>
-            {(Object.keys(statusFlags) as CaseStatus[]).map((status) => (
-              <li key={status}>
-                <Flag code={statusFlags[status]} height={14} />
-                <span>
-                  <strong>{statuses[status]}</strong>
-                  {flagMeaning[statusFlags[status]]}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </details>
 
         <div className="sidebar-bottom">
           <p className="guardrail">
@@ -643,7 +602,6 @@ export default function Workspace() {
                   );
                 }}
               >
-                <Flag code={statusFlags[attention[0].status]} height={13} />
                 <span className="attention-count">{attention.length}</span>
                 <span className="attention-label">needs attention</span>
               </button>
@@ -708,7 +666,6 @@ export default function Workspace() {
             <Notice
               tone="success"
               title={feedback.title}
-              flag={feedback.title === "Event received" ? "answer" : "C"}
               onDismiss={() => setFeedback(null)}
             >
               {feedback.message}
@@ -748,18 +705,6 @@ export default function Workspace() {
                     <h2>
                       <Status status={activeCase.status} />
                     </h2>
-                    <p className="case-flag-meaning">
-                      <Hoist
-                        code={statusFlags[activeCase.status]}
-                        height={18}
-                        flying={activeCase.running}
-                      />
-                      Flag{" "}
-                      {statusFlags[activeCase.status] === "answer"
-                        ? "answering pennant"
-                        : statusFlags[activeCase.status]}
-                      : “{flagMeaning[statusFlags[activeCase.status]]}”
-                    </p>
                   </div>
                 </div>
                 <dl className="case-voyage">
@@ -1122,7 +1067,6 @@ function Monitoring({ item }: { item: Case }) {
           executed.map((action) => (
             <div className="monitoring-transfer" key={action.validation_id}>
               <p className="monitoring-order">
-                <Flag code="C" height={16} />
                 Order created:{" "}
                 {action.sto?.purchase_order || "See agent activity"}
               </p>
@@ -1294,7 +1238,6 @@ function Overview({ item }: { item: Case }) {
       )}
       {plan.escalation && (
         <div className="escalation" role="note">
-          <Flag code="V" height={22} />
           <div>
             <strong>A decision needs your attention</strong>
             <p>{plan.escalation}</p>
@@ -1388,7 +1331,6 @@ function Option({
         {recommended && <span className="option-mark">Recommended</span>}
         {valid === false && (
           <span className="validation-rejected">
-            <Flag code="N" height={12} />
             Rejected by validator
           </span>
         )}
@@ -1808,7 +1750,6 @@ function Approval({
       </p>
       {action.status === "executed" ? (
         <div className="approval-executed">
-          <Flag code="C" height={22} />
           <div>
             <strong>
               Order created: {action.sto?.purchase_order || "See timeline"}
@@ -1854,7 +1795,7 @@ function Approval({
           />
           {error && (
             <div className="notice notice-error decision-error" role="alert">
-              <Flag code="V" height={16} />
+              <span className="notice-mark" aria-hidden="true" />
               <div className="notice-copy">
                 <strong>Decision not recorded</strong>
                 <div>
@@ -1878,7 +1819,6 @@ function Approval({
               disabled={disabled || !reason.trim()}
               onClick={() => void onDecision(action, "rejected", reason)}
             >
-              <Flag code="N" height={13} />
               Reject
             </button>
             <button
@@ -1886,7 +1826,6 @@ function Approval({
               disabled={disabled || !valid.valid}
               onClick={() => void onDecision(action, "approved", reason)}
             >
-              <Flag code="C" height={13} />
               Approve transfer
             </button>
           </div>
@@ -1927,8 +1866,7 @@ function Timeline({
         </span>
       </div>
       <p className="timeline-caption">
-        Every agent signs with the flag of its initial. Tool results and
-        decisions are recorded.
+        Every agent step, tool result and decision is recorded here.
       </p>
       <label className="timeline-filter">
         <input
@@ -1956,7 +1894,7 @@ function Timeline({
       >
         {visibleEntries.map((entry) => (
           <div className={`timeline-entry ${entry.flag || ""}`} key={entry.seq}>
-            <Flag code={actorFlag(entry.actor)} height={14} />
+            <span className="timeline-mark" aria-hidden="true" />
             <div className="timeline-entry-body">
               <div className="timeline-entry-heading">
                 <strong>{entry.actor}</strong>

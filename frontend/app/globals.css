@@ -1,7 +1,7 @@
-/* CLEAR · signal-flag workspace.
-   State speaks in the International Code of Signals. Signal yellow is reserved
-   for the human decision that is waiting; red marks shortage, rejection and
-   error; flag blue carries actions and confirmation. There is no green. */
+/* CLEAR · harbour workspace.
+   Signal yellow is reserved for the human decision that is waiting; red marks
+   shortage, rejection and error; blue carries actions and confirmation.
+   There is no green. */
 
 :root {
   /* The harbour at dusk: night water for the ground, steel for surfaces,
@@ -153,60 +153,6 @@ h4 {
   background-clip: padding-box;
 }
 
-/* Flags ---------------------------------------------------------------- */
-
-.flag {
-  display: inline-block;
-  flex-shrink: 0;
-  vertical-align: middle;
-  outline: 1px solid rgb(255 255 255 / 0.16);
-}
-
-.flag.pennant {
-  outline: 0;
-}
-
-.hoist {
-  position: relative;
-  display: inline-flex;
-  flex-shrink: 0;
-  width: var(--flag-w);
-  height: var(--flag-h);
-}
-
-.hoist-cloth {
-  display: flex;
-  width: 100%;
-  height: 100%;
-  transform-origin: left center;
-  animation: hoist-run 720ms var(--ease-out) both;
-}
-
-.hoist-slice {
-  position: relative;
-  flex: 1 0 0;
-  height: 100%;
-  margin-right: -1px;
-  overflow: hidden;
-}
-
-.hoist-cloth > .flag {
-  outline-offset: 0;
-}
-
-.hoist-slice .flag {
-  position: absolute;
-  top: 0;
-  left: calc(var(--flag-w) / var(--n) * var(--i) * -1);
-  outline: 0;
-}
-
-.hoist[data-flying="true"] .hoist-slice {
-  animation: cloth 1.3s ease-in-out infinite alternate;
-  animation-delay: calc(var(--i) * -160ms);
-}
-
-
 @keyframes hoist-run {
   0% {
     opacity: 0;
@@ -219,17 +165,6 @@ h4 {
   100% {
     opacity: 1;
     transform: none;
-  }
-}
-
-@keyframes cloth {
-  from {
-    transform: translateY(calc(var(--i) * -0.55px)) skewY(calc(var(--i) * 0.5deg));
-    filter: brightness(1.06);
-  }
-  to {
-    transform: translateY(calc(var(--i) * 0.55px)) skewY(calc(var(--i) * -0.5deg));
-    filter: brightness(0.9);
   }
 }
 
@@ -377,10 +312,6 @@ main {
   background: var(--mast-2);
 }
 
-.case-link .hoist {
-  margin-left: -1px;
-}
-
 .case-link-copy {
   display: flex;
   flex-direction: column;
@@ -402,6 +333,26 @@ main {
   color: var(--mast-ink);
 }
 
+.case-mark {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  background: var(--mast-ink-2);
+}
+
+.case-link.awaiting_approval .case-mark {
+  background: var(--signal-yellow);
+}
+
+.case-link.needs_human_decision .case-mark {
+  background: var(--signal-red);
+}
+
+.case-link.executing .case-mark,
+.case-link.monitoring .case-mark {
+  background: var(--action);
+}
+
 .case-link.awaiting_approval .status {
   color: var(--signal-yellow);
   font-weight: 600;
@@ -416,59 +367,6 @@ main {
   margin: 4px 22px 0 52px;
   color: var(--mast-ink-2);
   font-size: 13px;
-}
-
-.flag-legend {
-  margin: 18px 22px 0;
-  font-size: 13px;
-  color: var(--mast-ink-2);
-}
-
-.flag-legend summary {
-  margin-left: 36px;
-  cursor: pointer;
-  color: var(--mast-ink);
-  font-weight: 600;
-  list-style: none;
-  padding: 6px 0;
-}
-
-.flag-legend summary::-webkit-details-marker {
-  display: none;
-}
-
-.flag-legend summary::after {
-  content: " +";
-  color: var(--mast-ink-2);
-}
-
-.flag-legend[open] summary::after {
-  content: " –";
-}
-
-.flag-legend ul {
-  margin: 6px 0 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  gap: 10px;
-}
-
-.flag-legend li {
-  display: grid;
-  grid-template-columns: 26px 1fr;
-  gap: 10px;
-  align-items: start;
-}
-
-.flag-legend li .flag {
-  margin-top: 3px;
-}
-
-.flag-legend strong {
-  display: block;
-  color: var(--mast-ink);
-  font-weight: 600;
 }
 
 .sidebar-bottom {
@@ -672,8 +570,24 @@ main {
   animation: arrive 260ms var(--ease-out) both;
 }
 
-.notice > .flag {
-  margin-top: 3px;
+.notice-mark {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  margin-top: 6px;
+  background: var(--ink-3);
+}
+
+.notice-success .notice-mark {
+  background: var(--action);
+}
+
+.notice-warning .notice-mark {
+  background: var(--signal-yellow);
+}
+
+.notice-error .notice-mark {
+  background: var(--signal-red);
 }
 
 .notice-copy {
@@ -824,15 +738,6 @@ main {
   color: var(--ink-3);
 }
 
-.event-card:disabled .flag {
-  opacity: 0.45;
-}
-
-.event-hoist {
-  display: inline-flex;
-  gap: 4px;
-}
-
 .event-copy {
   display: flex;
   flex-direction: column;
@@ -940,13 +845,6 @@ main {
 .scene-copy h2 .status {
   display: inline-block;
   animation: arrive 420ms var(--ease-out) both;
-}
-
-.case-flag-meaning {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-style: italic;
 }
 
 .case-voyage {
@@ -1067,8 +965,7 @@ main {
 .mast-flag > g {
   transform-box: fill-box;
   transform-origin: left center;
-  animation: hoist-run 900ms var(--ease-out) both;
-  animation-delay: calc(var(--i) * 160ms + 200ms);
+  animation: hoist-run 900ms var(--ease-out) 200ms both;
 }
 
 .mast-flag.flying > g {
@@ -1658,10 +1555,6 @@ main {
   padding: 16px;
   background: var(--red-wash);
   border-radius: var(--radius);
-}
-
-.escalation .flag {
-  margin-top: 2px;
 }
 
 .escalation p {
@@ -2378,10 +2271,6 @@ textarea:focus-visible {
   animation: arrive 360ms var(--ease-out) both;
 }
 
-.approval-executed .flag {
-  margin-top: 2px;
-}
-
 .approval-executed strong {
   font-size: 17px;
 }
@@ -2582,8 +2471,20 @@ textarea:focus-visible {
   animation: log-in 280ms var(--ease-out) both;
 }
 
-.timeline-entry > .flag {
-  margin-top: 3px;
+.timeline-mark {
+  width: 8px;
+  height: 8px;
+  margin: 7px 0 0 6px;
+  background: var(--line-strong);
+}
+
+.timeline-entry.rejected .timeline-mark,
+.timeline-entry.error .timeline-mark {
+  background: var(--signal-red);
+}
+
+.timeline-entry.write .timeline-mark {
+  background: var(--action);
 }
 
 .timeline-entry-heading {
@@ -3083,10 +2984,6 @@ footer {
     animation-duration: 1ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 1ms !important;
-  }
-
-  .hoist[data-flying="true"] .hoist-slice {
-    animation: none;
   }
 
   .clear-mark .compass-animated {
