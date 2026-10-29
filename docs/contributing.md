@@ -1,7 +1,8 @@
 # Working on CLEAR
 
 How the team works on this repository: the rules the code keeps, how to
-change each part safely, and where the project stands. Setup:
+change each part safely. For the demo, current status, and prototype
+boundaries, start with the [README](../README.md). Developer setup:
 [setup.md](setup.md).
 
 ## The design rule
@@ -84,36 +85,34 @@ deleted without the owner's agreement.
   `Project=ID-Hackathon-2026`, `Team=Cookusan`, `DeleteAfter=2026-10-31`.
 - No NAT gateways, GPUs, always-on endpoints, or high-volume logging.
 
-## Where the project stands (29 October 2026)
+## Changing Joule responses
 
-| Part | State |
-|---|---|
-| Data, mock S/4HANA, documents, the nine tools | Done, with tests |
-| Agents (Strands) on Claude Sonnet 4.6 in SAP AI Core | Done; S1 (both events) and S2 run live |
-| Next.js workspace with the FastAPI service | Done; local and gateway modes ([web-development.md](web-development.md)) |
-| Streamlit UI | Done; local and gateway modes |
-| SAP-RPT-1.6 predictions with the baseline fallback | Done |
-| AgentCore Gateway, Lambda, DynamoDB, Cedar policies (ENFORCE) | Deployed; the workspace's agents run on the presenter's machine |
-| SAP Joule front door (A2A server in a Cloud Foundry app on SAP BTP) | Deployed; S1 runs end to end from Joule through the gateway |
-| AgentCore Runtime | Built, not deployed: the account has no Runtime quota |
-| Evaluation, 20 variants | Done; the final run on 28 October passes every check ([evaluation.md](evaluation.md)) |
-| Pitch deck, demo video | In progress |
+Message routing and Markdown presentation live in `src/clear_app/joule.py`.
+Keep case-list, status, and details requests read-only. Approval must keep
+its explicit validation ID and use the shared contract's existing checks.
+Update [joule-responses.md](joule-responses.md) when commands or visible
+behavior change. These replies do not replace the structured FastAPI data
+used by Next.js.
 
-Open items:
+Run the full test suite before committing; `tests/test_joule.py` covers
+command routing and the A2A conversation with an isolated synthetic store.
+Live SAP/AWS checks are separate from offline tests. A backend deployment
+is needed for updated replies; capability and destination changes have
+their own Joule deployment step.
 
-- Reset the demo data before presenting: `python scripts/reset_data.py --aws`.
-- Measure the manual baseline for S1, or drop the minutes from the pitch;
-  [evaluation.md](evaluation.md) lists them as estimates.
-- Tag the CDK bootstrap stack ([deployment.md](deployment.md)).
-- Before submission, remove the `docs/PLAN.md` references from docstrings,
-  since that document is not public.
+Do not run independent case-writing processes against the shared demo
+store concurrently. The service's busy lock is process-local, so starting
+FastAPI beside the deployed A2A service does not provide a shared lock.
 
 ## Private documents
 
 `docs/PLAN.md` (the locked design decisions), `docs/pitch.md` (the pitch
 draft), and `docs/reference/` (hackathon brief, slides, proposal) stay out of
-Git; the team shares them privately, together with the operating notes of
-the deployed Joule path. Docstrings cite sections of the plan as
+Git; the team shares them privately. `docs/joule.md` contains private
+operating notes and is excluded locally via `.git/info/exclude`. Keep
+account URLs, credentials, login workarounds, and generated deployment
+archives out of new public documentation. Docstrings cite sections of the
+plan as
 `docs/PLAN.md §…`. Material from `docs/reference/`, especially slides marked
 internal, is never copied into the repository; summarize it in your own
 words where needed.

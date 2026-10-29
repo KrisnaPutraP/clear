@@ -44,8 +44,53 @@ machine, or in SAP Joule, whose agents run on SAP BTP Cloud Foundry; both
 share the same data. AgentCore Runtime is built but not deployed, since the
 team's AWS account has no Runtime quota. Twenty evaluation variants check
 the agents' decisions against an oracle; the final run on 28 October passes
-every check ([docs/evaluation.md](docs/evaluation.md)). Details and open
-items: [docs/contributing.md](docs/contributing.md).
+every check ([docs/evaluation.md](docs/evaluation.md)). Prototype boundaries
+are described below.
+
+The current online demo uses **SAP Joule with the A2A backend on Cloud
+Foundry**. The Next.js frontend and FastAPI service are available locally;
+they are not deployed as a public website.
+
+## Try the Joule demo
+
+Use the team's CLEAR assistant in SAP Joule with an authorized account.
+Access is provided by the team; this repository does not grant access to
+the deployed assistant.
+
+| Message | What to expect |
+|---|---|
+| `show open cases` | Recorded cases, with human decisions and approvals first |
+| `status of SHP-1001` | The case summary, or shipment facts if no case exists yet |
+| `work S1-DOC-HOLD` | Submit the prepared customs-hold event and start live analysis |
+| `details of SHP-1001` | Evidence, recommendation rationale, and assessed options |
+| `approve VAL-xxxx` | Approve the currently pending transfer using the ID in the reply |
+| `work S1-ETA-SLIP` | Reassess the same case after the prepared ETA change |
+
+If analysis is still running, ask for status again after about a minute.
+Case and validation IDs depend on the run. `work` starts investigation; it
+does not close the case. Monitoring cases remain listed. Coordinate with
+the presenter before submitting events or approvals because the demo data
+is shared. See the [Joule guide](docs/joule-responses.md) for commands,
+rejection, and response details.
+
+## Evidence and prototype boundaries
+
+The recorded evaluation on 28 October covers 20 synthetic variants: all
+decision and governance checks passed, with a median recovery-plan time of
+79 seconds. These are bounded prototype results, not production guarantees.
+The 93-minute manual comparison is an estimate, not a measured baseline.
+See [evaluation](docs/evaluation.md) for the method and limitations.
+
+- Shipments, documents, and ERP records are synthetic; approved STOs update
+  the mock ERP, not a live S/4HANA system. In transit does not mean received.
+- Demo events are submitted manually. A live ERP/logistics event feed is
+  not connected, and emergency procurement remains a human decision.
+- Agents use live model reasoning; chat commands are routed by keywords
+  and IDs. Scripted mode is a separate development fallback.
+- Joule approvals use a shared planner label. Per-user approval identity,
+  durable job recovery, and coordination across independent writer
+  processes remain production work. Run one case-writing service at a
+  time against shared data.
 
 ## Quick start
 
@@ -69,7 +114,7 @@ from an activated environment, then run `npm ci` and `npm run dev` in
 `frontend/`. Set `CLEAR_UI_SCRIPTED=1` in the API process for a development
 demo without credentials. Full instructions: [docs/web-development.md](docs/web-development.md).
 
-## Commands
+## Developer commands
 
 | Command | What it does |
 |---|---|
@@ -107,17 +152,21 @@ demo without credentials. Full instructions: [docs/web-development.md](docs/web-
 | `tests/` | Unit, scenario-invariant, and deployment tests, with stand-ins for AWS |
 | `docs/` | Architecture, setup, deployment, evaluation, UI contract, contributing |
 
-## Documentation
+## Review the solution
 
 - [docs/architecture.md](docs/architecture.md): how CLEAR works, with diagrams
 - [docs/proposal-alignment.md](docs/proposal-alignment.md): how the demo implements the proposal, adaptations and their justification, and remaining scope
+- [docs/evaluation.md](docs/evaluation.md): evaluation method, results, and limitations
+- [docs/joule-responses.md](docs/joule-responses.md): Joule commands and case responses
+- [data/README.md](data/README.md): the synthetic data and its generator rules
+
+## Developer documentation
+
 - [docs/setup.md](docs/setup.md): from a fresh clone to the full demo
 - [docs/web-development.md](docs/web-development.md): Next.js and FastAPI setup, workflow, configuration, and checks
 - [docs/deployment.md](docs/deployment.md): what runs on AWS and how to deploy it
-- [docs/evaluation.md](docs/evaluation.md): the reliability batch and its results
 - [docs/ui-contract.md](docs/ui-contract.md): the interface between the UI and the agents
-- [docs/contributing.md](docs/contributing.md): rules, workflow, status, open items
-- [data/README.md](data/README.md): the synthetic data and its generator rules
+- [docs/contributing.md](docs/contributing.md): contribution rules, validation, and development workflow
 
 All data in this repository is synthetic, and every company and person name
 in it is fictional.

@@ -55,7 +55,7 @@ flowchart LR
 |---|---|
 | Logistics event feed (simulated) | Starts a case; in production the same payload would come from Amazon EventBridge |
 | Next.js workspace and FastAPI service | The planner's workspace: event feed, live agent timeline, documents, inventory, approval desk; FastAPI serves the UI contract ([web-development.md](web-development.md)). The Streamlit UI offers the same workflow |
-| SAP Joule | The planner can start a case, read its status and plan, and approve or reject a validated transfer in Joule; Joule calls CLEAR over A2A |
+| SAP Joule | The planner lists cases, reads shipment status before analysis, starts an investigation, reviews evidence and options, and approves or rejects a validated transfer; Joule calls CLEAR over A2A |
 | Strands agents | The orchestrator and three specialists, with a case-log hook on every agent; they run in the FastAPI (or Streamlit) process for the workspace, and in a Cloud Foundry app on SAP BTP for Joule |
 | Claude Sonnet 4.6 | The agents' LLM, in SAP AI Core's generative AI hub, called with the Bedrock Converse API; one setting (`CLEAR_LLM_BACKEND`) switches the agents to Amazon Bedrock |
 | AgentCore Gateway | The only way to the tools; each agent signs its calls with its own IAM role |
@@ -76,6 +76,11 @@ The same code runs in four configurations:
 | Runtime | AgentCore Runtime | AgentCore Gateway, Lambda, DynamoDB, Cedar policies | Built and tested with stand-ins; not deployed, because the team's AWS account has no AgentCore Runtime quota |
 
 Deployment details: [deployment.md](deployment.md).
+
+The online demo uses the Joule path. Next.js and FastAPI currently run
+locally. Sharing DynamoDB does not coordinate concurrent agent runs: each
+service has its own process-local busy lock. Only one service should
+submit events or decisions against the shared demo data at a time.
 
 ## SAP Joule as a front door
 
@@ -107,6 +112,11 @@ sequenceDiagram
   workspace. The approval is recorded as "Planner via Joule": the
   destination's credentials identify Joule, not the person; a production
   setup would pass the user's identity through.
+
+The [Joule guide](joule-responses.md) documents the case inbox, read-only
+status and details commands, prepared demo events, and approvals. These
+Markdown replies are specific to Joule; Next.js consumes structured
+FastAPI responses. No LLM rewrite is used to format a Joule reply.
 
 ## A case, step by step
 
