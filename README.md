@@ -2,7 +2,7 @@
 
 Agentic AI Hackathon 2026 · Track A: Intelligent Supply Chain · Team Cookusan
 
-> ERP runs the process. Humans chase the exceptions. CLEAR resolves them.
+> ERP runs the process. CLEAR chases the exceptions. Humans make the call.
 
 When an imported shipment is held at the port, a planner today pieces the
 case together by hand from the ERP, the shipping documents, stock reports,
