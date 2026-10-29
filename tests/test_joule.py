@@ -163,12 +163,22 @@ def test_escalation_summary_keeps_the_decision_and_all_follow_up(clear):
     desk = CaseDesk(clear, wait_seconds=30)
     desk.answer("work S1-DOC-HOLD")
     action = clear.get_case("CASE-0001")["plan"]["actions"][0]
-    desk.answer(f"approve {action['validation_id']}")
+    preview = desk.respond(f"approve {action['validation_id']}")
+    assert "STO 4500001023 created" in desk.answer(preview.buttons[0].value)
     desk.answer("work S1-ETA-SLIP")
     case = clear.get_case("CASE-0001")
     assert case["status"] == "needs_human_decision"
     summary = desk.answer("status of SHP-1001")
+    # The situation names the ETA slip, not only the customs hold that opened the case.
+    assert "Latest update: Berth congestion at Tanjung Priok" in summary and "ETA now: " in summary
     assert "**Decision required**" in summary
+    # Only a human decision waits: no Approve or Reject, in words or as buttons.
+    decisions = desk.respond("what needs my decision?")
+    assert "Needs a human decision" in decisions.text and "Press **Approve**" not in decisions.text
+    assert [b.value for b in decisions.buttons] == ["details of CASE-0001", "Show the open cases"]
+    desk.understand = FakeModel({"approve the transfer": Intent(kind="approve")})
+    assert "No transfer is awaiting approval." in desk.answer("approve the transfer")
+    desk.understand = None
     assert case["plan"]["escalation"] in summary
     assert _follow_up(case["plan"]["next_check"]) in summary
     assert "**Evidence and rationale**" not in summary

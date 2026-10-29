@@ -224,7 +224,8 @@ class CaseDesk:
             return self.decisions(note=f"`{validation_id}` is not awaiting approval.")
         if validation_id is None:
             if len(awaiting) != 1:
-                return self.decisions(note="Which transfer do you mean?" if awaiting else None)
+                return self.decisions(note="Which transfer do you mean?" if awaiting
+                                      else "No transfer is awaiting approval.")
             validation_id = next(iter(awaiting))
         if command.kind == "reject" and not command.reason:
             return Reply(f"Why do you reject `{validation_id}`? Tell me the reason, for example: "
@@ -357,13 +358,14 @@ class CaseDesk:
 
     def decisions(self, note: str | None = None) -> Reply:
         """Transfers awaiting approval and cases awaiting a human decision. Read-only."""
-        rows, first = [], None
+        rows, first, human = [], None, None
         with self.clear.snapshot():
             for case in self.clear.list_cases():
                 if case["status"] == "needs_human_decision":
+                    human = human or case["case_id"]
                     reason = self.clear.get_case(case["case_id"])["status_reason"]
                     rows.append(f"**{case['case_id']} · {case['shipment_id']} · Needs a human decision**\n"
-                                f"  {reason}\n  Open: `details {case['case_id']}`")
+                                f"  {reason}")
                 if case["status"] != "awaiting_approval":
                     continue
                 plan = self.clear.get_case(case["case_id"])["plan"]
@@ -383,11 +385,15 @@ class CaseDesk:
         lead = f"{note}\n\n" if note else ""
         if not rows:
             return Reply(lead + _section("Decisions", "Nothing is waiting for your decision.") +
-                         "\n\nTo see every case: `list cases`.")
-        return Reply(lead + _section("Decisions waiting for you", _bullets(rows)) +
-                     "\n\nPress **Approve** or **Reject**, or tell me in your own words which transfer and "
-                     "what you decide. You confirm before anything changes.",
-                     self._decision_buttons(first) if first else None)
+                         "\n\nTo see every case, ask me to show the open cases.")
+        text = lead + _section("Decisions waiting for you", _bullets(rows))
+        if first:  # A transfer to approve or reject: its buttons, and the way to decide in words.
+            return Reply(text + "\n\nPress **Approve** or **Reject**, or tell me in your own words which transfer "
+                         "and what you decide. You confirm before anything changes.", self._decision_buttons(first))
+        # Only human decisions, such as emergency sourcing: CLEAR has no action to take for them.
+        return Reply(text + "\n\nCLEAR cannot take these decisions for you: review the details and decide with "
+                     "your team.", (Button(f"Details of {human}", f"details of {human}"),
+                                    Button("Show open cases", "Show the open cases")))
 
     def shipment_status(self, shipment_id: str, events: list[dict]) -> str:
         """Read the recorded shipment before a case exists, without submitting an event."""
@@ -438,8 +444,7 @@ class CaseDesk:
         if not plan:
             return "\n\n".join(paragraphs)
 
-        exception = case["shipment"].get("exception") or {}
-        paragraphs.append(_section("Situation", exception.get("description") or plan["exception"]))
+        paragraphs.append(_section("Situation", _situation(case["shipment"], plan)))
         prediction = plan["impact"]["prediction"]
         rows = view.option_rows(plan)
         facts = [f"Predicted resolution: **{prediction['predicted_days']:g} days**",
@@ -636,6 +641,19 @@ def build_app(clear: Clear, url: str, user: str | None = None, password: str | N
     if password:
         app.add_middleware(BasicAuth, user=user or "clear", password=password)
     return app
+
+
+def _situation(shipment: dict, plan: dict) -> str:
+    """The recorded exception, and the latest event when a later one changed it, such as an ETA slip."""
+    exception = shipment.get("exception") or {}
+    situation = exception.get("description") or plan["exception"]
+    events = shipment.get("events") or []
+    latest = events[-1] if events else None
+    if latest and latest.get("description") and latest["description"] != situation:
+        situation += f"\n\nLatest update: {latest['description']}"
+        if latest.get("type") == "eta_change":
+            situation += f" ETA now: {shipment['eta']}."
+    return situation
 
 
 def _coverage(row: dict) -> str:
