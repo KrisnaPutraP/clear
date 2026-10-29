@@ -105,7 +105,7 @@ historical decision reason where the repository does not record one.
 |---|---|---|---|
 | Model platform | Amazon Bedrock provides model reasoning | Claude Sonnet 4.6 in SAP AI Core; a setting can switch the model backend to Bedrock | The setup documentation records SAP AI Core access and model deployments provided for the hackathon. This is a platform adaptation: tool selection, structured plans, and validation remain part of the agent workflow. The repository does not explicitly record why AI Core was preferred over the original Bedrock plan |
 | Agent hosting | AgentCore Runtime hosts the workflow | Strands agents run on the presenter's machine for the workspace, and in a Cloud Foundry app on SAP BTP for SAP Joule; both reach the tools through AgentCore Gateway | The documented constraint is the AWS account's lack of AgentCore Runtime quota. Runtime packaging exists, but that hosting configuration is not deployed. Gateway, Lambda, DynamoDB, and Cedar policies remain the deployed tool path for both |
-| Planner interface | Planners and authorized decision makers review and approve recovery actions | A Next.js workspace, and SAP Joule, which calls CLEAR over A2A through a BTP destination | Joule brings the case to the SAP assistant a planner already uses; the approval must name the validation it approves, and the same validator, approval check, and Cedar policies apply. Joule approvals are recorded under a shared label, not per person |
+| Planner interface | Planners and authorized decision makers review and approve recovery actions | A Next.js workspace, and SAP Joule, which calls CLEAR over A2A through a BTP destination | Joule brings the case to the SAP assistant a planner already uses; the planner writes in their own words, a decision takes effect only after confirming a preview, and the same validator, approval check, and Cedar policies apply. Joule approvals are recorded under a shared label, not per person |
 | ERP integration | SAP S/4HANA Cloud supplies enterprise context and receives approved actions | Mock S/4HANA records, locally or in DynamoDB, use SAP entity and field names | The proposal explicitly permits controlled synthetic data when live SAP access is unavailable. The mock supports investigation, calculations, approval, and post-action checks without claiming a live SAP integration. This allowance does not establish the team's historical access situation |
 | Event ingestion | An operational event can initiate a case | A user submits a prepared event through the demo UI or CLI | Simulating ingestion makes the prototype repeatable while preserving event-driven case execution. A live event-source integration remains to be implemented |
 | Recovery actions | Broader options include transfer, emergency sourcing, prioritization, or keeping the plan | Transfer, demand-priority assessment, keeping the plan, and escalation; STO creation is the only business write tool | A single governed write is consistent with the proposal's bounded prototype. Emergency sourcing remains a human decision rather than an unimplemented capability being presented as automated |
@@ -165,6 +165,7 @@ When describing the demo, make the following claims precise:
   behavior, not evidence of dynamic agent decisions.
 - Report evaluation results with their run date and distinguish measured
   agent latency from the estimated manual baseline.
-- Joule chooses CLEAR's skill and forwards the planner's message; CLEAR
-  matches the message by IDs and keywords, not with an LLM, and records
-  Joule approvals under a shared label rather than the person's identity.
+- Joule chooses CLEAR's skill and forwards the planner's message; Claude
+  reads what the planner means, an approval or a rejection takes effect
+  only after the planner confirms a preview, and Joule approvals are
+  recorded under a shared label rather than the person's identity.

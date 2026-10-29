@@ -55,7 +55,7 @@ flowchart LR
 |---|---|
 | Logistics event feed (simulated) | Starts a case; in production the same payload would come from Amazon EventBridge |
 | Next.js workspace and FastAPI service | The planner's workspace: event feed, live agent timeline, documents, inventory, approval desk; FastAPI serves the UI contract ([web-development.md](web-development.md)). The Streamlit UI offers the same workflow |
-| SAP Joule | The planner lists cases, reads shipment status before analysis, starts an investigation, reviews evidence and options, and approves or rejects a validated transfer; Joule calls CLEAR over A2A |
+| SAP Joule | The planner talks to CLEAR in their own words: what needs a decision, shipment and case status, evidence and options, starting an investigation, and approving or rejecting a validated transfer after a confirmation; Joule calls CLEAR over A2A and shows its buttons |
 | Strands agents | The orchestrator and three specialists, with a case-log hook on every agent; they run in the FastAPI (or Streamlit) process for the workspace, and in a Cloud Foundry app on SAP BTP for Joule |
 | Claude Sonnet 4.6 | The agents' LLM, in SAP AI Core's generative AI hub, called with the Bedrock Converse API; one setting (`CLEAR_LLM_BACKEND`) switches the agents to Amazon Bedrock |
 | AgentCore Gateway | The only way to the tools; each agent signs its calls with its own IAM role |
@@ -89,34 +89,47 @@ sequenceDiagram
     actor P as Planner
     participant J as SAP Joule
     participant C as CLEAR A2A server<br/>(Cloud Foundry)
+    participant M as Claude<br/>(SAP AI Core)
     participant A as Agents, gateway,<br/>Cedar, tools
-    P->>J: status of SHP-1001
+    P->>J: "How is SHP-1001 doing?"
     J->>C: agent-request (A2A message/send)
-    C->>A: read the case and its records
-    C-->>J: plan, numbers with their sources,<br/>"awaiting approval: VAL-0002"
-    P->>J: approve VAL-0002
-    J->>C: agent-request
+    C->>M: what does the planner mean?
+    M-->>C: status of SHP-1001
+    C-->>J: plan, numbers with their sources,<br/>buttons [Approve VAL-0002] [Reject VAL-0002]
+    P->>J: "Do not approve yet"
+    C-->>J: nothing changed
+    P->>J: "Approve the transfer"
+    C-->>J: preview, buttons [Confirm approval] [Cancel]<br/>(Confirm carries a one-time code)
+    P->>J: presses Confirm approval
+    J->>C: the button's text, with the code
     C->>A: record the approval, run the Action agent
     A-->>C: STO created through the gateway
     C-->>J: STO created, case monitoring
 ```
 
-- Joule chooses CLEAR's skill and forwards the planner's message. CLEAR does
-  not use an LLM to read the message: it matches IDs and keywords
-  (`clear_app.joule`), and an approval must name the validation it approves.
+- Joule chooses CLEAR's skill and forwards the planner's message. Claude in
+  SAP AI Core reads what the planner means, in English or Indonesian, with
+  the open cases and the transfers awaiting approval as context
+  (`clear_app.joule_intent`); keyword rules take over when the model fails
+  or is unsure.
+- Reading a message never changes a case. An approval or a rejection only
+  shows a preview with a one-time code; only a message carrying that code,
+  normally the **Confirm** button, records the decision. "Do not approve",
+  a question, or **Cancel** changes nothing.
 - Joule waits at most 60 seconds for an answer, and a case takes 24 to 136
-  seconds. CLEAR answers within 40 seconds: a run continues in the
-  background, the answer shows its latest steps, and the planner asks for
-  the status again.
+  seconds. CLEAR answers within 35 seconds: a run continues in the
+  background, the answer shows its latest steps, and the planner presses
+  **Refresh status** later.
 - Every number in the answer is read from the case records, as in the
   workspace. The approval is recorded as "Planner via Joule": the
   destination's credentials identify Joule, not the person; a production
   setup would pass the user's identity through.
 
-The [Joule guide](joule-responses.md) documents the case inbox, read-only
-status and details commands, prepared demo events, and approvals. These
-Markdown replies are specific to Joule; Next.js consumes structured
-FastAPI responses. No LLM rewrite is used to format a Joule reply.
+The [Joule guide](joule-responses.md) documents the conversation, the
+confirmation step, prepared demo events, and the replies. The Markdown
+replies and buttons are specific to Joule; Next.js consumes structured
+FastAPI responses. The model reads the message; it does not write the
+reply, whose numbers all come from the case records.
 
 ## A case, step by step
 
@@ -204,7 +217,7 @@ telling a human.
 
 1. **Tool contract.** The write tool takes a `validation_id` and an `approval_id`, nothing else.
 2. **Validator.** Four business rules: the source plant stays above safety stock, the transfer arrives in time, no over-transfer, the right material and plants.
-3. **Human approval.** A planner approves or rejects in the workspace, which shows the plan, the validation, and the source of every number, or in Joule, where the approval must name the validation.
+3. **Human approval.** A planner approves or rejects in the workspace, which shows the plan, the validation, and the source of every number, or in Joule, where a decision takes effect only after the planner confirms a preview of exactly what will happen.
 4. **Gateway policy.** Cedar in AgentCore Policy, outside the agents: each agent's IAM role may call only its own tools, the STO write is forbidden unless the Action agent's role calls it with an approval ID, and an administrator without these roles reaches no tool at all. This holds for the agents on the presenter's machine and on SAP BTP alike.
 5. **Code check.** The tool verifies that the approval exists, is for that validation, is an approval and not a rejection, and has not been used before.
 

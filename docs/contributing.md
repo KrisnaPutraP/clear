@@ -87,15 +87,21 @@ deleted without the owner's agreement.
 
 ## Changing Joule responses
 
-Message routing and Markdown presentation live in `src/clear_app/joule.py`.
-Keep case-list, status, and details requests read-only. Approval must keep
-its explicit validation ID and use the shared contract's existing checks.
-Update [joule-responses.md](joule-responses.md) when commands or visible
-behavior change. These replies do not replace the structured FastAPI data
+Reading the planner's message lives in `src/clear_app/joule_intent.py`
+(Claude, with the keyword rules in `joule.interpret` as the fallback);
+answers, buttons, and confirmations live in `src/clear_app/joule.py`. Keep
+reading a message free of side effects: case-list, status, details, and
+question replies stay read-only, and an approval or a rejection must stay
+a preview until a message carries its one-time confirmation code. Decisions
+use the shared contract's existing checks. Update
+[joule-responses.md](joule-responses.md) when the conversation or visible
+behavior changes. These replies do not replace the structured FastAPI data
 used by Next.js.
 
-Run the full test suite before committing; `tests/test_joule.py` covers
-command routing and the A2A conversation with an isolated synthetic store.
+Run the full test suite before committing; `tests/test_joule.py` covers the
+keyword rules, the model path with a stand-in model, the confirmation step,
+and the A2A conversation with an isolated synthetic store. After changing
+the model's prompt, check it against real messages on the live model.
 Live SAP/AWS checks are separate from offline tests. A backend deployment
 is needed for updated replies; capability and destination changes have
 their own Joule deployment step.
