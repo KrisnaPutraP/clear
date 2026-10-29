@@ -1,0 +1,6 @@
+# The standalone Joule assistant for CLEAR: joule deploy -c -n cookusan_clear
+schema_version: 1.2.0
+name: cookusan_clear
+capabilities:
+  - type: local
+    folder: ./clear_capability

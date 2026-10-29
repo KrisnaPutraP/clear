@@ -11,9 +11,10 @@ This document records that relationship and the explanation for each
 adaptation. It summarizes the team's three-page `CLEAR_Sokrates.pdf`
 proposal in original wording; it does not reproduce the private proposal.
 
-Assessment date: 27 October 2026. The assessment uses repository code and
-documentation, including the live-run status recorded on 12 October 2026.
-It is not a new live deployment check or a new evaluation run.
+Assessment date: 29 October 2026. The assessment uses repository code and
+documentation, including the final evaluation run of 28 October 2026 and the
+SAP Joule path deployed on 29 October 2026. It is not a new live deployment
+check or a new evaluation run.
 
 The UI migration adds a Next.js workspace and a FastAPI adapter around the
 same Python contract. It preserves the workflow described below; see
@@ -53,7 +54,7 @@ they are not all implemented demo capabilities.
 | Compare recovery options | Assess keeping the current plan, full or partial stock transfers, and serving demand by priority | Implemented; demand prioritization is part of the current demo |
 | Consider emergency sourcing | Escalate to a human when no feasible transfer can cover the required demand | Human decision boundary only; automated supplier search, sourcing, and procurement are not implemented |
 | Block infeasible actions | The validator checks source safety stock, transfer timing, quantity, material, and plants | Implemented; rejection can lead to a revised option |
-| Execute only permitted, approved actions | The STO tool requires a valid validation record and a matching human approval; Gateway policies restrict tool access by agent role | Implemented against the mock ERP; no live SAP order creation is demonstrated |
+| Execute only permitted, approved actions | The STO tool requires a valid validation record and a matching human approval, given in the workspace or in SAP Joule; Gateway policies restrict tool access by agent role | Implemented against the mock ERP; no live SAP order creation is demonstrated |
 | Verify the action and monitor the case | Check inventory after the STO and re-plan on an ETA update | Implemented as post-action verification and event-driven reassessment; a monitoring status is not proof that the physical shipment has arrived |
 | Follow the incident through resolution | The plan records the next condition to check and can escalate on increased exposure | Partial: the demo does not automate customs release, document correction with external parties, or physical goods receipt |
 
@@ -103,14 +104,15 @@ historical decision reason where the repository does not record one.
 | Area | Proposal | Current documented demo | Explanation and justification |
 |---|---|---|---|
 | Model platform | Amazon Bedrock provides model reasoning | Claude Sonnet 4.6 in SAP AI Core; a setting can switch the model backend to Bedrock | The setup documentation records SAP AI Core access and model deployments provided for the hackathon. This is a platform adaptation: tool selection, structured plans, and validation remain part of the agent workflow. The repository does not explicitly record why AI Core was preferred over the original Bedrock plan |
-| Agent hosting | AgentCore Runtime hosts the workflow | Strands agents run on the presenter's laptop; tools are accessed through AgentCore Gateway | The documented constraint is the AWS account's lack of AgentCore Runtime quota. Runtime packaging exists, but that hosting configuration is not deployed. Gateway, Lambda, DynamoDB, and Cedar policies remain the documented deployed tool path |
+| Agent hosting | AgentCore Runtime hosts the workflow | Strands agents run on the presenter's machine for the workspace, and in a Cloud Foundry app on SAP BTP for SAP Joule; both reach the tools through AgentCore Gateway | The documented constraint is the AWS account's lack of AgentCore Runtime quota. Runtime packaging exists, but that hosting configuration is not deployed. Gateway, Lambda, DynamoDB, and Cedar policies remain the deployed tool path for both |
+| Planner interface | Planners and authorized decision makers review and approve recovery actions | A Next.js workspace, and SAP Joule, which calls CLEAR over A2A through a BTP destination | Joule brings the case to the SAP assistant a planner already uses; the approval must name the validation it approves, and the same validator, approval check, and Cedar policies apply. Joule approvals are recorded under a shared label, not per person |
 | ERP integration | SAP S/4HANA Cloud supplies enterprise context and receives approved actions | Mock S/4HANA records, locally or in DynamoDB, use SAP entity and field names | The proposal explicitly permits controlled synthetic data when live SAP access is unavailable. The mock supports investigation, calculations, approval, and post-action checks without claiming a live SAP integration. This allowance does not establish the team's historical access situation |
 | Event ingestion | An operational event can initiate a case | A user submits a prepared event through the demo UI or CLI | Simulating ingestion makes the prototype repeatable while preserving event-driven case execution. A live event-source integration remains to be implemented |
 | Recovery actions | Broader options include transfer, emergency sourcing, prioritization, or keeping the plan | Transfer, demand-priority assessment, keeping the plan, and escalation; STO creation is the only business write tool | A single governed write is consistent with the proposal's bounded prototype. Emergency sourcing remains a human decision rather than an unimplemented capability being presented as automated |
 | Duration prediction | The workflow estimates how long the exception may last | SAP-RPT-1.6 with a labelled baseline fallback | This makes the estimate's source explicit while keeping supply calculations outside the LLM |
 
 The [architecture](architecture.md), [setup guide](setup.md), and
-[project status](contributing.md#where-the-project-stands-12-october-2026)
+[project status](contributing.md#where-the-project-stands-29-october-2026)
 describe the current configuration. Presentation diagrams should match
 that configuration and label future integrations separately.
 
@@ -122,9 +124,8 @@ human interventions, uncovered supply gap, and critical demand protected.
 
 The repository has a 20-variant evaluation framework that reports those
 outcomes alongside decision, priority, escalation, path, schema, and
-approval checks. The recorded live run is dated 12 October 2026. The
-evaluation documentation also states that prompts changed afterward and
-that the full batch must be repeated before the feature freeze.
+approval checks. The final live run, on 28 October 2026 with the last
+prompts, passes every check in all 20 variants.
 
 The manual baseline is not yet a measured comparison. Its documented
 93-minute total is an estimate. It must remain labelled as an estimate;
@@ -144,11 +145,12 @@ by this alignment document.
 > reassess when the ETA changes. We bounded the prototype to document and
 > port-delay cases, demand prioritization, and one governed write action:
 > a stock transport order. We use synthetic SAP records, as allowed in the
-> proposal, and run the agents on a laptop because the AWS account has no
-> AgentCore Runtime quota. Model reasoning uses SAP AI Core, while the
-> documented deployed tools use AgentCore Gateway, Lambda, DynamoDB, and
-> Cedar policies. These choices adapt the implementation while preserving
-> the exception-resolution workflow.
+> proposal. The AWS account has no AgentCore Runtime quota, so the agents
+> run on the presenter's machine for the workspace and on SAP BTP Cloud
+> Foundry for SAP Joule, where a planner can also approve. Model reasoning
+> uses SAP AI Core, while the deployed tools use AgentCore Gateway, Lambda,
+> DynamoDB, and Cedar policies. These choices adapt the implementation while
+> preserving the exception-resolution workflow.
 
 When describing the demo, make the following claims precise:
 
@@ -163,3 +165,6 @@ When describing the demo, make the following claims precise:
   behavior, not evidence of dynamic agent decisions.
 - Report evaluation results with their run date and distinguish measured
   agent latency from the estimated manual baseline.
+- Joule chooses CLEAR's skill and forwards the planner's message; CLEAR
+  matches the message by IDs and keywords, not with an LLM, and records
+  Joule approvals under a shared label rather than the person's identity.

@@ -24,6 +24,10 @@ write before it reaches the ERP.
   policies** let each agent's IAM role call only its own tools and forbid the
   STO without the Action agent and an approval. The tools run in **AWS
   Lambda** on **DynamoDB**.
+- The planner follows the case in a **Next.js workspace** and approves there,
+  or works it from **SAP Joule**: Joule calls CLEAR over A2A through a BTP
+  destination, and the agents answer from a Cloud Foundry app on SAP BTP,
+  with the same tools, gateway, and policies.
 - **The LLM proposes, code computes and validates, a human approves:** every
   number comes from data, deterministic tools, or SAP-RPT-1.6, and shows its
   source.
@@ -32,13 +36,16 @@ Diagrams and details: [docs/architecture.md](docs/architecture.md).
 
 ## Status
 
-Working end to end (12 October 2026): both demo scenarios run live with the
+Working end to end (29 October 2026): both demo scenarios run live with the
 agents on Claude in SAP AI Core and the tools on AWS behind AgentCore Gateway
-with the Cedar policies enforced. The agents run on the presenter's laptop,
-since the team's AWS account has no AgentCore Runtime quota. Twenty
-evaluation variants check the agents' decisions against an oracle
-([docs/evaluation.md](docs/evaluation.md)). Next: the pitch deck and the demo
-video. Details and open items: [docs/contributing.md](docs/contributing.md).
+with the Cedar policies enforced. A planner works a case in the Next.js
+workspace (or the Streamlit UI), whose agents run on the presenter's
+machine, or in SAP Joule, whose agents run on SAP BTP Cloud Foundry; both
+share the same data. AgentCore Runtime is built but not deployed, since the
+team's AWS account has no Runtime quota. Twenty evaluation variants check
+the agents' decisions against an oracle; the final run on 28 October passes
+every check ([docs/evaluation.md](docs/evaluation.md)). Details and open
+items: [docs/contributing.md](docs/contributing.md).
 
 ## Quick start
 
@@ -77,6 +84,8 @@ demo without credentials. Full instructions: [docs/web-development.md](docs/web-
 | `python scripts/reset_data.py` | Fresh demo data (`--aws` for the DynamoDB table) |
 | `python scripts/check_policies.py` | What the gateway's Cedar policies allow and deny |
 | `python scripts/gateway_env.py` | The `.env` lines for the deployed gateway |
+| `python scripts/run_joule_agent.py` | CLEAR as an A2A agent for SAP Joule (`--scripted` without credentials) |
+| `python scripts/cf_env.py --gateway` | The Joule app's settings on Cloud Foundry, from `.env` |
 
 ## Repository
 
@@ -86,12 +95,14 @@ demo without credentials. Full instructions: [docs/web-development.md](docs/web-
 | `frontend/` | Next.js workspace, typed API client, and browser workflow test |
 | `src/clear_tools/` | The nine deterministic tools and the mock S/4HANA; standard library only |
 | `src/clear_agents/` | Strands agents, prompts, the recovery plan schema and checks, the SAP AI Core model |
-| `src/clear_app/` | UI contract, FastAPI adapter, backend initialization, and settings |
+| `src/clear_app/` | UI contract, FastAPI adapter, A2A server for SAP Joule, backend initialization, and settings |
+| `joule/` | The SAP Joule capability that calls CLEAR over A2A |
 | `src/clear_aws/` | AWS: DynamoDB store, Lambda handler, gateway client, Cedar policies, deployment config, setup |
 | `src/clear_eval/` | Evaluation: variants, oracle, scoring |
 | `src/clear_datagen/` | Generators of the synthetic seed data |
 | `data/seed/` | The committed demo data ([data/README.md](data/README.md)) |
 | `deploy/` | Templates of the code bundles for AgentCore Runtime and Lambda |
+| `manifest.yml` | The Cloud Foundry app for the Joule path (`cf push`) |
 | `scripts/` | Command-line entry points (table above) |
 | `tests/` | Unit, scenario-invariant, and deployment tests, with stand-ins for AWS |
 | `docs/` | Architecture, setup, deployment, evaluation, UI contract, contributing |

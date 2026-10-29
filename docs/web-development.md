@@ -130,6 +130,9 @@ Next.js configuration.
 Run the API as one process with one worker per data store. The current
 single-writer lock is process-local. Do not run Streamlit, a second API
 worker, or CLI agent runs against the same runtime store at the same time.
+In the gateway configuration the SAP Joule path uses the same DynamoDB
+table: a case started or approved in Joule shows up in the workspace through
+its polling, and runs should start from one front door at a time.
 Do not use automatic reload during an active case run. API shutdown waits
 for the current background thread to finish; a forced process termination
 can still interrupt it. Durable background jobs and recovery after a

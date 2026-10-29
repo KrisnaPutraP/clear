@@ -1,0 +1,19 @@
+# Never uploaded by cf push: secrets, private notes, local state, and what the app does not need.
+.env
+.env.*
+CLAUDE.md
+.claude/
+docs/
+.git/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+data/runtime/
+data/eval/
+deploy/
+tests/
+app/
+frontend/
+node_modules/
