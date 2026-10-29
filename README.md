@@ -57,21 +57,28 @@ Use the team's CLEAR assistant in SAP Joule with an authorized account.
 Access is provided by the team; this repository does not grant access to
 the deployed assistant.
 
-| Message | What to expect |
-|---|---|
-| `show open cases` | Recorded cases, with human decisions and approvals first |
-| `status of SHP-1001` | The case summary, or shipment facts if no case exists yet |
-| `work S1-DOC-HOLD` | Submit the prepared customs-hold event and start live analysis |
-| `details of SHP-1001` | Evidence, recommendation rationale, and assessed options |
-| `approve VAL-xxxx` | Approve the currently pending transfer using the ID in the reply |
-| `work S1-ETA-SLIP` | Reassess the same case after the prepared ETA change |
+Write in your own words, in English or Indonesian; CLEAR reads what you
+mean with the agents' model. For example:
 
-If analysis is still running, ask for status again after about a minute.
-Case and validation IDs depend on the run. `work` starts investigation; it
-does not close the case. Monitoring cases remain listed. Coordinate with
-the presenter before submitting events or approvals because the demo data
-is shared. See the [Joule guide](docs/joule-responses.md) for commands,
-rejection, and response details.
+| You write | What to expect |
+|---|---|
+| "What needs my decision?" | Transfers awaiting approval and cases needing a human decision |
+| "Show the open cases." | Recorded cases, with human decisions and approvals first |
+| "Work S1-DOC-HOLD." | Submits the prepared customs-hold event and starts live analysis |
+| "How is shipment SHP-1001 doing?" | The case summary, or shipment facts if no case exists yet |
+| "Why not transfer everything?" | Evidence, recommendation rationale, and assessed options |
+| "Do not approve yet, wait for customs." | Nothing changes; the transfer keeps waiting |
+| "Approve the transfer." | A preview with **Confirm approval** and **Cancel** buttons |
+| "Work S1-ETA-SLIP." | Reassesses the same case after the prepared ETA change |
+
+Replies end with buttons for the next step, such as **Refresh status** or
+**Approve** and **Reject**. An approval or a rejection always shows a
+preview first, and only **Confirm** records it. If analysis is still
+running, press **Refresh status** after about a minute. `work` starts an
+investigation; it does not close the case. Monitoring cases remain listed.
+Coordinate with the presenter before submitting events or approvals because
+the demo data is shared. See the [Joule guide](docs/joule-responses.md) for
+the conversation, the confirmation step, and the response details.
 
 ## Evidence and prototype boundaries
 
@@ -85,8 +92,9 @@ See [evaluation](docs/evaluation.md) for the method and limitations.
   the mock ERP, not a live S/4HANA system. In transit does not mean received.
 - Demo events are submitted manually. A live ERP/logistics event feed is
   not connected, and emergency procurement remains a human decision.
-- Agents use live model reasoning; chat commands are routed by keywords
-  and IDs. Scripted mode is a separate development fallback.
+- Agents use live model reasoning, and the same model reads the planner's
+  Joule messages; keyword rules take over only when it is unavailable.
+  Scripted mode is a separate development fallback.
 - Joule approvals use a shared planner label. Per-user approval identity,
   durable job recovery, and coordination across independent writer
   processes remain production work. Run one case-writing service at a
@@ -157,7 +165,7 @@ demo without credentials. Full instructions: [docs/web-development.md](docs/web-
 - [docs/architecture.md](docs/architecture.md): how CLEAR works, with diagrams
 - [docs/proposal-alignment.md](docs/proposal-alignment.md): how the demo implements the proposal, adaptations and their justification, and remaining scope
 - [docs/evaluation.md](docs/evaluation.md): evaluation method, results, and limitations
-- [docs/joule-responses.md](docs/joule-responses.md): Joule commands and case responses
+- [docs/joule-responses.md](docs/joule-responses.md): talking to CLEAR in Joule, confirmations, and case responses
 - [data/README.md](data/README.md): the synthetic data and its generator rules
 
 ## Developer documentation

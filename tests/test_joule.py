@@ -14,14 +14,23 @@ from starlette.testclient import TestClient  # noqa: E402
 from clear_agents.testing import ScriptedDirector  # noqa: E402
 from clear_app.contract import Clear  # noqa: E402
 from clear_app.joule import CaseDesk, Command, _follow_up, build_app, interpret  # noqa: E402
+from clear_app.joule_intent import Intent  # noqa: E402
 
 EVENTS = ["S1-DOC-HOLD", "S1-ETA-SLIP", "S2-CONGESTION"]
 
 
 @pytest.mark.parametrize("text, command", [
     ("approve VAL-0002", Command("approve", validation_id="VAL-0002")),
-    ("Approved val-0002, go ahead", Command("approve", validation_id="VAL-0002")),
-    ("Should I approve it?", Command("approve")),
+    ("approve val-0002.", Command("approve", validation_id="VAL-0002")),
+    ("Approved val-0002, go ahead", Command("decisions")),
+    ("Should I approve it?", Command("decisions")),
+    ("Do not approve VAL-0002", Command("hold", validation_id="VAL-0002")),
+    ("should I approve VAL-0002?", Command("decisions")),
+    ("why was VAL-0002 approved?", Command("decisions")),
+    ("don't reject VAL-0002, approve later", Command("hold", validation_id="VAL-0002")),
+    ("Cancel, keep VAL-0002 waiting", Command("hold", validation_id="VAL-0002")),
+    ("what needs my decision?", Command("decisions")),
+    ("anything pending?", Command("decisions")),
     ("reject VAL-0002 because plant 1200 needs the stock",
      Command("reject", validation_id="VAL-0002", reason="plant 1200 needs the stock")),
     ("reject VAL-0002", Command("reject", validation_id="VAL-0002")),
@@ -35,7 +44,7 @@ EVENTS = ["S1-DOC-HOLD", "S1-ETA-SLIP", "S2-CONGESTION"]
     ("list cases", Command("list")),
     ("Please show open cases", Command("list")),
     ("SHOW THE ALL CASES", Command("list")),
-    ("approve VAL-0002 and show open cases", Command("approve", validation_id="VAL-0002")),
+    ("approve VAL-0002 and show open cases", Command("decisions")),
 ])
 def test_interpret(text, command):
     assert interpret(text, EVENTS) == command
@@ -49,6 +58,11 @@ def clear(store, monkeypatch):
 
 def send(client: TestClient, text: str, auth: str | None = None) -> str:
     """One Joule turn: message/send as Joule's agent-request sends it, and the answer text."""
+    return send_task(client, text, auth)["status"]["message"]["parts"][0]["text"]
+
+
+def send_task(client: TestClient, text: str, auth: str | None = None) -> dict:
+    """One Joule turn, and the whole A2A task Joule receives."""
     response = client.post("/", headers={"Authorization": auth} if auth else {}, json={
         "jsonrpc": "2.0", "id": str(uuid.uuid4()), "method": "message/send",
         "params": {"message": {"role": "user", "kind": "message", "messageId": str(uuid.uuid4()),
@@ -59,7 +73,7 @@ def send(client: TestClient, text: str, auth: str | None = None) -> str:
     assert task["status"]["state"] == "completed"
     # The Joule function shows the final status message; the same text is the task's artifact.
     assert task["artifacts"][0]["parts"][0]["text"] == task["status"]["message"]["parts"][0]["text"]
-    return task["status"]["message"]["parts"][0]["text"]
+    return task
 
 
 def test_s1_through_joule(clear):
@@ -70,14 +84,28 @@ def test_s1_through_joule(clear):
     assert "Predicted resolution: **3 days**" in answer
     assert "**Supply impact**" in answer
     assert "**Approval required**" in answer
-    assert "details CASE-0001" in answer
-    validation_id = re.search(r"approve (VAL-\d{4})", answer).group(1)
+    assert "ask for the details of CASE-0001" in answer
+    validation_id = re.search(r"Validation: `(VAL-\d{4})`", answer).group(1)
 
-    assert "Name the validation" in send(client, "approve it")
-    assert "needs a reason" in send(client, f"reject {validation_id}")
+    # Nothing below changes the case until a confirmation code comes back.
+    reply = send(client, "approve it")
+    assert validation_id in reply and "You confirm before anything changes" in reply
+    assert "nothing changed" in send(client, f"do not approve {validation_id}").lower()
+    assert "Decisions waiting for you" in send(client, f"should I approve {validation_id}?")
+    assert "Why do you reject" in send(client, f"reject {validation_id}")
     assert "not awaiting approval" in send(client, "approve VAL-0999")
+    preview = send(client, f"approve {validation_id}")
+    assert "Nothing has changed yet" in preview
+    stale = re.search(r"code ([A-Z0-9]{4})", preview).group(1)
+    assert "nothing changed" in send(client, f"Cancel, keep {validation_id} waiting").lower()
+    send(client, f"Confirm approval of {validation_id}, code {stale}")
+    assert clear.get_case("CASE-0001")["status"] == "awaiting_approval"
 
-    answer = send(client, f"approve {validation_id}")
+    task = send_task(client, f"approve {validation_id}")
+    buttons = task["artifacts"][1]["parts"][0]["data"]
+    assert buttons["primary"]["title"] == "Confirm approval"
+    assert buttons["secondary"]["value"] == f"Cancel, keep {validation_id} waiting"
+    answer = send(client, buttons["primary"]["value"])
     assert "Monitoring" in answer
     assert f"STO 4500001023 created: 20 t from plant 1200 to plant 1100 ({validation_id}, APR-0001 by " \
            "Planner via Joule)" in answer
@@ -166,11 +194,15 @@ def test_rejected_transfer_does_not_offer_an_active_approval_command(clear):
     desk = CaseDesk(clear, wait_seconds=30)
     desk.answer("work S1-DOC-HOLD")
     action = clear.get_case("CASE-0001")["plan"]["actions"][0]
-    reply = desk.answer(f"reject {action['validation_id']} because the planner needs another route")
+    preview = desk.respond(f"reject {action['validation_id']} because the planner needs another route")
+    assert "Reason: the planner needs another route" in preview.text
+    reply = desk.answer(preview.buttons[0].value)
     assert "Needs a human decision" in reply
     assert "not currently accepting approval" in reply
     assert "**Approval required**" not in reply
     assert "To approve:" not in reply
+    decisions = desk.answer("what needs my decision?")
+    assert "Needs a human decision" in decisions and "To approve:" not in decisions
 
 
 class SlowAgents:
@@ -212,3 +244,50 @@ def test_agent_card_and_basic_auth(clear):
     assert card["url"] == "https://clear.example/"
     assert card["protocolVersion"] == "0.3.0"
     assert "Events in the feed" in send(client, "hi", auth)
+
+
+class FakeModel:
+    """Stands in for Claude: a fixed intent per message, and the context it was given."""
+
+    def __init__(self, intents: dict[str, Intent | None]):
+        self.intents, self.contexts = intents, []
+
+    def __call__(self, text, context):
+        self.contexts.append(context)
+        return self.intents.get(text)
+
+
+def test_the_model_reads_free_text_and_a_write_still_needs_the_code(clear):
+    desk = CaseDesk(clear, wait_seconds=30)
+    desk.answer("work S1-DOC-HOLD")
+    validation_id = clear.get_case("CASE-0001")["plan"]["actions"][0]["validation_id"]
+    model = FakeModel({
+        "jangan approve dulu, tunggu bea cukai": Intent(kind="hold"),
+        "oke approve transfernya": Intent(kind="approve"),
+        "kenapa nggak transfer semua?": Intent(kind="question"),
+        "status of the mill shipment": Intent(kind="status", shipment_id="SHP-9999"),
+    })
+    desk.understand = model
+
+    assert "nothing changed" in desk.answer("jangan approve dulu, tunggu bea cukai").lower()
+    assert model.contexts[0]["transfers_awaiting_approval"][0]["validation_id"] == validation_id
+    assert "Assessed options" in desk.answer("kenapa nggak transfer semua?")
+    assert "There is no case" not in desk.answer("status of the mill shipment")  # Unknown IDs are dropped.
+
+    preview = desk.respond("oke approve transfernya")  # The only transfer waiting; no ID needed.
+    assert f"Confirm approval · {validation_id}" in preview.text
+    assert clear.get_case("CASE-0001")["status"] == "awaiting_approval"
+
+    # A confirmation that the model reads as "hold" does not execute.
+    model.intents[f"no, do not {preview.buttons[0].value}"] = Intent(kind="hold")
+    assert "nothing changed" in desk.answer(f"no, do not {preview.buttons[0].value}").lower()
+    assert clear.get_case("CASE-0001")["status"] == "awaiting_approval"
+
+    preview = desk.respond("oke approve transfernya")
+    assert "Monitoring" in desk.answer(preview.buttons[0].value)  # The model has no reading: rules, code wins.
+
+
+def test_without_the_model_the_rules_answer(clear):
+    desk = CaseDesk(clear, wait_seconds=30, understand=FakeModel({"approve VAL-0009": Intent(kind="help")}))
+    assert "Events in the feed" in desk.answer("hi")  # The model returns nothing.
+    assert "`VAL-0009` is not awaiting approval" in desk.answer("approve VAL-0009")  # Unsure: the rules decide.
