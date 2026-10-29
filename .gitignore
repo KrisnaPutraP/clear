@@ -18,6 +18,17 @@ build/
 dist/
 .pytest_cache/
 
+# Next.js frontend
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+/frontend/next-env.d.ts
+/frontend/test-results/
+/frontend/playwright-report/
+/frontend/.test-runtime/
+
+
 # OS
 .DS_Store
 Thumbs.db
