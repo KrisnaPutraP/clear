@@ -3,7 +3,7 @@ schema_version: 3.27.0  # The first version with agent-request.
 metadata:
   namespace: joule.ext  # Capabilities outside joule.ext count as SAP content and fail to deploy.
   name: cookusan_clear
-  version: 1.0.0
+  version: 1.0.1
   display_name: CLEAR shipment exceptions
   description: >-
     Connects CLEAR, the cross-border supply chain exception resolution agent, to Joule over A2A:
