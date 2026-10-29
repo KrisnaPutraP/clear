@@ -155,14 +155,17 @@ a rehearsal.
 
 ## Running the demo
 
-1. Reset the demo data with the button in the sidebar.
+1. Reset the demo data: the button in the Streamlit sidebar, or
+   `python scripts/reset_data.py --aws` before starting the workspace's API.
 2. **S1 · Customs document hold.** The agents reconcile the documents,
    predict how long the hold lasts, propose moving the whole shortage from
    plant 1200, see the validator reject it, and settle on the largest
    feasible transfer with critical and high orders served. The approval card
    shows the plan, the validation, and where every number comes from.
-3. Approve. The Action agent creates the stock transport order and checks
-   both plants' stock.
+3. Approve in the workspace, or in SAP Joule: ask for the case status and
+   approve the validation by its ID (`approve VAL-0002`); the workspace shows
+   the approval as it happens. The Action agent creates the stock transport
+   order and checks both plants' stock.
 4. **S1 · ETA slip.** The delay grows; no further transfer is feasible, only
    critical orders are covered, and the case goes to a human for emergency
    sourcing.
@@ -171,7 +174,8 @@ a rehearsal.
 
 If the venue's network fails, empty `AGENTCORE_GATEWAY_TOOLS_URL` in `.env`
 and restart the UI: the tools then run locally on JSON files. The agents
-still need SAP AI Core, so keep a recording of the demo as the last resort.
+still need SAP AI Core, and Joule needs the network, so keep a recording of
+the demo as the last resort.
 
 ## What is not in Git
 

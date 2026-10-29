@@ -6,12 +6,18 @@ goes through AgentCore Gateway to an AWS Lambda function, the data lives in
 DynamoDB, and Cedar policies on the gateway decide which agent may call which
 tool. The tool logic (`src/clear_tools/`) is the same package in both cases.
 
-The agents themselves can run in two places:
+The agents themselves can run in three places:
 
-- **On the presenter's laptop (deployed now).** The team's account has no
-  AgentCore Runtime quota, so the agents run on the laptop with their tools
-  behind the gateway: `clear_aws.remote.GatewayAgents`, which runs the
-  runtime's own code in-process.
+- **On the presenter's machine (deployed now).** The team's account has no
+  AgentCore Runtime quota, so the agents run in the FastAPI (or Streamlit)
+  process with their tools behind the gateway:
+  `clear_aws.remote.GatewayAgents`, which runs the runtime's own code
+  in-process.
+- **On SAP BTP Cloud Foundry, for SAP Joule (deployed now).** The A2A server
+  that Joule calls runs the same agents in a Cloud Foundry app
+  (`manifest.yml`), also with `GatewayAgents`, under its own IAM identity
+  that may only assume the two agent roles, use the table, and invoke the
+  gateway.
 - **On AgentCore Runtime (built, not deployed).** The same code as a runtime
   in AWS, for an account with Runtime quota: `clear_aws.runtime` and
   `deploy/runtime/`.
@@ -23,7 +29,7 @@ Setting up a machine to use the deployment, without deploying anything:
 
 | Part | Where | Created by |
 |---|---|---|
-| Orchestrator and the three specialist agents, one process | The presenter's laptop (on AgentCore Runtime `cookusanhackathon_clear` in the Runtime variant) | — (AgentCore CLI) |
+| Orchestrator and the three specialist agents, one process | The presenter's machine for the workspace, a Cloud Foundry app on SAP BTP for Joule (on AgentCore Runtime `cookusanhackathon_clear` in the Runtime variant) | — (AgentCore CLI); `cf push` for Joule |
 | The nine tools | Lambda function `cookusanhackathon-clear-tools` behind AgentCore Gateway `cookusanhackathon-tools` (AWS IAM authorization) | AgentCore CLI |
 | Which agent may call which tool | Cedar policies in the AgentCore policy engine `clear_policies`, on the gateway | AgentCore CLI |
 | Mock S/4HANA, documents, records, case log | DynamoDB table `cookusan-hackathon-clear-data` | `scripts/aws_setup.py` |
@@ -31,7 +37,7 @@ Setting up a machine to use the deployment, without deploying anything:
 | The Action agent's identity at the gateway | IAM role `cookusan-hackathon-action-agent` | `scripts/aws_setup.py` |
 | SAP AI Core service key for SAP-RPT-1.6 | SSM SecureString parameter `/cookusan-hackathon/sap-aicore` | `scripts/aws_setup.py` |
 | The agents' model | Claude Sonnet 4.6 in SAP AI Core, outside AWS | The hackathon organizers |
-| Demo UI | Streamlit on the presenter's laptop | — |
+| Demo UI | Next.js workspace with the FastAPI service (or Streamlit) on the presenter's machine, and SAP Joule | — |
 
 A run, step by step:
 
@@ -50,8 +56,9 @@ A run, step by step:
 Each agent signs its gateway calls with its own IAM role: the Action agent,
 the only one holding the write tool, with `cookusan-hackathon-action-agent`,
 and the Evidence and Impact agents with `cookusan-hackathon-agents`. The
-laptop's identity assumes both and needs no access to the tools itself. The
-Cedar policies tell the agents apart by these roles.
+identity running the agents, on the presenter's machine or on SAP BTP,
+assumes both and needs no access to the tools itself. The Cedar policies
+tell the agents apart by these roles.
 
 Every resource carries the tags `Project=ID-Hackathon-2026`, `Team=Cookusan`,
 and `DeleteAfter=2026-10-31`. Resources created by CLEAR's scripts use the
@@ -263,6 +270,9 @@ python scripts/aws_cleanup.py --apply --include-bootstrap   # also the CDK boots
 `--include-bootstrap` removes what `agentcore deploy` set up for CDK in this
 account and region; skip it if anything else in the account uses CDK. Then
 delete `deploy/cookusanhackathon/`.
+
+The Joule path's Cloud Foundry app and its IAM identity are not created by
+these scripts; remove them by hand.
 
 ## Tests without AWS
 
