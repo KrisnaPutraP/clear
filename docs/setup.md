@@ -162,8 +162,9 @@ a rehearsal.
    plant 1200, see the validator reject it, and settle on the largest
    feasible transfer with critical and high orders served. The approval card
    shows the plan, the validation, and where every number comes from.
-3. Approve in the workspace, or in SAP Joule: ask for the case status and
-   approve the validation by its ID (`approve VAL-0002`); the workspace shows
+3. Approve in the workspace, or in SAP Joule: ask what needs your decision
+   or for the case status, approve in your own words or with the **Approve**
+   button, and press **Confirm approval** on the preview; the workspace shows
    the approval as it happens. The Action agent creates the stock transport
    order and checks both plants' stock.
 4. **S1 · ETA slip.** The delay grows; no further transfer is feasible, only
