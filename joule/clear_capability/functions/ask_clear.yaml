@@ -1,5 +1,6 @@
-# Forwards the user's message to CLEAR over A2A and shows CLEAR's answer. CLEAR answers within
-# Joule's 60-second limit; agent runs that take longer continue in the background.
+# Forwards the user's message to CLEAR over A2A and shows CLEAR's answer, then its two buttons when it
+# sends them. CLEAR answers within Joule's 60-second limit; agent runs that take longer continue in the
+# background. A postback button sends its value back to Joule as the user's next message.
 action_groups:
   - actions:
       - type: status-update
@@ -15,3 +16,19 @@ action_groups:
           type: text
           content: "<? result.body.status.message.parts[0].text ?>"
           markdown: true
+
+  # The second artifact, when present, is one data part: a title and a primary and a secondary button.
+  - condition: result.body != null && result.body.artifacts != null && result.body.artifacts.size() > 1
+    actions:
+      - type: message
+        message:
+          type: buttons
+          content:
+            title: "<? result.body.artifacts[1].parts[0].data.title ?>"
+            buttons:
+              - type: postback
+                title: "<? result.body.artifacts[1].parts[0].data.primary.title ?>"
+                value: "<? result.body.artifacts[1].parts[0].data.primary.value ?>"
+              - type: postback
+                title: "<? result.body.artifacts[1].parts[0].data.secondary.title ?>"
+                value: "<? result.body.artifacts[1].parts[0].data.secondary.value ?>"
