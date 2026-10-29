@@ -94,6 +94,7 @@ class Clear:
             "reconciliation": reconciliations[-1] if reconciliations else None,
             "inventory": read.get_inventory(self.store, material),
             "plan": render(self.store, RecoveryPlan.model_validate(case["plan"])) if case["plan"] else None,
+            "resolution": case.get("resolution"),
         }
 
     def get_case_log(self, case_id: str, after_seq: int = 0) -> list[dict]:
@@ -122,6 +123,24 @@ class Clear:
         else:
             self._busy.release()
         return approval
+
+    def resolve_case(self, case_id: str, approver: str, option: str | None = None,
+                     note: str | None = None) -> dict:
+        """Record a planner's course for a case that needs a human decision. Starts no agent run."""
+        def resolve():
+            case = caselog.get_case(self.store, case_id)
+            if case["status"] != "needs_human_decision":
+                raise PermissionError("This case does not need a planner's decision.")
+            options = {o["name"] for o in (case.get("plan") or {}).get("options", [])}
+            if option is not None and option not in options:
+                raise ValueError(f"{option!r} is not one of the case plan's options.")
+            if option is None and not note:
+                raise ValueError("A course outside the plan's options needs a note.")
+            return runner.resolve(self.store, case_id, approver, option, note)
+
+        case = self._prepare(resolve)
+        self._busy.release()
+        return case["resolution"]
 
     def snapshot(self):
         """Context in which reads see one state of the store: a single round trip on DynamoDB."""

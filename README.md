@@ -72,7 +72,7 @@ demo without credentials. Full instructions: [docs/web-development.md](docs/web-
 | `pytest` | All tests; the live ones run only with `CLEAR_LIVE_TESTS=1` |
 | `streamlit run app/streamlit_app.py` | The demo UI; `CLEAR_UI_SCRIPTED=1` in `.env` for a scripted model |
 | `python -m uvicorn clear_app.api:create_app --factory --host 127.0.0.1 --port 8000` | FastAPI adapter, one worker per store; API docs at `/docs` |
-| `npm run dev` (in `frontend/`) | Next.js workspace at `http://127.0.0.1:3000` |
+| `npm run dev` (in `frontend/`) | Next.js landing page at `http://127.0.0.1:3000`, workspace at `/workspace` |
 | `python scripts/run_scenario.py S2` | The short scenario, live, printing the case timeline |
 | `python scripts/run_scenario.py S1 --approve --eta-slip` | The hero scenario: exception, approval, ETA slip |
 | `... --gateway` | The same with the tools on AWS behind AgentCore Gateway |

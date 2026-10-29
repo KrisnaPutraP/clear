@@ -22,6 +22,7 @@ wording in it is illustrative; the shapes are exact.
 | Read a case | `get_case(case_id)` | `GET /cases/{case_id}` | Status, shipment, documents, stock, and the plan with all numbers filled in |
 | Read the timeline | `get_case_log(case_id, after_seq=0)` | `GET /cases/{case_id}/log?after_seq=N` | Log entries with `seq` greater than `N` |
 | Decide on an STO | `submit_decision(case_id, validation_id, approver, decision, reason=None)` | `POST /cases/{case_id}/decisions` | The approval record |
+| Resolve an escalation | `resolve_case(case_id, approver, option=None, note=None)` | `POST /cases/{case_id}/resolution` | The resolution |
 
 `decision` is `approved` or `rejected`; a rejection needs a `reason`. Only
 one agent run happens at a time: while `get_case(...)["running"]` is true,
@@ -33,6 +34,16 @@ the approval record. A rejection records its decision synchronously and
 starts no agent run. Approval requests must target an action that is
 awaiting approval on the current case plan. A stale or unrelated validation
 is rejected before an approval record is written.
+
+A case in `needs_human_decision` asks for a course CLEAR cannot carry out
+itself, such as deferring orders or emergency sourcing. The planner records
+the course they chose: `option` names one of the plan's `options`, or is
+`null` for a course of their own, which `note` then describes. The call is
+synchronous and starts no agent run; it logs a `decision` entry, sets the
+case to `monitoring`, and returns `{approver, option, note, at}`, which
+`get_case` also returns as `resolution` until the next event on the case.
+It fails with `409` unless the case needs a human decision, and with `422`
+for an option the plan does not have.
 
 Unknown IDs return `404`, conflicting runs or decisions return `409`, and
 invalid request bodies or negative log cursors return `422`. Decision
@@ -58,7 +69,7 @@ you have>)` every one or two seconds and append what comes back. When
 | `awaiting_approval` | A validated stock transport order waits for a planner | Approval card |
 | `executing` | Approved; the order is being created | Timeline |
 | `monitoring` | The plan is in place and nothing needs a decision | Plan and `next_check` |
-| `needs_human_decision` | Rejected, escalated, or the run failed | `status_reason`, options |
+| `needs_human_decision` | Rejected, escalated, or the run failed | `status_reason`, options, and a way to record the chosen course |
 
 ## Timeline entries
 
@@ -67,7 +78,8 @@ you have>)` every one or two seconds and append what comes back. When
 - `actor`: `Event feed`, `Orchestrator`, `Evidence`, `Impact & Options`,
   `Action`, the planner's name, `Plan check`, or `CLEAR`.
 - `kind`: `event`, `delegation`, `tool`, `note` (a short reason written by an
-  agent), `approval`, `status`, or `error`.
+  agent), `approval`, `decision` (a planner's course for an escalation),
+  `status`, or `error`.
 - `source`: where the numbers in `summary` come from, for example
   `baseline-median`, `S/4HANA (mock)`, `deterministic calculation`, or
   `business rules`. Show it next to the summary.

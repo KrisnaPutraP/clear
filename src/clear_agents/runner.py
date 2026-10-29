@@ -106,7 +106,7 @@ def open_case_for_event(store: JsonStore, event: dict) -> str:
     """Record the event, open the shipment's case (or reuse it), and log the event. No LLM."""
     record_event(store, event)
     case_id = caselog.open_case(store, event["shipment_id"])["case_id"]
-    caselog.update_case(store, case_id, status="analyzing", status_reason=None)
+    caselog.update_case(store, case_id, status="analyzing", status_reason=None, resolution=None)
     caselog.log(store, case_id, "Event feed", "event", event["description"],
                 source="logistics event feed (simulated)", event_id=event["event_id"])
     return case_id
@@ -134,6 +134,19 @@ def decide(store: JsonStore, case_id: str, validation_id: str, approver: str, de
     else:
         caselog.update_case(store, case_id, status="executing", status_reason=None)
     return approval
+
+
+def resolve(store: JsonStore, case_id: str, approver: str, option: str | None, note: str | None = None) -> dict:
+    """Record the course a planner chose for an escalated case and monitor it. No LLM.
+
+    Deferring orders and emergency sourcing are not CLEAR's to do: the planner carries out the chosen
+    course outside CLEAR, and the case records who chose what and why. option is one of the plan's
+    options, or None for a course of the planner's own, which the note then describes.
+    """
+    resolution = {"approver": approver, "option": option, "note": note, "at": records.now()}
+    summary = f"Chose {option}" if option else "Chose a course outside the plan's options"
+    caselog.log(store, case_id, approver, "decision", summary + (f": {note}" if note else ""))
+    return caselog.update_case(store, case_id, status="monitoring", status_reason=None, resolution=resolution)
 
 
 def work_approval(store: JsonStore, case_id: str, approval: dict, model_for: ModelFactory = live_model,

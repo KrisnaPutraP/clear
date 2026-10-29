@@ -46,7 +46,7 @@ def update_case(store: JsonStore, case_id: str, **fields) -> dict:
 
 
 def log(store: JsonStore, case_id: str, actor: str, kind: str, summary: str, **extra) -> dict:
-    """Append one entry. kind: event, delegation, tool, note, approval, status, error."""
+    """Append one entry. kind: event, delegation, tool, note, approval, decision, status, error."""
     entries = store.read(LOG)
     entry = {"seq": len(entries) + 1, "case_id": case_id, "at": records.now(), "actor": actor,
              "kind": kind, "summary": summary, **{k: v for k, v in extra.items() if v is not None}}
