@@ -90,13 +90,14 @@ deleted without the owner's agreement.
 |---|---|
 | Data, mock S/4HANA, documents, the nine tools | Done, with tests |
 | Agents (Strands) on Claude Sonnet 4.6 in SAP AI Core | Done; S1 (both events) and S2 run live |
+| Next.js workspace with the FastAPI service | Done; local and gateway modes ([web-development.md](web-development.md)) |
 | Streamlit UI | Done; local and gateway modes |
 | SAP-RPT-1.6 predictions with the baseline fallback | Done |
-| AgentCore Gateway, Lambda, DynamoDB, Cedar policies (ENFORCE) | Deployed; the agents run on the laptop |
+| AgentCore Gateway, Lambda, DynamoDB, Cedar policies (ENFORCE) | Deployed; the workspace's agents run on the presenter's machine |
+| SAP Joule front door (A2A server in a Cloud Foundry app on SAP BTP) | Deployed; S1 runs end to end from Joule through the gateway |
 | AgentCore Runtime | Built, not deployed: the account has no Runtime quota |
 | Evaluation, 20 variants | Done; the final run on 28 October passes every check ([evaluation.md](evaluation.md)) |
-| SAP Joule front door (A2A, Cloud Foundry app) | Works end to end on branch `experiment/joule` |
-| Pitch deck, demo video | Next |
+| Pitch deck, demo video | In progress |
 
 Open items:
 
@@ -111,7 +112,8 @@ Open items:
 
 `docs/PLAN.md` (the locked design decisions), `docs/pitch.md` (the pitch
 draft), and `docs/reference/` (hackathon brief, slides, proposal) stay out of
-Git; the team shares them privately. Docstrings cite sections of the plan as
+Git; the team shares them privately, together with the operating notes of
+the deployed Joule path. Docstrings cite sections of the plan as
 `docs/PLAN.md §…`. Material from `docs/reference/`, especially slides marked
 internal, is never copied into the repository; summarize it in your own
 words where needed.
