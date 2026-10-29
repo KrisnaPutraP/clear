@@ -27,6 +27,7 @@ from a2a.utils.errors import ServerError, UnsupportedOperationError
 from starlette.applications import Starlette
 from starlette.responses import PlainTextResponse
 
+from clear_agents.plan import format_points
 from clear_app import view
 from clear_app.contract import Clear
 from clear_tools import read
@@ -42,11 +43,12 @@ _APPROVE = re.compile(r"\bapprove[ds]?\b", re.IGNORECASE)
 _REJECT = re.compile(r"\breject(?:ed|s)?\b", re.IGNORECASE)
 _REASON = re.compile(r"\b(?:because|reason:?|due to)\s+(.+)", re.IGNORECASE | re.DOTALL)
 _STATUS = re.compile(r"\b(?:status|update|progress|plan|recommend\w*|happening|where are we)\b", re.IGNORECASE)
+_DETAILS = re.compile(r"\b(?:details?|detailed)\b", re.IGNORECASE)
 
 
 @dataclass(frozen=True)
 class Command:
-    """What the planner asked for. kind: start, approve, reject, status, or help."""
+    """What the planner asked for. kind: start, approve, reject, status, details, or help."""
 
     kind: str
     event_id: str | None = None
@@ -69,6 +71,8 @@ def interpret(text: str, event_ids: list[str]) -> Command:
     event = next((e for e in event_ids if e.lower() in text.lower()), None)
     if event:
         return Command("start", event_id=event)
+    if _DETAILS.search(text):
+        return Command("details", case_id=case, shipment_id=shipment)
     if case or _STATUS.search(text):
         return Command("status", case_id=case, shipment_id=shipment)
     if shipment:
@@ -91,21 +95,22 @@ class CaseDesk:
                 return self._start(command, events)
             if command.kind in ("approve", "reject"):
                 return self._decide(command)
-            if command.kind == "status":
+            if command.kind in ("status", "details"):
                 case_id = command.case_id or self._latest_case(command.shipment_id)
                 if case_id is None:
                     return self._help(events, f"There is no case for {command.shipment_id or 'any shipment'} yet.")
-                return self.describe(case_id)
+                return self.describe(case_id, detailed=command.kind == "details")
         except RuntimeError as error:  # An agent run is already in progress.
             return f"{error}\n\n{self.describe(self._latest_case())}"
         except LookupError as error:
             return self._help(events, str(error))
         return self._help(events)
 
-    def describe(self, case_id: str) -> str:
-        """The case as a short message: status, prediction, recommended option, and what is asked of the planner.
+    def describe(self, case_id: str, detailed: bool = False) -> str:
+        """A scannable Markdown summary, with full evidence and rationale available on request.
 
-        Joule renders the answer as Markdown, so paragraphs are separated by blank lines.
+        All metrics come from the rendered plan's records. Formatting does
+        not call a model or change the case, its actions, or its approval.
         """
         with self.clear.snapshot():
             case = self.clear.get_case(case_id.upper())
@@ -114,44 +119,73 @@ class CaseDesk:
         paragraphs = [f"**{case['case_id']} · {case['shipment_id']} · {label}**"]
         plan = case["plan"]
         if case["running"] and case["status"] in ("analyzing", "executing"):
-            paragraphs.append("The agents are working. Latest steps:")
-            paragraphs.append(_bullets(f"{e['actor']}: {e['summary']}" for e in log[-LOG_LINES:]))
-            paragraphs.append("Ask me for the status again in a minute.")
+            paragraphs.append(_section("Work in progress", "The agents are working. Latest steps:\n\n" +
+                                      _bullets(f"{e['actor']}: {e['summary']}" for e in log[-LOG_LINES:])))
+            paragraphs.append(f"Check again in a minute: `status of {case['shipment_id']}`.")
             return "\n\n".join(paragraphs)
         if case["status_reason"] and not (plan and plan["escalation"] == case["status_reason"]):
-            paragraphs.append(case["status_reason"])
+            paragraphs.append(_section("Case update", case["status_reason"]))
         if not plan:
             return "\n\n".join(paragraphs)
 
+        exception = case["shipment"].get("exception") or {}
+        paragraphs.append(_section("Situation", exception.get("description") or plan["exception"]))
         prediction = plan["impact"]["prediction"]
         rows = view.option_rows(plan)
-        facts = [f"Exception: {plan['exception']}",
-                 f"Predicted resolution: {prediction['predicted_days']:g} days ({view.prediction_note(prediction)})",
-                 f"Current plan: {_coverage(rows[0])}"]
+        facts = [f"Predicted resolution: **{prediction['predicted_days']:g} days**",
+                 f"Prediction source: {view.prediction_note(prediction)}",
+                 f"Current coverage: {_coverage(rows[0])}"]
+        paragraphs.append(_section("Supply impact", _bullets(facts)))
         recommended = next((r for r in rows if r["recommended"]), None)
         if recommended:
-            facts.append(f"Recommended: {recommended['option']}: {_coverage(recommended)}; "
-                         f"deferred orders: {recommended['deferred_orders']}")
-        paragraphs.append(_bullets(facts))
-        if plan["recommendation"]:
-            paragraphs.append(plan["recommendation"])
+            paragraphs.append(_section("Recommended course", f"**{recommended['option']}**\n\n" + _bullets([
+                f"Orders served: {recommended['orders_served']}",
+                f"Transfer: {recommended['transfer'] if recommended['transfer'] != '—' else 'No new transfer'}",
+                f"Coverage for selected demand: {_coverage(recommended)}",
+                f"Deferred orders: {recommended['deferred_orders']}",
+            ])))
+        elif plan["recommendation"]:
+            # Preserve the explanation when the plan is kept or no option is feasible.
+            paragraphs.append(_section("Recommended course", plan["recommendation"]))
         for action in plan["actions"]:
             validation = action["validation"]
             move = (f"{validation['quantity']:g} t from plant {validation['source_plant']} "
                     f"to plant {validation['destination_plant']}")
             if action["status"] == "awaiting_approval":
-                paragraphs.append(f"Awaiting your approval: {action['validation_id']}, a stock transport order of "
-                                  f"{move}, valid under the business rules. Reply **approve "
-                                  f"{action['validation_id']}** or **reject {action['validation_id']} because "
-                                  "<reason>**.")
+                if case["status"] != "awaiting_approval":
+                    paragraphs.append(_section("Transfer status",
+                                      f"`{action['validation_id']}` is not currently accepting approval. "
+                                      "Review the case update and decision required."))
+                    continue
+                paragraphs.append(_section("Approval required", _bullets([
+                    f"Transfer: **{move}**",
+                    f"Validation: `{action['validation_id']}` - passed the business rules",
+                ]) + f"\n\nTo approve: `approve {action['validation_id']}`"
+                     f"\n\nTo reject: `reject {action['validation_id']} because your reason`"))
             elif action["sto"]:
                 approval = action["approval"]
-                paragraphs.append(f"STO {action['sto']['purchase_order']} created: {move} ({action['validation_id']}, "
-                                  f"{approval['approval_id']} by {approval['approver']}).")
+                paragraphs.append(_section("Transfer recorded",
+                                  f"STO {action['sto']['purchase_order']} created: {move} ({action['validation_id']}, "
+                                  f"{approval['approval_id']} by {approval['approver']}).\n\n"
+                                  "The stock is in transit; this does not confirm physical receipt."))
         if plan["escalation"]:
-            paragraphs.append(f"Escalation: {plan['escalation']}")
+            # Keep the full human-decision requirement, including in the short view.
+            paragraphs.append(_section("Decision required", plan["escalation"]))
         if plan["next_check"]:
-            paragraphs.append(f"Next check: {plan['next_check']}")
+            paragraphs.append(_section("Follow-up", _follow_up(plan["next_check"])))
+        if detailed:
+            paragraphs.append(_section("Evidence and rationale", plan["exception"]))
+            if plan["evidence"]:
+                paragraphs.append(_bullets(f"{e['fact']} (source: {e['source']})" for e in plan["evidence"]))
+            if recommended and plan["recommendation"]:
+                paragraphs.append(plan["recommendation"])
+            options = [f"**{row['option']}**: {_coverage(row)}; orders served: {row['orders_served']}; "
+                       f"transfer: {row['transfer']}; deferred orders: {row['deferred_orders']}; "
+                       f"validation: {row['validation']}; assessment: `{row['assessment_id']}`"
+                       for row in rows]
+            paragraphs.append(_section("Assessed options", _bullets(options)))
+        else:
+            paragraphs.append(f"For full evidence, rationale, and assessed options: `details {case['case_id']}`.")
         return "\n\n".join(paragraphs)
 
     def _start(self, command: Command, events: list[dict]) -> str:
@@ -206,6 +240,7 @@ class CaseDesk:
         paragraphs.append(_bullets([
             "start an event from the logistics feed, for example: work S1-DOC-HOLD",
             "ask for the status of a case or shipment, for example: status of SHP-1001",
+            "read the full evidence and assessed options, for example: details CASE-0001",
             "approve or reject a validated transfer: approve VAL-0002, or reject VAL-0002 because <reason>",
         ]))
         paragraphs.append("Events in the feed:")
@@ -253,7 +288,7 @@ def agent_card(url: str) -> AgentCard:
                        examples=["Work S1-DOC-HOLD", "SHP-1002 is delayed by yard congestion"]),
             AgentSkill(id="case-status", name="Case status",
                        description="The case status, the predicted resolution time, and the recommended option.",
-                       tags=["status", "recovery plan"], examples=["Status of SHP-1001"]),
+                       tags=["status", "recovery plan"], examples=["Status of SHP-1001", "Details of SHP-1001"]),
             AgentSkill(id="decide-transfer", name="Approve or reject a transfer",
                        description="Records the planner's decision on a validated stock transport order.",
                        tags=["approval", "stock transport order"],
@@ -292,7 +327,17 @@ def build_app(clear: Clear, url: str, user: str | None = None, password: str | N
 
 
 def _coverage(row: dict) -> str:
-    return f"covers {row['coverage_days']:g} of {row['needed_days']:g} days needed, {row['label']}"
+    outcome = "covered" if row["covered"] else f"**{row['shortage_t']:g} t short**"
+    return f"**{row['coverage_days']:g} / {row['needed_days']:g} days** - {outcome}"
+
+
+def _section(title: str, content: str) -> str:
+    return f"**{title}**\n\n{content}"
+
+
+def _follow_up(text: str) -> str:
+    """Use actual numbered Markdown with spacing, preserving all follow-up text."""
+    return re.sub(r"\n(?=\d+\.\s)", "\n\n", format_points(text))
 
 
 def _bullets(items) -> str:

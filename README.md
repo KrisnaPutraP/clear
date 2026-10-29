@@ -110,6 +110,7 @@ demo without credentials. Full instructions: [docs/web-development.md](docs/web-
 - [docs/deployment.md](docs/deployment.md): what runs on AWS and how to deploy it
 - [docs/evaluation.md](docs/evaluation.md): the reliability batch and its results
 - [docs/ui-contract.md](docs/ui-contract.md): the interface between the UI and the agents
+- [docs/joule-responses.md](docs/joule-responses.md): concise Joule summaries and detailed evidence replies
 - [docs/contributing.md](docs/contributing.md): rules, workflow, status, open items
 - [data/README.md](data/README.md): the synthetic data and its generator rules
 
