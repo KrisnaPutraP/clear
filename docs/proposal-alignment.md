@@ -112,7 +112,7 @@ historical decision reason where the repository does not record one.
 | Duration prediction | The workflow estimates how long the exception may last | SAP-RPT-1.6 with a labelled baseline fallback | This makes the estimate's source explicit while keeping supply calculations outside the LLM |
 
 The [architecture](architecture.md), [setup guide](setup.md), and
-[project status](contributing.md#where-the-project-stands-29-october-2026)
+[project status](../README.md#status)
 describe the current configuration. Presentation diagrams should match
 that configuration and label future integrations separately.
 
