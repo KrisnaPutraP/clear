@@ -39,9 +39,12 @@ LOG_LINES = 4  # Latest timeline steps shown while a run is in progress.
 _VALIDATION = re.compile(r"\bVAL-\d{4}\b", re.IGNORECASE)
 _CASE = re.compile(r"\bCASE-\d{4}\b", re.IGNORECASE)
 _SHIPMENT = re.compile(r"\bSHP-\d+\b", re.IGNORECASE)
-_APPROVE = re.compile(r"\bapprove[ds]?\b", re.IGNORECASE)
-_REJECT = re.compile(r"\breject(?:ed|s)?\b", re.IGNORECASE)
-_REASON = re.compile(r"\b(?:because|reason:?|due to)\s+(.+)", re.IGNORECASE | re.DOTALL)
+# A decision runs only when the whole message is the command, so "do not approve VAL-0002" or
+# "should I approve VAL-0002?" changes nothing; any other mention lists the decisions instead.
+_APPROVE_COMMAND = re.compile(r"^\s*approve\s+(VAL-\d{4})\s*[.!]?\s*$", re.IGNORECASE)
+_REJECT_COMMAND = re.compile(r"^\s*reject\s+(VAL-\d{4})(?:\s*[,:]?\s*(?:because|reason:?|due to)\s+(.+?))?\s*$",
+                             re.IGNORECASE | re.DOTALL)
+_DECISIONS = re.compile(r"\b(?:approv\w*|reject\w*|decision\w*|decide|pending)\b", re.IGNORECASE)
 _STATUS = re.compile(r"\b(?:status|update|progress|plan|recommend\w*|happening|where are we)\b", re.IGNORECASE)
 _DETAILS = re.compile(r"\b(?:details?|detailed)\b", re.IGNORECASE)
 _LIST_CASES = re.compile(r"\b(?:list|show)\s+(?:the\s+)?(?:(?:all|open)\s+)?cases\b", re.IGNORECASE)
@@ -49,7 +52,7 @@ _LIST_CASES = re.compile(r"\b(?:list|show)\s+(?:the\s+)?(?:(?:all|open)\s+)?case
 
 @dataclass(frozen=True)
 class Command:
-    """What the planner asked for: start, approve, reject, status, details, list, or help."""
+    """What the planner asked for: start, approve, reject, decisions, status, details, list, or help."""
 
     kind: str
     event_id: str | None = None
@@ -60,15 +63,16 @@ class Command:
 
 
 def interpret(text: str, event_ids: list[str]) -> Command:
-    """Match a message to a command by IDs and keywords. Approvals and rejections come first."""
-    validation = _match(_VALIDATION, text)
+    """Match a message to a command by IDs and keywords. Exact approve and reject commands come first."""
     case = _match(_CASE, text)
     shipment = _match(_SHIPMENT, text)
-    if _APPROVE.search(text):
-        return Command("approve", validation_id=validation)
-    if _REJECT.search(text):
-        reason = _REASON.search(text)
-        return Command("reject", validation_id=validation, reason=reason.group(1).strip() if reason else None)
+    if approve := _APPROVE_COMMAND.match(text):
+        return Command("approve", validation_id=approve.group(1).upper())
+    if reject := _REJECT_COMMAND.match(text):
+        reason = reject.group(2).strip() if reject.group(2) else None
+        return Command("reject", validation_id=reject.group(1).upper(), reason=reason)
+    if _DECISIONS.search(text):
+        return Command("decisions")
     event = next((e for e in event_ids if e.lower() in text.lower()), None)
     if event:
         return Command("start", event_id=event)
@@ -98,6 +102,8 @@ class CaseDesk:
                 return self._start(command, events)
             if command.kind in ("approve", "reject"):
                 return self._decide(command)
+            if command.kind == "decisions":
+                return self.decisions()
             if command.kind == "list":
                 return self.list_cases()
             if command.kind in ("status", "details"):
@@ -134,6 +140,42 @@ class CaseDesk:
                             f"  Open: `status {case['case_id']}`")
         return (_section("Cases", _bullets(rows)) +
                 "\n\nCases needing a human decision or approval appear first. Monitoring cases remain listed.")
+
+    def decisions(self) -> str:
+        """Transfers awaiting approval and cases awaiting a human decision, with the exact commands.
+
+        Read-only: a message that mentions a decision without being the exact command lands here.
+        """
+        rows = []
+        with self.clear.snapshot():
+            for case in self.clear.list_cases():
+                if case["status"] == "needs_human_decision":
+                    reason = self.clear.get_case(case["case_id"])["status_reason"]
+                    rows.append(f"**{case['case_id']} · {case['shipment_id']} · Needs a human decision**\n"
+                                f"  {reason}\n  Open: `details {case['case_id']}`")
+                if case["status"] != "awaiting_approval":
+                    continue
+                plan = self.clear.get_case(case["case_id"])["plan"]
+                recommended = next((r for r in view.option_rows(plan) if r["recommended"]), None)
+                for action in plan["actions"]:
+                    if action["status"] != "awaiting_approval":
+                        continue
+                    validation, validation_id = action["validation"], action["validation_id"]
+                    lines = [f"**{validation_id} · {case['case_id']} · {case['shipment_id']}**",
+                             f"  Transfer: {validation['quantity']:g} t from plant {validation['source_plant']} "
+                             f"to plant {validation['destination_plant']}"]
+                    if recommended:
+                        lines.append(f"  Recommended: {recommended['option']}; "
+                                     f"deferred orders: {recommended['deferred_orders']}")
+                    lines += [f"  To approve: `approve {validation_id}`",
+                              f"  To reject: `reject {validation_id} because your reason`"]
+                    rows.append("\n".join(lines))
+        if not rows:
+            return _section("Decisions", "Nothing is waiting for your decision.") + \
+                "\n\nTo see every case: `list cases`."
+        return (_section("Decisions waiting for you", _bullets(rows)) +
+                "\n\nApprovals and rejections run only on these exact commands; a question or a sentence "
+                "such as \"do not approve\" changes nothing.")
 
     def shipment_status(self, shipment_id: str, events: list[dict]) -> str:
         """Read the recorded shipment before a case exists, without submitting an event."""
@@ -252,8 +294,6 @@ class CaseDesk:
 
     def _decide(self, command: Command) -> str:
         pending = self._pending()
-        if not command.validation_id:
-            raise LookupError("Name the validation you decide on, for example: approve VAL-0002.")
         case_id = pending.get(command.validation_id)
         if case_id is None:
             raise LookupError(f"{command.validation_id} is not awaiting approval.")

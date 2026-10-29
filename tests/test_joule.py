@@ -20,8 +20,15 @@ EVENTS = ["S1-DOC-HOLD", "S1-ETA-SLIP", "S2-CONGESTION"]
 
 @pytest.mark.parametrize("text, command", [
     ("approve VAL-0002", Command("approve", validation_id="VAL-0002")),
-    ("Approved val-0002, go ahead", Command("approve", validation_id="VAL-0002")),
-    ("Should I approve it?", Command("approve")),
+    ("approve val-0002.", Command("approve", validation_id="VAL-0002")),
+    ("Approved val-0002, go ahead", Command("decisions")),
+    ("Should I approve it?", Command("decisions")),
+    ("Do not approve VAL-0002", Command("decisions")),
+    ("should I approve VAL-0002?", Command("decisions")),
+    ("why was VAL-0002 approved?", Command("decisions")),
+    ("don't reject VAL-0002, approve later", Command("decisions")),
+    ("what needs my decision?", Command("decisions")),
+    ("anything pending?", Command("decisions")),
     ("reject VAL-0002 because plant 1200 needs the stock",
      Command("reject", validation_id="VAL-0002", reason="plant 1200 needs the stock")),
     ("reject VAL-0002", Command("reject", validation_id="VAL-0002")),
@@ -35,7 +42,7 @@ EVENTS = ["S1-DOC-HOLD", "S1-ETA-SLIP", "S2-CONGESTION"]
     ("list cases", Command("list")),
     ("Please show open cases", Command("list")),
     ("SHOW THE ALL CASES", Command("list")),
-    ("approve VAL-0002 and show open cases", Command("approve", validation_id="VAL-0002")),
+    ("approve VAL-0002 and show open cases", Command("decisions")),
 ])
 def test_interpret(text, command):
     assert interpret(text, EVENTS) == command
@@ -73,7 +80,11 @@ def test_s1_through_joule(clear):
     assert "details CASE-0001" in answer
     validation_id = re.search(r"approve (VAL-\d{4})", answer).group(1)
 
-    assert "Name the validation" in send(client, "approve it")
+    reply = send(client, "approve it")
+    assert f"approve {validation_id}" in reply and "changes nothing" in reply
+    assert "changes nothing" in send(client, f"do not approve {validation_id}")
+    assert "changes nothing" in send(client, f"should I approve {validation_id}?")
+    assert clear.get_case("CASE-0001")["status"] == "awaiting_approval"
     assert "needs a reason" in send(client, f"reject {validation_id}")
     assert "not awaiting approval" in send(client, "approve VAL-0999")
 
@@ -171,6 +182,8 @@ def test_rejected_transfer_does_not_offer_an_active_approval_command(clear):
     assert "not currently accepting approval" in reply
     assert "**Approval required**" not in reply
     assert "To approve:" not in reply
+    decisions = desk.answer("what needs my decision?")
+    assert "Needs a human decision" in decisions and "To approve:" not in decisions
 
 
 class SlowAgents:
