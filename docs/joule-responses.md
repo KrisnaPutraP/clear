@@ -66,7 +66,11 @@ the Action agent and an approval.
 "What needs my decision?" lists each transfer awaiting approval (validation,
 case, shipment, transfer, recommended course, deferred orders) and each case
 needing a human decision with its reason, followed by **Approve** and
-**Reject** buttons for the first transfer.
+**Reject** buttons for the first transfer. When only human decisions wait,
+such as emergency sourcing after an escalation, the reply offers no
+approval: it says CLEAR cannot take these decisions and shows **Details**
+and **Show open cases** buttons instead. Asking to approve when no transfer
+is waiting says so and lists what is waiting.
 
 "Show the open cases" lists recorded case IDs, shipment IDs, exception
 descriptions, and statuses. Human decisions appear first, followed by
@@ -88,7 +92,8 @@ details requests do not submit events, create cases, or start agents.
 For a case, the reply contains:
 
 - The case, shipment, and status.
-- **Situation:** the recorded exception description.
+- **Situation:** the recorded exception description, and the latest event
+  when a later one changed the case, such as an ETA slip with the new ETA.
 - **Supply impact:** duration and prediction source, current coverage, and
   shortage.
 - **Recommended course:** the selected option, demand priorities, transfer,
