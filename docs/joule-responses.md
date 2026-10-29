@@ -1,8 +1,35 @@
-# Joule response format
+# Joule commands and case responses
 
 The A2A server formats a case from the existing rendered plan. It does not
 ask an LLM to rewrite the reply, recalculate quantities, or change the case.
 The Joule function already displays that text with Markdown enabled.
+
+## Commands
+
+| Intent | Example | Effect |
+|---|---|---|
+| Help | `help` | Lists commands and prepared events |
+| Case inbox | `show open cases`, `show cases`, `list cases` | Reads the shared case list |
+| Shipment or case status | `status of SHP-1001`, `status CASE-0001` | Reads shipment facts or the latest case plan |
+| Evidence and options | `details of SHP-1001`, `details CASE-0001` | Reads the full case explanation |
+| Start investigation | `work S1-DOC-HOLD` | Submits a prepared event and starts agents |
+| Approve transfer | `approve VAL-xxxx` | Records approval and starts the STO execution run |
+| Reject transfer | `reject VAL-xxxx because <reason>` | Records rejection and requests a human decision |
+| Reassess an ETA change | `work S1-ETA-SLIP` | Submits the follow-up event on the existing shipment case |
+
+Use actual case and validation IDs from the reply. The parser recognizes
+keywords and IDs, not unrestricted natural-language intent. For example,
+`check status SHP-1001` is accepted. Approvals must name the validation;
+rejections also need a reason. Status, details, and inbox requests are
+read-only. `work` starts handling an event, not closing the case. The current
+lifecycle has no separate closed status. Additional event IDs are listed
+by `help`.
+
+The demo's logistics events are prepared synthetic inputs. Submitting an
+event starts live agent reasoning when the backend uses the live model;
+it does not mean an external logistics subscription is connected. The
+separate scripted mode is for development. Coordinate event submissions,
+approvals, and resets with the presenter because data is shared.
 
 ## Case inbox
 
@@ -64,9 +91,13 @@ Replies use bold section labels, short metric lists, inline-code commands,
 and numbered follow-ups. These are text messages, not the Next.js dashboard
 or interactive Joule cards. Exact styling depends on Joule's renderer.
 
-The formatter is in `src/clear_app/joule.py`; routing, calculations, agent
-prompts, and approval requirements remain in their existing components.
-After reviewing and merging the change, the running A2A backend must be
-updated for Joule to show the new output. Editing local files alone does
-not change an already deployed server. No destination or credentials need
-to be included in this public formatting guide.
+Routing and response formatting are in `src/clear_app/joule.py`.
+Calculations, agent prompts, and approval requirements are unchanged by
+this presentation layer. Next.js reads structured data through FastAPI;
+it does not consume this Markdown response.
+
+Backend command and format changes require an A2A backend deployment.
+Capability or destination changes require the corresponding Joule
+configuration update as well. Editing local files alone does not change
+the deployed assistant. Account-specific deployment settings and
+credentials are kept outside this public guide.
