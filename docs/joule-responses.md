@@ -4,7 +4,17 @@ The A2A server formats a case from the existing rendered plan. It does not
 ask an LLM to rewrite the reply, recalculate quantities, or change the case.
 The Joule function already displays that text with Markdown enabled.
 
-## Status summary
+## Case inbox
+
+Ask `show open cases`, `show cases`, or `list cases` to see recorded case
+IDs, shipment IDs, exception descriptions, and statuses. Human decisions
+appear first, followed by approvals, active runs, and monitoring cases.
+Newest cases appear first within each group. Monitoring cases remain in
+the list: the current lifecycle has no separate closed status. These
+commands show the shared case inbox, not a user-specific assignment list.
+Listing cases does not create a case or start an investigation.
+
+## Case status
 
 Ask `status of SHP-1001` or `status CASE-0001`. The reply contains:
 

@@ -32,6 +32,10 @@ EVENTS = ["S1-DOC-HOLD", "S1-ETA-SLIP", "S2-CONGESTION"]
     ("Show the detailed plan for SHP-1001", Command("details", shipment_id="SHP-1001")),
     ("SHP-1002 is stuck at the port", Command("start", shipment_id="SHP-1002")),
     ("hello", Command("help")),
+    ("list cases", Command("list")),
+    ("Please show open cases", Command("list")),
+    ("SHOW THE ALL CASES", Command("list")),
+    ("approve VAL-0002 and show open cases", Command("approve", validation_id="VAL-0002")),
 ])
 def test_interpret(text, command):
     assert interpret(text, EVENTS) == command
@@ -80,6 +84,20 @@ def test_s1_through_joule(clear):
 
     assert "S1-ETA-SLIP" in send(client, "hello")
     assert "CASE-0001 · SHP-1001 · Monitoring" in send(client, "status of SHP-1001")
+
+
+def test_case_list_is_read_only_and_puts_approval_before_monitoring(clear):
+    client = TestClient(build_app(clear, "http://testserver/", wait_seconds=30))
+    assert "No cases have been created" in send(client, "show open cases")
+    assert clear.list_cases() == []
+    send(client, "work S1-DOC-HOLD")
+    send(client, "work S2-CONGESTION")
+    before = [clear.get_case(c["case_id"]) for c in clear.list_cases()]
+    answer = send(client, "list cases")
+    assert answer.index("CASE-0001") < answer.index("CASE-0002")
+    assert "Awaiting approval" in answer and "Monitoring" in answer
+    assert "Exception:" in answer and "status CASE-0001" in answer
+    assert [clear.get_case(c["case_id"]) for c in clear.list_cases()] == before
 
 
 def test_escalation_summary_keeps_the_decision_and_all_follow_up(clear):

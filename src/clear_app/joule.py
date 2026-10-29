@@ -44,11 +44,12 @@ _REJECT = re.compile(r"\breject(?:ed|s)?\b", re.IGNORECASE)
 _REASON = re.compile(r"\b(?:because|reason:?|due to)\s+(.+)", re.IGNORECASE | re.DOTALL)
 _STATUS = re.compile(r"\b(?:status|update|progress|plan|recommend\w*|happening|where are we)\b", re.IGNORECASE)
 _DETAILS = re.compile(r"\b(?:details?|detailed)\b", re.IGNORECASE)
+_LIST_CASES = re.compile(r"\b(?:list|show)\s+(?:the\s+)?(?:(?:all|open)\s+)?cases\b", re.IGNORECASE)
 
 
 @dataclass(frozen=True)
 class Command:
-    """What the planner asked for. kind: start, approve, reject, status, details, or help."""
+    """What the planner asked for: start, approve, reject, status, details, list, or help."""
 
     kind: str
     event_id: str | None = None
@@ -71,6 +72,8 @@ def interpret(text: str, event_ids: list[str]) -> Command:
     event = next((e for e in event_ids if e.lower() in text.lower()), None)
     if event:
         return Command("start", event_id=event)
+    if _LIST_CASES.search(text):
+        return Command("list")
     if _DETAILS.search(text):
         return Command("details", case_id=case, shipment_id=shipment)
     if case or _STATUS.search(text):
@@ -95,6 +98,8 @@ class CaseDesk:
                 return self._start(command, events)
             if command.kind in ("approve", "reject"):
                 return self._decide(command)
+            if command.kind == "list":
+                return self.list_cases()
             if command.kind in ("status", "details"):
                 case_id = command.case_id or self._latest_case(command.shipment_id)
                 if case_id is None:
@@ -105,6 +110,28 @@ class CaseDesk:
         except LookupError as error:
             return self._help(events, str(error))
         return self._help(events)
+
+    def list_cases(self) -> str:
+        """List recorded cases without starting agents; decisions come before monitoring."""
+        priority = {"needs_human_decision": 0, "awaiting_approval": 1,
+                    "analyzing": 2, "executing": 2, "monitoring": 3}
+        with self.clear.snapshot():
+            cases = self.clear.list_cases()
+            if not cases:
+                return ("**Cases**\n\nNo cases have been created yet. "
+                        "Use `help` to see available events, or `status of SHP-1001` to inspect a shipment.")
+            # Stable sorting preserves newest-first order within each priority.
+            cases = sorted(cases, key=lambda c: priority.get(c["status"], 4))
+            rows = []
+            for case in cases:
+                shipment = read.get_shipment(self.clear.store, case["shipment_id"])
+                exception = shipment.get("exception") or {}
+                label = view.STATUS.get(case["status"], (case["status"], ""))[0]
+                rows.append(f"**{case['case_id']} · {case['shipment_id']} · {label}**\n"
+                            f"  Exception: {exception.get('description') or exception.get('type') or 'None recorded'}\n"
+                            f"  Open: `status {case['case_id']}`")
+        return (_section("Cases", _bullets(rows)) +
+                "\n\nCases needing a human decision or approval appear first. Monitoring cases remain listed.")
 
     def describe(self, case_id: str, detailed: bool = False) -> str:
         """A scannable Markdown summary, with full evidence and rationale available on request.
@@ -238,6 +265,7 @@ class CaseDesk:
         paragraphs = [note] if note else []
         paragraphs.append("I am CLEAR. I resolve exceptions on inbound shipments. You can:")
         paragraphs.append(_bullets([
+            "list cases needing attention, for example: show open cases or list cases",
             "start an event from the logistics feed, for example: work S1-DOC-HOLD",
             "ask for the status of a case or shipment, for example: status of SHP-1001",
             "read the full evidence and assessed options, for example: details CASE-0001",
@@ -282,6 +310,9 @@ def agent_card(url: str) -> AgentCard:
         default_output_modes=["text"],
         capabilities=AgentCapabilities(streaming=False, push_notifications=False),
         skills=[
+            AgentSkill(id="list-cases", name="List cases",
+                       description="Lists recorded cases, with human decisions and approvals first.",
+                       tags=["cases", "planner inbox"], examples=["Show open cases", "List cases"]),
             AgentSkill(id="work-exception", name="Work a shipment exception",
                        description="Starts the agents on an event from the logistics feed.",
                        tags=["shipment exception", "customs hold", "port congestion"],
