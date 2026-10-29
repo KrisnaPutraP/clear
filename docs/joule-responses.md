@@ -16,6 +16,14 @@ Listing cases does not create a case or start an investigation.
 
 ## Case status
 
+Before a case exists, `status of SHP-1001` shows the recorded shipment
+status, purchase order, destination port, ETA, recorded exception, and
+latest event. Prepared demo events are labelled separately: they have not
+been submitted and are not evidence that the exception has occurred. The
+reply offers `work <event ID>` to submit the next prepared event and begin
+analysis. Status and details requests do not submit events, create cases,
+or start agents. Unknown shipment or case IDs return an explanatory reply.
+
 Ask `status of SHP-1001` or `status CASE-0001`. The reply contains:
 
 - The case, shipment, and status.

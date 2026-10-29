@@ -100,6 +100,37 @@ def test_case_list_is_read_only_and_puts_approval_before_monitoring(clear):
     assert [clear.get_case(c["case_id"]) for c in clear.list_cases()] == before
 
 
+def test_shipment_status_before_a_case_is_read_only(clear):
+    client = TestClient(build_app(clear, "http://testserver/", wait_seconds=30))
+    shipment_before = clear.store.read("logistics/shipments")
+    for command in ("status of SHP-1001", "details of SHP-1001"):
+        answer = send(client, command)
+        assert "SHP-1001 · Shipment status" in answer
+        assert "in_transit" in answer and "4500001021" in answer
+        assert "Tanjung Priok" in answer and "2026-10-31T14:00:00+07:00" in answer
+        assert "Recorded exception: None" in answer
+        assert "EV-1001-01" in answer
+        assert "Prepared demo events" in answer and "have not been submitted" in answer
+        assert "work S1-DOC-HOLD" in answer
+        assert "S2-CONGESTION" not in answer
+    assert clear.list_cases() == []
+    assert clear.store.read("logistics/shipments") == shipment_before
+    assert not clear.running
+    assert "Unknown shipment_id: SHP-9999" in send(client, "status of SHP-9999")
+    assert "Unknown" in send(client, "status CASE-9999")
+    assert clear.list_cases() == []
+
+
+def test_pre_case_status_preserves_a_recorded_exception(clear):
+    shipments = clear.store.read("logistics/shipments")
+    shipments[0]["exception"] = {"type": "customs_document_hold", "description": "Awaiting corrected invoice."}
+    clear.store.write("logistics/shipments", shipments)
+    answer = CaseDesk(clear).answer("status of SHP-1001")
+    assert "Recorded exception: Awaiting corrected invoice." in answer
+    assert "Analysis has not started" in answer
+    assert clear.list_cases() == []
+
+
 def test_escalation_summary_keeps_the_decision_and_all_follow_up(clear):
     desk = CaseDesk(clear, wait_seconds=30)
     desk.answer("work S1-DOC-HOLD")

@@ -103,6 +103,8 @@ class CaseDesk:
             if command.kind in ("status", "details"):
                 case_id = command.case_id or self._latest_case(command.shipment_id)
                 if case_id is None:
+                    if command.shipment_id:
+                        return self.shipment_status(command.shipment_id, events)
                     return self._help(events, f"There is no case for {command.shipment_id or 'any shipment'} yet.")
                 return self.describe(case_id, detailed=command.kind == "details")
         except RuntimeError as error:  # An agent run is already in progress.
@@ -132,6 +134,33 @@ class CaseDesk:
                             f"  Open: `status {case['case_id']}`")
         return (_section("Cases", _bullets(rows)) +
                 "\n\nCases needing a human decision or approval appear first. Monitoring cases remain listed.")
+
+    def shipment_status(self, shipment_id: str, events: list[dict]) -> str:
+        """Read the recorded shipment before a case exists, without submitting an event."""
+        with self.clear.snapshot():
+            shipment = read.get_shipment(self.clear.store, shipment_id)
+        exception = shipment.get("exception") or {}
+        paragraphs = [_section(f"{shipment_id} · Shipment status", _bullets([
+            f"Status: {shipment['status']}",
+            f"Purchase order: {shipment['purchase_order']}",
+            f"Destination port: {shipment['port_of_discharge']}",
+            f"ETA: {shipment['eta']}",
+            f"Recorded exception: {exception.get('description') or exception.get('type') or 'None'}",
+        ])), "No case has been created for this shipment. Analysis has not started."]
+        if shipment.get("events"):
+            latest = shipment["events"][-1]
+            paragraphs.append(_section("Latest recorded event",
+                                       f"{latest['event_id']}: {latest['description']}"))
+        recorded = {event["event_id"] for event in shipment.get("events", [])}
+        available = [e for e in events if e["shipment_id"] == shipment_id and e["event_id"] not in recorded]
+        if available:
+            paragraphs.append(_section("Prepared demo events", _bullets(
+                f"{event['event_id']}: {event['description']}" for event in available)))
+            paragraphs.append("These events have not been submitted. To submit the next demo event and start "
+                              f"CLEAR's analysis: `work {available[0]['event_id']}`.")
+        else:
+            paragraphs.append("There are no new prepared demo events for this shipment.")
+        return "\n\n".join(paragraphs)
 
     def describe(self, case_id: str, detailed: bool = False) -> str:
         """A scannable Markdown summary, with full evidence and rationale available on request.
@@ -267,7 +296,7 @@ class CaseDesk:
         paragraphs.append(_bullets([
             "list cases needing attention, for example: show open cases or list cases",
             "start an event from the logistics feed, for example: work S1-DOC-HOLD",
-            "ask for the status of a case or shipment, for example: status of SHP-1001",
+            "inspect a shipment before analysis or read its case status: status of SHP-1001",
             "read the full evidence and assessed options, for example: details CASE-0001",
             "approve or reject a validated transfer: approve VAL-0002, or reject VAL-0002 because <reason>",
         ]))
@@ -318,7 +347,8 @@ def agent_card(url: str) -> AgentCard:
                        tags=["shipment exception", "customs hold", "port congestion"],
                        examples=["Work S1-DOC-HOLD", "SHP-1002 is delayed by yard congestion"]),
             AgentSkill(id="case-status", name="Case status",
-                       description="The case status, the predicted resolution time, and the recommended option.",
+                       description="Recorded shipment status before analysis; case status, predicted resolution "
+                                   "time, and the recommended option when a case exists.",
                        tags=["status", "recovery plan"], examples=["Status of SHP-1001", "Details of SHP-1001"]),
             AgentSkill(id="decide-transfer", name="Approve or reject a transfer",
                        description="Records the planner's decision on a validated stock transport order.",
