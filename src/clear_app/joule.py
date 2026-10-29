@@ -43,7 +43,7 @@ from clear_app.joule_intent import Intent
 from clear_tools import read
 
 APPROVER = "Planner via Joule"
-WAIT_SECONDS = 40  # Joule waits 60 s for an answer; leave room for the network and the reply.
+WAIT_SECONDS = 35  # Joule waits 60 s: leave room for reading the message, the network, and the reply.
 LOG_LINES = 4  # Latest timeline steps shown while a run is in progress.
 CONFIRM_SECONDS = 600  # How long a confirmation code stays valid.
 _CODE_ALPHABET = "BCDFGHJKLMNPQRSTVWXZ23456789"  # No vowels, so a code never spells a word.
@@ -379,15 +379,14 @@ class CaseDesk:
                     if recommended:
                         lines.append(f"  Recommended: {recommended['option']}; "
                                      f"deferred orders: {recommended['deferred_orders']}")
-                    lines += [f"  To approve: `approve {validation_id}`",
-                              f"  To reject: `reject {validation_id} because your reason`"]
                     rows.append("\n".join(lines))
         lead = f"{note}\n\n" if note else ""
         if not rows:
             return Reply(lead + _section("Decisions", "Nothing is waiting for your decision.") +
                          "\n\nTo see every case: `list cases`.")
         return Reply(lead + _section("Decisions waiting for you", _bullets(rows)) +
-                     "\n\nApproving or rejecting asks you to confirm first; nothing changes until you do.",
+                     "\n\nPress **Approve** or **Reject**, or tell me in your own words which transfer and "
+                     "what you decide. You confirm before anything changes.",
                      self._decision_buttons(first) if first else None)
 
     def shipment_status(self, shipment_id: str, events: list[dict]) -> str:
@@ -432,7 +431,7 @@ class CaseDesk:
         if case["running"] and case["status"] in ("analyzing", "executing"):
             paragraphs.append(_section("Work in progress", "The agents are working. Latest steps:\n\n" +
                                       _bullets(f"{e['actor']}: {e['summary']}" for e in log[-LOG_LINES:])))
-            paragraphs.append(f"Check again in a minute: `status of {case['shipment_id']}`.")
+            paragraphs.append("Press **Refresh status** in a minute, or ask me for the status again.")
             return "\n\n".join(paragraphs)
         if case["status_reason"] and not (plan and plan["escalation"] == case["status_reason"]):
             paragraphs.append(_section("Case update", case["status_reason"]))
@@ -471,8 +470,8 @@ class CaseDesk:
                 paragraphs.append(_section("Approval required", _bullets([
                     f"Transfer: **{move}**",
                     f"Validation: `{action['validation_id']}` - passed the business rules",
-                ]) + f"\n\nTo approve: `approve {action['validation_id']}`"
-                     f"\n\nTo reject: `reject {action['validation_id']} because your reason`"))
+                ]) + "\n\nPress **Approve** or **Reject** below, or tell me in your own words. "
+                     "You confirm before anything changes."))
             elif action["sto"]:
                 approval = action["approval"]
                 paragraphs.append(_section("Transfer recorded",
@@ -496,7 +495,8 @@ class CaseDesk:
                        for row in rows]
             paragraphs.append(_section("Assessed options", _bullets(options)))
         else:
-            paragraphs.append(f"For full evidence, rationale, and assessed options: `details {case['case_id']}`.")
+            paragraphs.append(f"For the full evidence, rationale, and assessed options, ask for the details "
+                              f"of {case['case_id']}.")
         return "\n\n".join(paragraphs)
 
     def _start(self, command: Command, events: list[dict]) -> Reply:
@@ -522,15 +522,17 @@ class CaseDesk:
 
     def _help(self, events: list[dict], note: str | None = None) -> str:
         paragraphs = [note] if note else []
-        paragraphs.append("I am CLEAR. I resolve exceptions on inbound shipments. You can:")
+        paragraphs.append("I am CLEAR. I resolve exceptions on inbound shipments. Tell me in your own words, "
+                          "in English or Indonesian, for example:")
         paragraphs.append(_bullets([
-            "list cases needing attention, for example: show open cases or list cases",
-            "start an event from the logistics feed, for example: work S1-DOC-HOLD",
-            "inspect a shipment before analysis or read its case status: status of SHP-1001",
-            "read the full evidence and assessed options, for example: details CASE-0001",
-            "see what needs your decision: what needs my decision?",
-            "approve or reject a validated transfer, in your own words; you confirm before anything changes",
+            "What needs my decision?",
+            "Show the open cases.",
+            "How is shipment SHP-1001 doing?",
+            "Why not transfer everything?",
+            "Work S1-DOC-HOLD (an event from the feed below).",
+            "Approve the transfer, or: do not approve yet, wait for customs.",
         ]))
+        paragraphs.append("Approving or rejecting always shows a preview first; nothing changes until you confirm.")
         paragraphs.append("Events in the feed:")
         paragraphs.append(_bullets(f"{e['event_id']} ({e['shipment_id']}): {e['description']}" for e in events))
         latest = self._latest_case()
@@ -583,7 +585,8 @@ def agent_card(url: str) -> AgentCard:
         skills=[
             AgentSkill(id="list-cases", name="List cases",
                        description="Lists recorded cases, with human decisions and approvals first.",
-                       tags=["cases", "planner inbox"], examples=["Show open cases", "List cases"]),
+                       tags=["cases", "planner inbox"],
+                       examples=["Show open cases", "What needs my decision?"]),
             AgentSkill(id="work-exception", name="Work a shipment exception",
                        description="Starts the agents on an event from the logistics feed.",
                        tags=["shipment exception", "customs hold", "port congestion"],
@@ -591,11 +594,14 @@ def agent_card(url: str) -> AgentCard:
             AgentSkill(id="case-status", name="Case status",
                        description="Recorded shipment status before analysis; case status, predicted resolution "
                                    "time, and the recommended option when a case exists.",
-                       tags=["status", "recovery plan"], examples=["Status of SHP-1001", "Details of SHP-1001"]),
+                       tags=["status", "recovery plan"],
+                       examples=["How is shipment SHP-1001 doing?", "Why not transfer everything?"]),
             AgentSkill(id="decide-transfer", name="Approve or reject a transfer",
-                       description="Records the planner's decision on a validated stock transport order.",
+                       description="Takes the planner's decision on a validated stock transport order, in their "
+                                   "own words, and records it only after they confirm.",
                        tags=["approval", "stock transport order"],
-                       examples=["approve VAL-0002", "reject VAL-0002 because plant 1200 needs the stock"]),
+                       examples=["Approve the transfer", "Do not approve yet, wait for customs",
+                                 "Reject it, plant 1200 needs the stock"]),
         ],
     )
 

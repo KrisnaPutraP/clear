@@ -84,12 +84,12 @@ def test_s1_through_joule(clear):
     assert "Predicted resolution: **3 days**" in answer
     assert "**Supply impact**" in answer
     assert "**Approval required**" in answer
-    assert "details CASE-0001" in answer
-    validation_id = re.search(r"approve (VAL-\d{4})", answer).group(1)
+    assert "ask for the details of CASE-0001" in answer
+    validation_id = re.search(r"Validation: `(VAL-\d{4})`", answer).group(1)
 
     # Nothing below changes the case until a confirmation code comes back.
     reply = send(client, "approve it")
-    assert f"approve {validation_id}" in reply and "nothing changes until you do" in reply
+    assert validation_id in reply and "You confirm before anything changes" in reply
     assert "nothing changed" in send(client, f"do not approve {validation_id}").lower()
     assert "Decisions waiting for you" in send(client, f"should I approve {validation_id}?")
     assert "Why do you reject" in send(client, f"reject {validation_id}")

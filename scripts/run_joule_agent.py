@@ -5,12 +5,13 @@ AGENTCORE_GATEWAY_TOOLS_URL set (as for the UI), the tools run behind the
 gateway on the DynamoDB table; otherwise in this process on data/runtime.
 Settings in .env: CLEAR_A2A_URL, the public URL Joule reaches this server at
 (it goes into the agent card); CLEAR_A2A_USER and CLEAR_A2A_PASSWORD, the
-Basic credentials of the BTP destination.
+Basic credentials of the BTP destination. The agents' model also reads the
+planner's messages (clear_app.joule_intent).
 
 Usage:
     python scripts/run_joule_agent.py              # port 10000
     python scripts/run_joule_agent.py --port 8080
-    python scripts/run_joule_agent.py --scripted   # scripted model, for trying the conversation only
+    python scripts/run_joule_agent.py --scripted   # scripted model and keyword rules, for trying the conversation
 
 On Cloud Foundry (manifest.yml) it listens on all interfaces at the port in PORT.
 """
